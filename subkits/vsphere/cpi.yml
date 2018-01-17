@@ -1,0 +1,43 @@
+---
+meta:
+  vsphere:
+    ephemeral:  (( join "|" params.vsphere_ephemeral_datastores ))
+    persistent: (( join "|" params.vsphere_persistent_datastores ))
+
+params:
+  vsphere_ip:                    (( param "Please specify the IP address of your vSphere vCenter" ))
+  vsphere_ephemeral_datastores:  (( param "Please specify your vSphere ephemeral datastore pattern" ))
+  vsphere_persistent_datastores: (( param "Please specify your vSphere persistent datastore pattern" ))
+  vsphere_clusters:              (( param "Please specify your vSphere clusters" ))
+  vsphere_datacenter:            (( param "Please specify your vSphere Datacenter Name" ))
+
+releases:
+  - name:    bosh-vsphere-cpi
+    version: '45'
+    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-vsphere-cpi-release?v=45
+    sha1:    b5f3c53c800d6c8a9182b263ec239a952f33ba67
+
+instance_groups:
+  - name: blacksmith
+    jobs:
+      - { release: bosh-vsphere-cpi, name: vsphere_cpi }
+
+    properties:
+      director:
+        cpi_job: vsphere_cpi
+
+      vcenter:
+        address:  (( grab params.vsphere_ip ))
+        user:     (( vault meta.vault "/vsphere:user"     ))
+        password: (( vault meta.vault "/vsphere:password" ))
+
+        datacenters:
+          - name:     (( grab params.vsphere_datacenter ))
+            clusters: (( grab params.vsphere_clusters   ))
+
+            vm_folder:       (( concat params.env "/vms"       ))
+            template_folder: (( concat params.env "/templates" ))
+            disk_path:       (( concat params.env "/disks"     ))
+
+            datastore_pattern:            (( concat "^(" meta.vsphere.ephemeral  ")$" ))
+            persistent_datastore_pattern: (( concat "^(" meta.vsphere.persistent ")$" ))

@@ -1,0 +1,29 @@
+---
+meta:
+  default:
+    rabbitmq_plans:
+      standalone:
+        name: standalone
+        description: A dedicated RabbitMQ server, with no redundancy or replication
+        limit: 7
+        type: standalone
+        vm_type: default
+
+releases:
+  - name:    rabbitmq-forge
+    version: 0.0.1
+    url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v0.0.1/rabbitmq-forge-0.0.1.tgz
+    sha1:    20c3d34f1dd1609924022f1509899f2d363fb557
+
+params:
+  releases:
+    - (( append ))
+    - (( grab releases.rabbitmq-forge ))
+
+instance_groups:
+  - name: blacksmith
+    jobs:
+      - release: rabbitmq-forge
+        name:    rabbitmq-blacksmith-plans
+        properties:
+          plans: (( grab params.rabbitmq_plans || meta.default.rabbitmq_plans ))

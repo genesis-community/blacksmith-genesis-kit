@@ -1,0 +1,27 @@
+---
+meta:
+  vault: (( concat "secret/" params.vault ))
+
+instance_groups:
+  - name:      blacksmith
+    instances: 1
+    stemcell:  default
+    azs:             (( grab params.availability_zones ))
+    vm_type:         (( grab params.vm_type ))
+    persistent_disk: (( grab params.disk_size ))
+    networks:
+      - name:       (( grab params.network ))
+        static_ips: [(( grab params.ip ))]
+
+stemcells:
+  - alias: default
+    os:      (( grab params.stemcell_os ))
+    version: (( grab params.stemcell_version ))
+
+update:
+  serial: false
+  canaries: 1
+  canary_watch_time: 30000-600000
+  update_watch_time: 5000-600000
+  max_in_flight: 1
+  max_errors: 1

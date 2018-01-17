@@ -1,0 +1,29 @@
+---
+meta:
+  default:
+    redis_plans:
+      standalone:
+        name: standalone
+        description: A dedicated Redis server, with no redundancy or replication
+        limit: 7
+        type: standalone
+        vm_type: default
+
+releases:
+  - name:    redis-forge
+    version: 0.0.1
+    url:     https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v0.0.1/redis-forge-0.0.1.tgz
+    sha1:    7e6b9367aea43a90db1078d4e8997d3da4589df4
+
+params:
+  releases:
+    - (( append ))
+    - (( grab releases.redis-forge ))
+
+instance_groups:
+  - name: blacksmith
+    jobs:
+      - release: redis-forge
+        name:    redis-blacksmith-plans
+        properties:
+          plans: (( grab params.redis_plans || meta.default.redis_plans ))

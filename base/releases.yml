@@ -1,0 +1,11 @@
+---
+releases:
+  - name:    blacksmith
+    version: 0.0.4
+    url:     https://github.com/cloudfoundry-community/blacksmith-boshrelease/releases/download/v0.0.4/blacksmith-0.0.4.tgz
+    sha1:    d45bb4b812f86482723eaede8969f15cea41f4db
+
+  - name:    bosh
+    version: "264.5.0"
+    url:     https://s3.amazonaws.com/bosh-compiled-release-tarballs/bosh-264.5.0-ubuntu-trusty-3468.13-20171214-231004-994547171-20171214231009.tgz?versionId=66MJhlOuDZn3SM18oBXxVP6DuV2BOXZi
+    sha1:    0ff5b856bbdb901691e98283823fd1f112768569

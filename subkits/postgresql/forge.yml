@@ -1,0 +1,38 @@
+---
+meta:
+  default:
+    postgresql_plans:
+      standalone:
+        name: standalone
+        description: A dedicated PostgreSQL server, with no redundancy or replication
+        limit: 7
+        type: standalone
+        vm_type: default
+      cluster:
+        name: cluster
+        description: A 3-node PostgreSQL replicated cluster, with PGPoolII front-end
+        limit: 4
+        type: cluster
+        vm_type: default
+
+releases:
+  - name:    postgresql-forge
+    version: 0.0.1
+    url:     https://github.com/blacksmith-community/postgresql-forge-boshrelease/releases/download/v0.0.1/postgresql-forge-0.0.1.tgz
+    sha1:    edc19a48fe6bd367c64a4cdd00617e2d75c55dad
+
+params:
+  releases:
+    - (( append ))
+    - name:    postgres
+      version: 2.0.0
+      url:     https://github.com/cloudfoundry-community/postgres-boshrelease/releases/download/v2.0.0/postgres-2.0.0.tgz
+      sha1:    dea5cad517c62afaf97a1b31df41ad691928d960
+
+instance_groups:
+  - name: blacksmith
+    jobs:
+      - release: postgresql-forge
+        name:    postgresql-blacksmith-plans
+        properties:
+          plans: (( grab params.postgresql_plans || meta.default.postgresql_plans ))

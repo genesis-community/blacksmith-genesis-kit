@@ -1,0 +1,69 @@
+---
+name:     Blacksmith
+author:   James Hunt <james@niftylogic.com>
+homepage: https://github.com/cloudfoundry-community/blacksmith-boshrelease
+github:   https://github.com/genesis-community/blacksmith-genesis-kit
+
+subkits:
+  - prompt: What IaaS will Blacksmith deploy on-demand services to?
+    type: subkit
+    choices:
+      - subkit: vsphere
+        label: vSphere
+
+#  - prompt: Which on-demand services do you want?
+#    type: list
+#    choices:
+#      - subkit: redis
+#        label: Redis Key-Value Storage
+#      - subkit: rabbitmq
+#        label: RabbitMQ messaging queue
+#      - subkit: postgresql
+#        label: PostrgreSQL RDBMS
+
+params:
+  base:
+    - param: ip
+      ask:   What IP should I assign to the Blacksmith Broker?
+      description: |
+        Blacksmith needs to be given a static IP address so that it can
+        be registered with your Cloud Foundry reliably.
+
+certificates:
+  base:
+    tls:
+      ca: {valid_for: 1y}
+      director:
+        valid_for: 1y
+        names:
+          - ${params.ip}
+
+    tls/nats:
+      ca: {valid_for: 1y}
+      server:
+        valid_for: 1y
+        names:
+          - default.nats.bosh-internal
+          - ${params.ip}
+      director:
+        valid_for: 1y
+        names:
+          - default.director.bosh-internal
+      hm:
+        valid_for: 1y
+        names:
+          - default.hm.bosh-internal
+
+credentials:
+  base:
+    broker:             {password: random 64}
+
+    db:                 {password: random 64}
+    nats:               {password: random 64}
+    blobstore/agent:    {password: random 64}
+    blobstore/director: {password: random 64}
+
+    users/admin:        {password: random 64}
+    users/hm:           {password: random 64}
+    users/blacksmith:   {password: random 64}
+

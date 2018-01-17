@@ -1,0 +1,22 @@
+---
+instance_groups:
+  - name: blacksmith
+    jobs:
+      - release: blacksmith
+        name:    blacksmith
+        properties:
+          debug: (( grab params.blacksmith_debug ))
+          env:   (( grab params.blacksmith_env ))
+
+          broker:
+            port:     (( grab params.blacksmith_port ))
+            username: blacksmith
+            password: (( vault meta.vault "/broker:password" ))
+
+          bosh:
+            username: blacksmith
+            password: (( vault meta.vault "/users/blacksmith:password" ))
+            address:  (( concat "https://" params.ip ":25555" ))
+            stemcells:    (( grab params.stemcells ))
+            releases:     (( grab params.releases ))
+            cloud-config: (( grab params.cloud_config ))
