@@ -4,30 +4,8 @@ author:   James Hunt <james@niftylogic.com>
 homepage: https://github.com/cloudfoundry-community/blacksmith-boshrelease
 github:   https://github.com/genesis-community/blacksmith-genesis-kit
 
-subkits:
-  - prompt: What IaaS will Blacksmith deploy on-demand services to?
-    type: subkit
-    choices:
-      - subkit: vsphere
-        label: vSphere
-
-#  - prompt: Which on-demand services do you want?
-#    type: list
-#    choices:
-#      - subkit: redis
-#        label: Redis Key-Value Storage
-#      - subkit: rabbitmq
-#        label: RabbitMQ messaging queue
-#      - subkit: postgresql
-#        label: PostrgreSQL RDBMS
-
-params:
-  base:
-    - param: ip
-      ask:   What IP should I assign to the Blacksmith Broker?
-      description: |
-        Blacksmith needs to be given a static IP address so that it can
-        be registered with your Cloud Foundry reliably.
+subkits: []
+params: {}
 
 certificates:
   base:
