@@ -1,0 +1,148 @@
+#!/bin/bash
+
+cpis=0
+forges=0
+
+read -r -d '' CPI_USAGE <<EOF
+  BOSH Director Cloud Provider Interfaces
+  (you need *exactly one* of these)
+
+     vsphere  - VMWare's vSphere ESXi+vCenter
+EOF
+read -r -d '' FORGE_USAGE <<EOF
+  Blacksmith Forges
+  (you need *at least one* of these)
+
+     redis      - Redis Key-Value storage, available
+                  as dedicated, single-instance VMs.
+
+     rabbitmq   - RabbitMQ messaging queue, available
+                  as standalone VMs and clustered.
+
+     postgresql - PostgreSQL database server, available
+                  as standalone VMs and clustered with
+                  replication.
+EOF
+
+declare -a yamls
+yamls+=( base/*.yml )
+
+declare -a features
+features+=( vsphere redis rabbitmq postgresql )
+
+invalid_features() {
+  declare -a bad_ones
+  for have in "${GENESIS_ENV_FEATURES[@]}"; do
+    local ok=0
+    for valid in "$@"; do
+      if [[ "${have}" = "${valid}" ]]; then
+        ok=1
+        break;
+      fi
+    done
+    if [[ $ok = 0 ]]; then
+      bad_ones+=( $have )
+    fi
+  done
+  echo "${bad_ones[@]}"
+  return 0
+}
+
+valid_features() {
+  for have in "${GENESIS_ENV_FEATURES[@]}"; do
+    local ok=0
+    for valid in "$@"; do
+      if [[ "${have}" = "${valid}" ]]; then
+        ok=1
+        break;
+      fi
+    done
+    if [[ $ok = 0 ]]; then
+      return 1
+    fi
+  done
+  return 0
+}
+
+validate_features() {
+  if ! valid_features "$@"; then
+    echo >&2 "$GENESIS_KIT_NAME/$GENESIS_KIT_VERSION does not understand the following feature flags:"
+    for bad in $(invalid_features "$@"); do
+      echo >&2 " - $bad"
+    done
+    exit 1
+  fi
+}
+
+want_feature() {
+  want=$1
+  for have in "${GENESIS_ENV_FEATURES[@]}"; do
+    if [[ "${have}" = "${want}" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+#######################################
+
+GENESIS_ENV_FEATURES=($@)
+
+validate_features ${features[@]};
+
+if ! valid_features ${features[@]}; then
+  echo >&2 "Unrecognized feature flags:"
+  for x in $(invalid_features ${features[@]}); do
+    echo >&2 " - $x"
+  done
+  echo >&2
+  cat >&2 <<EOF
+Unrecognized features:
+This Genesis kit knows about the following subkits:
+
+$CPI_USAGE
+
+
+$FORGE_USAGE
+
+EOF
+  exit 1
+fi
+
+#######################################
+
+if want_feature vsphere; then
+  yamls+=( subkits/vsphere/*.yml )
+else
+  cat >&2 <<EOF
+You have not specified a BOSH Director Cloud Provider Interface
+subkit.  Blacksmith needs to know how to talk to the IaaS layer
+you wish to use to deploy on-demand services.
+
+$CPI_USAGE
+
+EOF
+  exit 1
+fi
+
+forges=0
+for forge in redis rabbitmq postgresql; do
+  if want_feature $forge; then
+    forges=1
+    yamls+=( subkits/$forge/*.yml )
+  fi
+done
+if [[ $forges -ne 1 ]]; then
+  cat >&2 <<EOF
+You have not specified any Blacksmith Forges to use.
+Each Forge provides the necessary bits to deploy an entire class
+of on-demand service, i.e. PostgreSQL database servers.
+
+$FORGE_USAGE
+
+EOF
+  exit 1
+fi
+
+
+echo "${yamls[@]}"
