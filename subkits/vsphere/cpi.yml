@@ -11,6 +11,12 @@ params:
   vsphere_clusters:              (( param "Please specify your vSphere clusters" ))
   vsphere_datacenter:            (( param "Please specify your vSphere Datacenter Name" ))
 
+  stemcells:
+    - name:    bosh-vsphere-esxi-ubuntu-trusty-go_agent
+      version: '3468.17'
+      url:     https://bosh.io/d/stemcells/bosh-vsphere-esxi-ubuntu-trusty-go_agent?v=3468.17
+      sha1:    1691f18b9141ac59aec893a1e8437a7d68a88038
+
 releases:
   - name:    bosh-vsphere-cpi
     version: '45'
