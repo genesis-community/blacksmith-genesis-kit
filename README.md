@@ -119,11 +119,11 @@ the parameters that let you do that:
   This defaults to `latest`, which is usually what you want.
 
 - **network** - The name of the `network` (per cloud-config) where
-  the blacksmith broker will be deployed.  Defaults to `default`.
+  the blacksmith broker will be deployed.  Defaults to `blacksmith`.
 
 - **vm_type** - The name of the `vm_type` (per cloud-config) that
   will be used to deploy the blacksmith broker VM.  Defaults to
-  `default`.
+  `blacksmith`.
 
 - **disk_size** - How big of a data disk to provide the Blacksmith
   broker, for persistent storage.  Defaults to `20480` (20G).
