@@ -155,7 +155,7 @@ the parameters that let you do that:
   differentiate Blacksmith brokers in their management UIs.
   Defaults to empty, but you probably want to set this.
 
-### Blacksmith Broker Deployment
+### Blacksmith BOSH Director Deployment
 
 - **cloud_config** - A YAML chunk that defines an entire BOSH v2
   cloud-config that Blacksmith will deploy to its internal BOSH
