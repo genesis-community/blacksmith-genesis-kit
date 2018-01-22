@@ -7,7 +7,8 @@ API.  These services will be backed by real VMs, running under the
 watchful eye of a dedicated BOSH director.
 
 For more information on Blacksmith itself, check out the
-[Blacksmith Project Page on Github][blacksmith].
+[Blacksmith Project Page on Github][blacksmith] and the
+[Blacksmith BOSH Release Docs][blacksmith-bosh].
 
 Quick Start
 -----------
@@ -177,6 +178,7 @@ the parameters that let you do that:
 [1]: https://github.com/genesis-community/blacksmith-genesis-kit/issues
 
 [blacksmith]: https://github.com/cloudfoundry-community/blacksmith
+[blacksmith-bosh]: https://github.com/cloudfoundry-community/blacksmith-boshrelease
 
 [postgresql-forge]: https://github.com/blacksmith-community/postgresql-forge-boshrelease
 [rabbitmq-forge]:   https://github.com/blacksmith-community/rabbitmq-forge-boshrelease
