@@ -1,0 +1,125 @@
+#!/bin/bash
+set -u
+
+back="\e[0m"
+red="\e[1;31m"
+green="\e[1;32m"
+yellow="\e[1;33m"
+blue="\e[1;34m"
+purple="\e[1;35m"
+cyan="\e[1;36m"
+
+
+panic() {
+	printf >&2 "${red}THIS KIT IS BROKEN{$back}\n"
+	echo >&2 "$*"
+	exit 2
+}
+
+is_ipv4() {
+	echo "${1:-}" | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+'
+	return $?
+}
+
+VCENTER_IP=
+prompt_for_iaas_vsphere() {
+	while true; do
+		printf "What is your ${cyan}vCenter IP${back}?\n"
+		printf "> "
+		read -r VCENTER_IP
+		if [[ -n $VCENTER_IP ]]; then
+			printf "using vcenter ip '${VCENTER_IP}'\n"
+			printf "\n\n"
+			return
+		fi
+	done
+}
+
+IAAS=
+prompt_for_iaas() {
+	printf "Blacksmith will deploy its own BOSH director to\n"
+	printf "facilitate the deployment of standalone services.\n"
+	printf "To do so, it needs  to know what IaaS to target\n\n"
+
+	printf "${red}NOTE: BLACKSMITH CURRENTLY ONLY SUPPORT${back} ${purple}VSPHERE${back}\n\n"
+
+	IAAS=vsphere
+
+	case "${IAAS}" in
+	vsphere) prompt_for_iaas_vsphere ;;
+	*) panic "unhandled iaas '${IAAS}'"
+	esac
+}
+
+FORGE_LIST=
+prompt_for_forges() {
+	try=1
+	while true; do
+		if [[ $try == 1 ]]; then
+			printf "Blacksmith Forges allow you to deploy different\n"
+			printf "types of services, on-demand.  This kit provides\n"
+			printf "builtin support for the following:\n\n"
+
+			printf "  ${green}redis${back})       Redis Key-Value store (persistent or cache)\n"
+			printf "  ${green}postgresql${back})  PostgreSQL standalone and clustered databases\n"
+			printf "  ${green}rabbitmq${back})    RabbitMQ message bus clusters\n\n"
+
+			printf "Which ${cyan}Blacksmith Forges${back} would you like to activate?\n"
+			printf "(separate multiple forges with spaces)\n"
+		fi
+		try=$(( try + 1 ))
+
+		printf "> "
+		read -r FORGE_LIST
+		if [[ -n $FORGE_LIST ]]; then
+			local ok=1
+			for f in $FORGE_LIST; do
+				case "${f}" in
+				redis|postgresql|rabbitmq) ;;
+				*) printf >&2 "  ${red}error${back}: unrecognized forge ${red}${f}${back}\n"
+				   ok=0
+				esac
+			done
+			if [[ $ok == 1 ]]; then
+				return
+			fi
+			printf "\n"
+		fi
+	done
+}
+
+BROKER_IP=
+prompt_for_broker_ip() {
+	while true; do
+		printf "What ${cyan}static IP${back} do you want Blacksmith to live at?\n"
+		printf "> "
+		read -r BROKER_IP
+		if [[ -n $BROKER_IP ]] && is_ipv4 $BROKER_IP; then
+			printf "using broker ip '${BROKER_IP}'\n"
+			printf "\n"
+			return
+		fi
+	done
+}
+
+prompt_for_iaas
+prompt_for_broker_ip
+prompt_for_forges
+
+echo; echo; echo
+printf "Generating your ${purple}new Genesis Environment${back}...\n\n\n"
+
+cat <<EOF
+---
+kit:
+  features:
+    - $IAAS
+EOF
+for forge in $FORGE_LIST; do
+  echo "    - $forge"
+done
+cat <<EOF
+
+params:
+  ip: $BROKER_IP
+EOF
