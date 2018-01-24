@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# ci/scripts/testflight
+#
+# Script for testing a Genesis Kit
+#
+# author:  James Hunt <james@niftylogic.com>
+# created: 2018-01-23
+#
+
+set -eu
+
+: ${BOSH_ENVIRONMENT:?required}
+: ${BOSH_CA_CERT:?required}
+: ${BOSH_CLIENT:?required}
+: ${BOSH_CLIENT_SECRET:?required}
+
+header() {
+	echo
+	echo "###############################################"
+	echo
+	echo $*
+	echo
+}
+
+header "Setting up Genesis *-deployments/ directory..."
+rm -rf work/; mkdir -p work/
+genesis -C work/ init -L kit/
+
+header "Copying test environment YAMLs from \$kit/ci/envs..."
+cp -av kit/ci/envs/*.yml work/*-deployments/
+
+header "Handing off to \$kit/ci/test..."
+cd work/*-deployments
+../../kit/ci/test
+
+echo
+echo "SUCCESS"
+exit 0
