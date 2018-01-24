@@ -23,6 +23,10 @@ header() {
 	echo
 }
 
+header "Setting up git..."
+git config --global user.name  $GIT_NAME
+git config --global user.email $GIT_EMAIL
+
 header "Setting up Genesis *-deployments/ directory..."
 rm -rf work/; mkdir -p work/
 genesis -C work/ init -L ../kit/

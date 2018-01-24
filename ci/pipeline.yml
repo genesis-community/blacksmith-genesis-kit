@@ -28,7 +28,7 @@ meta:
     tag: latest
 
   aws:
-    bucket:      genesis-ci
+    bucket:      genesis-pipeline
     region_name: us-east-1
     access_key: (( param "Please set your AWS Access Key ID for your pipeline S3 Bucket" ))
     secret_key: (( param "Please set your AWS Secret Key ID for your pipeline S3 Bucket" ))
@@ -93,6 +93,8 @@ jobs:
               path: ./kit/ci/scripts/testflight
               args: []
             params:
+              GIT_NAME:             (( grab meta.git.name ))
+              GIT_EMAIL:            (( grab meta.git.email ))
               BOSH_ENVIRONMENT:     (( grab meta.bosh.uri ))
               BOSH_CA_CERT:         (( grab meta.bosh.cacert ))
               BOSH_CLIENT:          (( grab meta.bosh.username ))
