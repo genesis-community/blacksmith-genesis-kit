@@ -6,7 +6,7 @@ meta:
   url:     https://10.200.131.2.netip.cc
 
   bosh:
-    uri:      https://10.58.111.49:25555
+    uri:      (( vault "secret/pipelines/genesis-ci/bosh:uri" ))
     username: (( vault "secret/pipelines/genesis-ci/admin:username" ))
     password: (( vault "secret/pipelines/genesis-ci/admin:password" ))
     cacert:   (( vault "secret/pipelines/genesis-ci/ca:certificate" ))
