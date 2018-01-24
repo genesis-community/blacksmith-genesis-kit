@@ -8,7 +8,7 @@ kit:
 
 params:
   env:   ci-baseline
-  vault: ci/blacksmith/ci/baseline
+  vault: genesis-ci/blacksmith/ci/baseline
   bosh:  genesis-ci
 
   ip: 10.200.136.1
