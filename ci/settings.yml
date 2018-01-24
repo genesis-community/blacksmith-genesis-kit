@@ -2,8 +2,8 @@
 meta:
   kit:     blacksmith
   release: Blacksmith Genesis Kit
-  target:  sw
-  url:     https://ci.starkandwayne.com
+  target:  buf
+  url:     https://10.200.131.2.netip.cc
 
   bosh:
     uri:      https://10.58.111.49:25555

@@ -25,7 +25,7 @@ header() {
 
 header "Setting up Genesis *-deployments/ directory..."
 rm -rf work/; mkdir -p work/
-genesis -C work/ init -L kit/
+genesis -C work/ init -L ../kit/
 
 header "Copying test environment YAMLs from \$kit/ci/envs..."
 cp -av kit/ci/envs/*.yml work/*-deployments/
