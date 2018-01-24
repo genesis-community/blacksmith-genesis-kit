@@ -99,7 +99,7 @@ jobs:
             params:
               GIT_NAME:             (( grab meta.git.name ))
               GIT_EMAIL:            (( grab meta.git.email ))
-              VAULT_URI:            (( grab meta.vault.uri ))
+              VAULT_URI:            (( grab meta.vault.url ))
               VAULT_TOKEN:          (( grab meta.vault.token ))
               BOSH_ENVIRONMENT:     (( grab meta.bosh.uri ))
               BOSH_CA_CERT:         (( grab meta.bosh.cacert ))
