@@ -76,5 +76,5 @@ git config --global user.email "${GIT_EMAIL}"
 cp -a ${REPO_ROOT} ${REPO_OUT}
 
 cat > ${NOTIFICATION_OUT:-notifications}/message <<EOS
-New ${KIT_SHORTNAME} v${VERSION} released. <https://github.com/${GITHUB_OWNER}/${KIT_SHORTNAME}-genesis-kit/releases/tag/v${VERSION}|Release notes>.
+New ${KIT_SHORTNAME} Genesis Kit v${VERSION} released. <https://github.com/${GITHUB_OWNER}/${KIT_SHORTNAME}-genesis-kit/releases/tag/v${VERSION}|Release notes>.
 EOS
