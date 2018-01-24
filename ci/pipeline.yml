@@ -197,8 +197,6 @@ jobs:
             GITHUB_OWNER:  (( grab meta.github.owner ))
             GIT_EMAIL:      (( grab meta.git.email ))
             GIT_NAME:       (( grab meta.git.name ))
-            AWS_ACCESS_KEY:       (( grab meta.aws.access_key ))
-            AWS_SECRET_KEY:       (( grab meta.aws.secret_key ))
 
       - name: upload-git
         put: git

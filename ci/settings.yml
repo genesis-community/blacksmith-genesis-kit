@@ -5,6 +5,8 @@ meta:
   target:  buf
   url:     https://10.200.131.2.netip.cc
 
+  initial_version: 0.0.4
+
   bosh:
     uri:      (( vault "secret/pipelines/genesis-ci/bosh:uri" ))
     username: (( vault "secret/pipelines/genesis-ci/admin:username" ))
