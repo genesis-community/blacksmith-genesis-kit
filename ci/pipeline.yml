@@ -101,6 +101,7 @@ jobs:
               GIT_EMAIL:            (( grab meta.git.email ))
               VAULT_URI:            (( grab meta.vault.url ))
               VAULT_TOKEN:          (( grab meta.vault.token ))
+              KIT_SHORTNAME:        (( grab meta.kit ))
               BOSH_ENVIRONMENT:     (( grab meta.bosh.uri ))
               BOSH_CA_CERT:         (( grab meta.bosh.cacert ))
               BOSH_CLIENT:          (( grab meta.bosh.username ))

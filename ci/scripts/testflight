@@ -16,6 +16,7 @@ set -eu
 : ${BOSH_CLIENT_SECRET:?required}
 : ${VAULT_URI:?required}
 : ${VAULT_TOKEN:?required}
+: ${KIT_SHORTNAME:?required}
 
 header() {
 	echo
@@ -35,13 +36,13 @@ safe read secret/handshake
 
 header "Setting up Genesis *-deployments/ directory..."
 rm -rf work/; mkdir -p work/
-genesis -C work/ init -L ../kit/
+genesis -C work/ init -L ../kit/ ${KIT_SHORTNAME}
 
 header "Copying test environment YAMLs from \$kit/ci/envs..."
-cp -av kit/ci/envs/*.yml work/*-deployments/
+cp -av kit/ci/envs/*.yml work/${KIT_SHORTNAME}-deployments/
 
 header "Handing off to \$kit/ci/test..."
-cd work/*-deployments
+cd work/${KIT_SHORTNAME}-deployments
 BOSH=bosh2 ../../kit/ci/test
 
 echo
