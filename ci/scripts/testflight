@@ -14,6 +14,8 @@ set -eu
 : ${BOSH_CA_CERT:?required}
 : ${BOSH_CLIENT:?required}
 : ${BOSH_CLIENT_SECRET:?required}
+: ${VAULT_URI:?required}
+: ${VAULT_TOKEN:?required}
 
 header() {
 	echo
@@ -27,10 +29,9 @@ header "Setting up git..."
 git config --global user.name  "$GIT_NAME"
 git config --global user.email "$GIT_EMAIL"
 
-header "Setting up vault..."
-vault server &
-sleep 3
-safe init
+safe target da-vault "$VAULT_URI" -k
+echo "$VAULT_TOKEN" | safe auth token
+safe read secret/handshake
 
 header "Setting up Genesis *-deployments/ directory..."
 rm -rf work/; mkdir -p work/

@@ -24,6 +24,8 @@ $BOSH deployments
 
 header "Cleaning up from any previous deployments (if necessary)..."
 cleanup ci-baseline-blacksmith
+safe rm -rf secret/genesis-ci/blacksmith
+safe cp -r  secret/genesis-ci/{static/,}blacksmith
 
 header "Deploying BASELINE environment to verify functionality..."
 genesis secrets add ci-baseline

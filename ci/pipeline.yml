@@ -19,6 +19,10 @@ meta:
   url:      (( param "Please specify the full url of the target Concourse CI" ))
   pipeline: (( grab meta.name ))
 
+  vault:
+    url:   (( param "Please provide the address of your Vault" ))
+    token: (( param "Please provide a Vault Token" ))
+
   git:
     email: ci@starkandwayne.com
     name:  Stark & Wayne CI Bot
@@ -95,6 +99,8 @@ jobs:
             params:
               GIT_NAME:             (( grab meta.git.name ))
               GIT_EMAIL:            (( grab meta.git.email ))
+              VAULT_URI:            (( grab meta.vault.uri ))
+              VAULT_TOKEN:          (( grab meta.vault.token ))
               BOSH_ENVIRONMENT:     (( grab meta.bosh.uri ))
               BOSH_CA_CERT:         (( grab meta.bosh.cacert ))
               BOSH_CLIENT:          (( grab meta.bosh.username ))
