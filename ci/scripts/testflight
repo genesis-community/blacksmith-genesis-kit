@@ -36,7 +36,7 @@ cp -av kit/ci/envs/*.yml work/*-deployments/
 
 header "Handing off to \$kit/ci/test..."
 cd work/*-deployments
-../../kit/ci/test
+BOSH=bosh2 ../../kit/ci/test
 
 echo
 echo "SUCCESS"
