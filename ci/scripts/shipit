@@ -46,8 +46,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ###############################################################
 
-header "Compiling v$(cat $VERSION_FROM) of Genesis Kit..."
-genesis compile-kit -C ${REPO_ROOT} --version $(cat $VERSION_FROM) --name ${KIT_SHORTNAME}
+VERSION=$(cat $VERSION_FROM)
+header "Compiling v$VERSION of Genesis Kit..."
+(cd $REPO_ROOT
+ genesis compile-kit --version "$VERSION" --name "$KIT_SHORTNAME")
 
 header "Assembling Github Release Artifacts..."
 mkdir -p ${RELEASE_ROOT}/artifacts
