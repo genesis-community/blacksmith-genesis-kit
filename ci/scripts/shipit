@@ -55,7 +55,7 @@ header "Assembling Github Release Artifacts..."
 mkdir -p ${RELEASE_ROOT}/artifacts
 echo "v${VERSION}"                         > ${RELEASE_ROOT}/tag
 echo "v${VERSION}"                         > ${RELEASE_ROOT}/name
-mv *.tar.gz                                  ${RELEASE_ROOT}/artifacts
+mv git/*.tar.gz                              ${RELEASE_ROOT}/artifacts
 mv ${REPO_ROOT}/ci/release_notes.md          ${RELEASE_ROOT}/notes.md
 cat > ${RELEASE_ROOT}/notification <<EOF
 <!here> New ${KIT_SHORTNAME} v${VERSION} released!
@@ -63,12 +63,8 @@ EOF
 
 
 header "Updating Git repository..."
-if [[ -z $(git config --global user.email) ]]; then
-  git config --global user.email "${GIT_EMAIL}"
-fi
-if [[ -z $(git config --global user.name) ]]; then
-  git config --global user.name "${GIT_NAME}"
-fi
+git config --global user.name  "${GIT_NAME}"
+git config --global user.email "${GIT_EMAIL}"
 
 (cd ${REPO_ROOT}
  git merge --no-edit ${BRANCH}
