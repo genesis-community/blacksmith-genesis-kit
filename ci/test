@@ -30,5 +30,5 @@ safe cp -rf secret/genesis-ci/static/blacksmith secret/genesis-ci/blacksmith/ci/
 header "Deploying BASELINE environment to verify functionality..."
 genesis secrets --vault da-vault add ci-baseline
 genesis deploy -n ci-baseline
-$BOSH -d ci-baseline-blacksmith instances --vitals
+$BOSH -d ci-baseline-blacksmith instances --ps
 cleanup ci-baseline-blacksmith
