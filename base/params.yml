@@ -12,7 +12,7 @@ params:
 
   blacksmith_debug: false
   blacksmith_port:  3000
-  blacksmith_env:   (( grab params.env )
+  blacksmith_env:   (( grab params.env ))
 
   cloud_config: (( param "Please specify a complete BOSH v2 cloud-config, for the Blacksmith internal BOSH director to use" ))
 
