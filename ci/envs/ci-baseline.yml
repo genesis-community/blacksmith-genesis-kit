@@ -11,7 +11,8 @@ params:
   vault: genesis-ci/blacksmith/ci/baseline
   bosh:  genesis-ci
 
-  ip: 10.200.136.1
+  network: genesis-ci
+  ip: 10.200.138.1
 
   # vSphere
   vsphere_ip: 10.200.129.1
