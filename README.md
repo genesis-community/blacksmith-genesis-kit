@@ -160,6 +160,39 @@ persistent (for durable key-value storage) or not (caches).
   service instances _total_ that can be provisioned, regardless of
   per-plan limits.  `0` (the default) imposes no global limit.
 
+### Experimental Forge: `mariadb`
+
+The `mariadb` feature activates the [Blacksmith MariaDB / MySQL
+Forge][mariadb-forge] so that this Blacksmith can deploy
+standalone and clustered MariaDB / MySQL database services.
+
+The following parameters exist:
+
+- **mariadb_plans** - A YAML fragment that contains the set of
+  Cloud Foundry service plans to offer, insofar as MariaDB is
+  concerned.  For full details, you'll want to refer to the
+  [forge documentation][mariadb-forge].
+
+- **mariadb_service_name** - The name of the service, to be shown
+  in the services marketplace.  Defaults to `mariadb`.
+
+- **mariadb_service_id** - A globally unique (internal)
+  identifier for this service.  Defaults to `mariadb`.
+
+- **mariadb_service_description** - A long-form description of
+  the service, for use in both console and web-based UIs.
+  Defaults to `A dedicated MariaDB instance, deployed on-demand`.
+
+- **mariadb_service_tags** - The list of tags to apply to all
+  new instances of this service.  Defaults `blacksmith`,
+  `mariadb`, and `dedicated`.  If you specify this, and you
+  want the defaults too, you have to provide them explicitly.
+
+- **mariadb_service_limit** - An upper limit on the number of
+  service instances _total_ that can be provisioned, regardless of
+  per-plan limits.  `0` (the default) imposes no global limit.
+
+
 Params
 ------
 
@@ -240,3 +273,4 @@ the parameters that let you do that:
 [postgresql-forge]: https://github.com/blacksmith-community/postgresql-forge-boshrelease
 [rabbitmq-forge]:   https://github.com/blacksmith-community/rabbitmq-forge-boshrelease
 [redis-forge]:      https://github.com/blacksmith-community/redis-forge-boshrelease
+[mariadb-forge]:    https://github.com/blacksmith-community/mariadb-forge-boshrelease

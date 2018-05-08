@@ -1,0 +1,40 @@
+---
+meta:
+  default:
+    mariadb_tags:
+      - blacksmith
+      - dedicated
+      - mariadb
+
+    mariadb_plans:
+      standalone:
+        name: standalone
+        description: A dedicated MariaDB server, with no redundancy or replication
+        limit: 7
+        type: standalone
+        vm_type: default
+
+releases:
+  - name:    mariadb-forge
+    version: 0.0.1
+    url:     https://github.com/blacksmith-community/mariadb-forge-boshrelease/releases/download/v0.0.1/mariadb-forge-0.0.1.tgz
+    sha1:    e12a086c4313c10317d6851c71795fe9e3d92d8d
+
+params:
+  releases:
+    - (( append ))
+    - (( grab releases.mariadb-forge ))
+
+instance_groups:
+  - name: blacksmith
+    jobs:
+      - release: mariadb-forge
+        name:    mariadb-blacksmith-plans
+        properties:
+          plans: (( grab params.mariadb_plans || meta.default.mariadb_plans ))
+          service:
+            id:          (( grab params.mariadb_service_id          || "mariadb" ))
+            name:        (( grab params.mariadb_service_name        || params.mariadb_service_id || "mariadb" ))
+            description: (( grab params.mariadb_service_description || "A dedicated MariaDB instance, deployed on-demand" ))
+            tags:        (( grab params.mariadb_service_tags        || meta.default.mariadb_tags ))
+            limit:       (( grab params.mariadb_service_limit       || 0 ))

@@ -62,7 +62,8 @@ prompt_for_forges() {
 
 			printf "  ${green}redis${back})       Redis Key-Value store (persistent or cache)\n"
 			printf "  ${green}postgresql${back})  PostgreSQL standalone and clustered databases\n"
-			printf "  ${green}rabbitmq${back})    RabbitMQ message bus clusters\n\n"
+			printf "  ${green}rabbitmq${back})    RabbitMQ message bus clusters\n"
+			printf "  ${green}mariadb${back})     [EXPERIMENTAL] MariaDB / MySQL databases\n\n"
 
 			printf "Which ${cyan}Blacksmith Forges${back} would you like to activate?\n"
 			printf "(separate multiple forges with spaces)\n"
@@ -75,7 +76,7 @@ prompt_for_forges() {
 			local ok=1
 			for f in $FORGE_LIST; do
 				case "${f}" in
-				redis|postgresql|rabbitmq) ;;
+				redis|postgresql|rabbitmq|mariadb) ;;
 				*) printf >&2 "  ${red}error${back}: unrecognized forge ${red}${f}${back}\n"
 				   ok=0
 				esac
