@@ -78,6 +78,25 @@ The following parameters exist:
   concerned.  For full details, you'll want to refer to the
   [forge documentation][postgresql-forge].
 
+- **postgresql_service_name** - The name of the service, to be shown
+  in the services marketplace.  Defaults to `postgresql`.
+
+- **postgresql_service_id** - A globally unique (internal)
+  identifier for this service.  Defaults to `postgresql`.
+
+- **postgresql_service_description** - A long-form description of
+  the service, for use in both console and web-based UIs.
+  Defaults to `A dedicated PostgreSQL instance, deployed on-demand`.
+
+- **postgresql_service_tags** - The list of tags to apply to all
+  new instances of this service.  Defaults `blacksmith`,
+  `postgresql`, and `dedicated`.  If you specify this, and you
+  want the defaults too, you have to provide them explicitly.
+
+- **postgresql_service_limit** - An upper limit on the number of
+  service instances _total_ that can be provisioned, regardless of
+  per-plan limits.  `0` (the default) imposes no global limit.
+
 ### Forge: `rabbitmq`
 
 The `rabbitmq` feature activates the [Blacksmith RabbitMQ
@@ -91,6 +110,25 @@ The following parameters exist:
   concerned.  For full details, you'll want to refer to the
   [forge documentation][rabbitmq-forge].
 
+- **rabbitmq_service_name** - The name of the service, to be shown
+  in the services marketplace.  Defaults to `rabbitmq`.
+
+- **rabbitmq_service_id** - A globally unique (internal)
+  identifier for this service.  Defaults to `rabbitmq`.
+
+- **rabbitmq_service_description** - A long-form description of
+  the service, for use in both console and web-based UIs.
+  Defaults to `A dedicated RabbitMQ instance, deployed on-demand`.
+
+- **rabbitmq_service_tags** - The list of tags to apply to all
+  new instances of this service.  Defaults `blacksmith`,
+  `rabbitmq`, and `dedicated`.  If you specify this, and you
+  want the defaults too, you have to provide them explicitly.
+
+- **rabbitmq_service_limit** - An upper limit on the number of
+  service instances _total_ that can be provisioned, regardless of
+  per-plan limits.  `0` (the default) imposes no global limit.
+
 ### Forge: `redis`
 
 The `redis` feature activates the [Blacksmith Redis
@@ -102,6 +140,25 @@ persistent (for durable key-value storage) or not (caches).
   Foundry service plans to offer, infosfar as Redis is concerned.
   For full details, you'll want to refer to the
   [forge documentation][redis-forge].
+
+- **redis_service_name** - The name of the service, to be shown
+  in the services marketplace.  Defaults to `redis`.
+
+- **rabbitmq_service_id** - A globally unique (internal)
+  identifier for this service.  Defaults to `rabbitmq`.
+
+- **redis_service_description** - A long-form description of
+  the service, for use in both console and web-based UIs.
+  Defaults to `A dedicated Redis instance, deployed on-demand`.
+
+- **redis_service_tags** - The list of tags to apply to all
+  new instances of this service.  Defaults `blacksmith`,
+  `redis`, and `dedicated`.  If you specify this, and you
+  want the defaults too, you have to provide them explicitly.
+
+- **redis_service_limit** - An upper limit on the number of
+  service instances _total_ that can be provisioned, regardless of
+  per-plan limits.  `0` (the default) imposes no global limit.
 
 Params
 ------

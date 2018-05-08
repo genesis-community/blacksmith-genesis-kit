@@ -1,6 +1,11 @@
 ---
 meta:
   default:
+    postgresql_tags:
+      - blacksmith
+      - dedicated
+      - postgresql
+
     postgresql_plans:
       standalone:
         name: standalone
@@ -36,3 +41,9 @@ instance_groups:
         name:    postgresql-blacksmith-plans
         properties:
           plans: (( grab params.postgresql_plans || meta.default.postgresql_plans ))
+          service:
+            id:          (( grab params.postgresql_service_id          || "postgresql" ))
+            name:        (( grab params.postgresql_service_name        || params.postgresql_service_id || "postgresql" ))
+            description: (( grab params.postgresql_service_description || "A dedicated PostgreSQL instance, deployed on-demand" ))
+            tags:        (( grab params.postgresql_service_tags        || meta.default.postgresql_tags ))
+            limit:       (( grab params.postgresql_service_limit       || 0 ))

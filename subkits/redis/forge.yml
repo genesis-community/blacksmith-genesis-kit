@@ -1,6 +1,11 @@
 ---
 meta:
   default:
+    redis_tags:
+      - blacksmith
+      - dedicated
+      - redis
+
     redis_plans:
       standalone:
         name: standalone
@@ -27,3 +32,9 @@ instance_groups:
         name:    redis-blacksmith-plans
         properties:
           plans: (( grab params.redis_plans || meta.default.redis_plans ))
+          service:
+            id:          (( grab params.redis_service_id          || "redis" ))
+            name:        (( grab params.redis_service_name        || params.redis_service_id || "redis" ))
+            description: (( grab params.redis_service_description || "A dedicated Redis instance, deployed on-demand" ))
+            tags:        (( grab params.redis_service_tags        || meta.default.redis_tags ))
+            limit:       (( grab params.redis_service_limit       || 0 ))

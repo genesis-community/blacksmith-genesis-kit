@@ -1,6 +1,11 @@
 ---
 meta:
   default:
+    rabbitmq_tags:
+      - blacksmith
+      - dedicated
+      - rabbitmq
+
     rabbitmq_plans:
       standalone:
         name: standalone
@@ -27,3 +32,9 @@ instance_groups:
         name:    rabbitmq-blacksmith-plans
         properties:
           plans: (( grab params.rabbitmq_plans || meta.default.rabbitmq_plans ))
+          service:
+            id:          (( grab params.rabbitmq_service_id          || "rabbitmq" ))
+            name:        (( grab params.rabbitmq_service_name        || params.rabbitmq_service_id || "rabbitmq" ))
+            description: (( grab params.rabbitmq_service_description || "A dedicated RabbitMQ instance, deployed on-demand" ))
+            tags:        (( grab params.rabbitmq_service_tags        || meta.default.rabbitmq_tags ))
+            limit:       (( grab params.rabbitmq_service_limit       || 0 ))
