@@ -1,0 +1,49 @@
+#!/bin/bash
+set -eu
+vault="secret/$GENESIS_VAULT_PREFIX"
+
+ip=$(lookup params.ip)
+port=$(lookup params.port 3000)
+export SB_BROKER_URL=http://$ip:$port
+export SB_BROKER_USERNAME=blacksmith
+export SB_BROKER_PASSWORD=$(safe read $vault/broker:password)
+
+export BOSH_ENVIRONMENT=https://$(lookup params.ip):25555
+export BOSH_CA_CERT=$(safe read $vault/tls/ca:certificate)
+export BOSH_CLIENT=admin
+export BOSH_CLIENT_SECRET=$(safe read $vault/users/admin:password)
+
+
+    echo "----------------------------------------------------"
+    echo "$GENESIS_ENVIRONMENT (internal) bosh director"
+    echo
+describe "ca certificate"
+         safe read $vault/tls/ca:certificate
+    echo
+    echo "bosh env"
+         bosh env --tty | sed -e 's/^/  /';
+    echo
+    echo
+    echo "blacksmith (internal) bosh director"
+describe "  bosh url: #C{$BOSH_ENVIRONMENT}"
+describe "  username: #M{$BOSH_CLIENT}"
+describe "  password: #G{$BOSH_CLIENT_SECRET}"
+    echo
+    echo
+    echo "blacksmith web management UI"
+describe "  web url:   #C{$SB_BROKER_URL}"
+describe "  username:  #M{$SB_BROKER_USERNAME}"
+describe "  password:  #G{$SB_BROKER_PASSWORD}"
+describe "  clickable: #B{http://$SB_BROKER_USERNAME:$SB_BROKER_PASSWORD@$ip:$port}"
+    echo
+    echo
+    echo "blacksmith catalog"
+if ! command -v eden >/dev/null 2>&1; then
+    echo "  !!! install the 'eden' cli to query the blacksmith catalog"
+    echo "      (https://github.com/starkandwayne/eden)"
+else
+         eden catalog | sed -e 's/^/  /';
+fi
+    echo
+    echo "----------------------------------------------------"
+    echo

@@ -1,0 +1,42 @@
+---
+params:
+  openstack_auth_url: (( param "What is the OpenStack Auth URL?" ))
+  openstack_username: (( vault meta.vault "/openstack/creds:username" ))
+  openstack_password: (( vault meta.vault "/openstack/creds:password" ))
+  openstack_domain:   (( vault meta.vault "/openstack/creds:domain" ))
+  openstack_project:  (( vault meta.vault "/openstack/creds:project" ))
+  openstack_region:   (( param "What is the OpenStack Region?" ))
+  openstack_ssh_key:  (( param "What is the OpenStack SSH Key Name?" ))
+  openstack_default_security_groups: (( param "What OpenStack SGs are applied to VMs by default?" ))
+
+stemcells:
+  - name:    bosh-openstack-kvm-ubuntu-trusty-go_agent
+    version: '3468.17'
+    url:     https://bosh.io/stemcells/bosh-openstack-kvm-ubuntu-trusty-go_agent?v=3468.17
+    sha1:    206b4de50512485c7e3011ddac36e2f0c798272a
+
+releases:
+- name:    bosh-openstack-cpi
+  version: '33'
+  url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-openstack-cpi-release?v=33
+  sha1:    86b8eedcb0a6be3e821a5d0042916180706262be
+
+instance_groups:
+- name: bosh
+  jobs:
+  - name: openstack_cpi
+    release: bosh-openstack-cpi
+  properties:
+    director:
+      cpi_job: openstack_cpi
+
+    openstack:
+      auth_url: (( grab params.openstack_auth_url ))
+      username: (( grab params.openstack_username ))
+      api_key: (( grab params.openstack_password ))
+      domain: (( grab params.openstack_domain ))
+      project: (( grab params.openstack_project ))
+      region: (( grab params.openstack_region ))
+      default_key_name: (( grab params.openstack_ssh_key ))
+      default_security_groups: (( grab params.openstack_default_security_groups ))
+      human_readable_vm_names: true

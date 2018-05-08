@@ -1,0 +1,61 @@
+#!/bin/bash
+set -eu
+
+declare -a merge
+
+validate_features aws azure google openstack vsphere \
+                  rabbitmq redis postgresql mariadb
+
+#
+# We always start out with the skeleton of a BOSH deployment,
+# and add-in a local UAA and a Credhub
+merge=( manifests/blacksmith/blacksmith.yml
+        manifests/blacksmith/bosh.yml )
+
+iaas=0
+for want in ${GENESIS_REQUESTED_FEATURES}; do
+  case "$want" in
+  # IaaS selector feature flags
+  aws|azure|google|openstack|vsphere)
+    iaas=$(( iaas + 1 ))
+    merge+=( manifests/iaas/$want.yml )
+
+    case $want in
+    vsphere) ;; # vSphere doesn't need a registry
+    *)          # but everyone else does...
+      merge+=( manifests/addons/registry.yml )
+      ;;
+    esac
+    ;;
+  esac
+done
+
+forges=0
+for want in ${GENESIS_REQUESTED_FEATURES}; do
+  case "$want" in
+  # Forges
+  rabbitmq|redis|postgresql|mariadb)
+    forges=$(( forges + 1 ))
+    merge+=( manifests/forges/$want.yml )
+    ;;
+  esac
+done
+
+# Sanity Check Time!
+# If we haven't chosen an IaaS, that's a problem.
+if [[ $iaas == 0 ]]; then
+  echo >&2 "You have not enabled an IaaS feature flag."
+  exit 1
+fi
+# If we have chosen more than one IaaS, that's a problem.
+if [[ $iaas > 1 ]]; then
+  echo >&2 "You have enabled more than one IaaS feature flag."
+  exit 1
+fi
+# If we didn't activate at least one Forge, that's a problem.
+if [[ $forges == 0 ]]; then
+  echo >&2 "You have not activated any Blacksmith Forges."
+  exit 1
+fi
+
+echo "${merge[@]}"

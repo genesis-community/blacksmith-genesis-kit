@@ -1,0 +1,15 @@
+---
+instance_groups:
+- name: blacksmith
+  jobs:
+  - name: registry
+    release: bosh
+  properties:
+    registry:
+      address: (( grab params.ip ))
+      host:    (( grab params.ip ))
+      db:      (( grab instance_groups.blacksmith.properties.postgres ))
+
+      username: registry-user
+      password: (( vault meta.vault "/registry:password" ))
+      port: 25777

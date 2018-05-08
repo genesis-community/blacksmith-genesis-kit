@@ -1,0 +1,65 @@
+---
+params:
+  ip:           (( param "Please specify the static IP address for the Blacksmith Service Broker" ))
+  cloud_config: (( param "Please specify a complete BOSH v2 cloud-config, for the Blacksmith internal BOSH director to use" ))
+
+  releases: []
+  stemcells: []
+
+meta:
+  default:
+    azs: [z1]
+
+exodus:
+  broker_url: (( concat "http://" params.ip ":" params.blacksmith_port || 3000 ))
+  broker_username: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.broker.username ))
+  broker_password: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.broker.password ))
+
+instance_groups:
+  - name:      blacksmith
+    instances: 1
+    stemcell:  default
+    azs:             (( grab params.availability_zones || meta.default.azs ))
+    vm_type:         (( grab params.vm_type   || "blacksmith" ))
+    persistent_disk: (( grab params.disk_size || 20480 ))
+    networks:
+      - name:       (( grab params.network || "blacksmith" ))
+        static_ips: [(( grab params.ip ))]
+    jobs:
+      - release: blacksmith
+        name:    blacksmith
+        properties:
+          debug: (( grab params.blacksmith_debug || false ))
+          env:   (( grab params.blacksmith_env   || params.env || "blacksmith" ))
+
+          broker:
+            port:     (( grab params.blacksmith_port || 3000 ))
+            username: blacksmith
+            password: (( vault meta.vault "/broker:password" ))
+
+          bosh:
+            username: blacksmith
+            password: (( vault meta.vault "/users/blacksmith:password" ))
+            address:  (( concat "https://" params.ip ":25555" ))
+            stemcells:    (( grab params.stemcells ))
+            releases:     (( grab params.releases ))
+            cloud-config: (( grab params.cloud_config ))
+
+releases:
+  - name:    blacksmith
+    version: 0.0.6
+    url:     https://github.com/cloudfoundry-community/blacksmith-boshrelease/releases/download/v0.0.6/blacksmith-0.0.6.tgz
+    sha1:    4ed2e095c216ea5baf671e61cc0e1cc617d7099b
+
+stemcells:
+  - alias: default
+    os:      (( grab params.stemcell_os      || "ubuntu-trusty"))
+    version: (( grab params.stemcell_version || "latest" ))
+
+update:
+  serial: false
+  canaries: 1
+  canary_watch_time: 30000-600000
+  update_watch_time: 5000-600000
+  max_in_flight: 1
+  max_errors: 1

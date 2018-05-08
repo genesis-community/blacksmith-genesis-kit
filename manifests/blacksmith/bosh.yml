@@ -11,9 +11,9 @@ instance_groups:
     properties:
       ## ENVIRONMENT
       env:
-        http_proxy:  (( grab params.http_proxy ))
-        https_proxy: (( grab params.https_proxy ))
-        no_proxy:    (( grab params.no_proxy ))
+        http_proxy:  (( grab params.http_proxy  || "" ))
+        https_proxy: (( grab params.https_proxy || "" ))
+        no_proxy:    (( grab params.no_proxy    || "" ))
 
       ## NATS CONFIGURATION
       nats:
@@ -58,7 +58,7 @@ instance_groups:
 
       ## BOSH DIRECTOR CONFIGURATION
       director:
-        name: (( concat params.name "-blacksmith" ))
+        name: (( concat params.env "-blacksmith" ))
         address: (( grab params.ip ))
         db: *db
         flush_arp: true
@@ -94,3 +94,9 @@ instance_groups:
           user: hm
           password: (( vault meta.vault "/users/hm:password" ))
           ca_cert:  (( vault meta.vault "/tls/ca:certificate" ))
+
+releases:
+  - name:    bosh
+    version: "264.5.0"
+    url:     https://s3.amazonaws.com/bosh-compiled-release-tarballs/bosh-264.5.0-ubuntu-trusty-3468.13-20171214-231004-994547171-20171214231009.tgz?versionId=66MJhlOuDZn3SM18oBXxVP6DuV2BOXZi
+    sha1:    0ff5b856bbdb901691e98283823fd1f112768569
