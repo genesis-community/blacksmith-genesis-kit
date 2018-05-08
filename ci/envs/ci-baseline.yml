@@ -12,7 +12,7 @@ params:
   bosh:  genesis-ci
 
   network: genesis-ci
-  ip: 10.200.138.1
+  ip: 10.200.190.128
 
   # vSphere
   vsphere_ip: 10.200.129.1
