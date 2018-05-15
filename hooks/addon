@@ -130,8 +130,8 @@ register)
       $SB_BROKER_URL
 
    describe "enabling service access..."
-   for x $(curl -Lsk -u "$SB_BROKER_USERNAME:$SB_BROKER_PASSWORD" "$SB_BROKER_URL/v2/catalog" \
-                -H Accept:application/json | jq -r '.services[].id'); do
+   for x in $(curl -Lsk -u "$SB_BROKER_USERNAME:$SB_BROKER_PASSWORD" "$SB_BROKER_URL/v2/catalog" \
+                   -H Accept:application/json | jq -r '.services[].id'); do
      describe "  - #C{$x}"
      cf enable-service-access $x
   done)
