@@ -178,8 +178,6 @@ done
 
 echo
 echo "params:"
-echo
-echo "params:"
 echo "  env:   $GENESIS_NAME"
 echo
 echo "  ip: $ip"
