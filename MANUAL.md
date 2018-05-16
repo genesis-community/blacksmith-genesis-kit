@@ -247,6 +247,20 @@ new data services instances on behalf of end users.
     of per-plan limits.  `0` (the default) imposes no global
     limit.
 
+
+# Cloud Configuration
+
+By default, Blacksmith uses the following VM types/networks/disk
+pools from your cloud config. Feel free to override them in your
+environment, if you would rather they use entities already
+existing in your cloud config:
+
+```
+params:
+  network:   blacksmith
+  vm_type:   blacksmith
+```
+
 # Available Addons
 
 - `visit` - Opens the Blacksmith Web Management Console in your
