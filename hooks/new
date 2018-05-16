@@ -37,7 +37,7 @@ aws)
 
     Then go to EC2 > Key Pairs > Import Key Pair and:
 
-      1. Type 'vcap@$GENESIS_NAME' in the 'Key pair name' input box
+      1. Type 'vcap@$GENESIS_ENVIRONMENT' in the 'Key pair name' input box
       2. Paste the safe command output into the 'Public key contents' input box
       3. Click 'Import' button
 
@@ -178,7 +178,7 @@ done
 
 echo
 echo "params:"
-echo "  env:   $GENESIS_NAME"
+echo "  env:   $GENESIS_ENVIRONMENT"
 echo
 echo "  ip: $ip"
 
@@ -247,4 +247,4 @@ openstack)
 	echo
 	;;
 esac
-) >$GENESIS_ROOT/$GENESIS_NAME.yml
+) >$GENESIS_ROOT/$GENESIS_ENVIRONMENT.yml
