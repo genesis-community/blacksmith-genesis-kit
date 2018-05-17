@@ -12,12 +12,12 @@ if [[ $GENESIS_DEPLOY_RC == 0 ]]; then
       echo
       echo "To access the Blacksmith Web Management Console, run"
       echo
-  describe "  #G{genesis do $GENESIS_ENVIRONMENT visit}"
+  describe "  #G{genesis do $GENESIS_ENVIRONMENT -- visit}"
       echo
       echo "To log into the Blacksmith BOSH director,"
       echo "(to troubleshoot service provisioning), run"
       echo
-  describe "  #G{genesis do $GENESIS_ENVIRONMENT bosh}"
+  describe "  #G{genesis do $GENESIS_ENVIRONMENT -- bosh}"
       echo
 
 fi
