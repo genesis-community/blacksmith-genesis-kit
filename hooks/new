@@ -126,14 +126,14 @@ esac
 
 
 # Forges
-echo "Blacksmith Forges allow you to deploy different\n"
-echo "types of services, on-demand.  This kit provides\n"
-echo "builtin support for the following:\n\n"
+echo "Blacksmith Forges allow you to deploy different"
+echo "types of services, on-demand.  This kit provides"
+echo "builtin support for the following:"
 echo
-echo "  redis)       Redis Key-Value store (persistent or cache)\n"
-echo "  postgresql)  PostgreSQL standalone and clustered databases\n"
-echo "  rabbitmq)    RabbitMQ message bus clusters\n"
-echo "  mariadb)     MariaDB / MySQL standalone databases (EXPERIMENTAL)\n\n"
+echo "  redis)       Redis Key-Value store (persistent or cache)"
+echo "  postgresql)  PostgreSQL standalone and clustered databases"
+echo "  rabbitmq)    RabbitMQ message bus clusters"
+echo "  mariadb)     MariaDB / MySQL standalone databases (EXPERIMENTAL)"
 echo
 
 declare -a forges
@@ -160,7 +160,7 @@ echo
 cat <<EOF
   NOTE: You still need to define a cloud-config, tailored to
         your specific IaaS / cloud provider, and your network
-        toplogy for services deployments.
+        topology for services deployments.
 
 EOF
 
