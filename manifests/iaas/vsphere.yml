@@ -5,7 +5,6 @@ meta:
     persistent: (( join "|" params.vsphere_persistent_datastores ))
 
 params:
-  vsphere_ip:                    (( param "Please specify the IP address of your vSphere vCenter" ))
   vsphere_ephemeral_datastores:  (( param "Please specify your vSphere ephemeral datastore pattern" ))
   vsphere_persistent_datastores: (( param "Please specify your vSphere persistent datastore pattern" ))
   vsphere_clusters:              (( param "Please specify your vSphere clusters" ))
@@ -33,7 +32,7 @@ instance_groups:
         cpi_job: vsphere_cpi
 
       vcenter:
-        address:  (( grab params.vsphere_ip ))
+        address:  (( vault meta.vault "/vsphere:address"  ))
         user:     (( vault meta.vault "/vsphere:user"     ))
         password: (( vault meta.vault "/vsphere:password" ))
 
