@@ -6,9 +6,8 @@ new data services instances on behalf of end users.
 
 # Base Parameters
 
-- `ip` - The static IP address of to deploy the Blacksmith
-  broker to.  This must exist within the static range of the
-  `network` 
+- `ip` - The static IP address to deploy the Blacksmith broker
+  to.  This must exist within the static range of the `network`.
 
 ## Sizing and Deployment Parameters
 
