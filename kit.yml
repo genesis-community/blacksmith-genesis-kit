@@ -44,3 +44,5 @@ credentials:
     users/hm:           {password: random 64}
     users/blacksmith:   {password: random 64}
 
+    registry:           {password: random 64}
+
