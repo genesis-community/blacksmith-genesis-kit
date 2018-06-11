@@ -1,126 +1,256 @@
 #!/bin/bash
 set -u
 
-back="\e[0m"
-red="\e[1;31m"
-green="\e[1;32m"
-yellow="\e[1;33m"
-blue="\e[1;34m"
-purple="\e[1;35m"
-cyan="\e[1;36m"
+prompt_for ip line \
+	'What static IP do you want to deploy this Blacksmith on?' \
+	--validation ip
 
+prompt_for iaas select \
+	'What IaaS will this Blacksmith deploy services to?' \
+	-o '[vsphere]   VMWare vSphere'        \
+	-o '[aws]       Amazon Web Services'   \
+	-o '[azure]     Microsoft Azure'       \
+	-o '[google]    Google Cloud Platform' \
+	-o '[openstack] OpenStack'
 
-panic() {
-	printf >&2 "${red}THIS KIT IS BROKEN{$back}\n"
-	echo >&2 "$*"
-	exit 2
-}
+case $iaas in
+aws)
+	prompt_for aws_region line \
+		'What AWS region would you like to deploy to?'
 
-is_ipv4() {
-	echo "${1:-}" | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+'
-	return $?
-}
+	prompt_for aws_access_key line \
+		'What is your AWS Access Key?'
+	prompt_for $GENESIS_VAULT_PREFIX/aws:secret_key secret-line \
+		'What is your AWS Secret Key?'
+	prompt_for aws_default_sgs multi-line \
+		'What security groups should the all deployed VMs be placed in?'
+	safe set --quiet secret/$GENESIS_VAULT_PREFIX/aws access_key="$aws_access_key"
 
-VCENTER_IP=
-prompt_for_iaas_vsphere() {
-	while true; do
-		printf "What is your ${cyan}vCenter IP${back}?\n"
-		printf "> "
-		read -r VCENTER_IP
-		if [[ -n $VCENTER_IP ]]; then
-			printf "using vcenter ip '${VCENTER_IP}'\n"
-			printf "\n\n"
-			return
-		fi
-	done
-}
+	cat >&2 <<EOF
 
-IAAS=
-prompt_for_iaas() {
-	printf "Blacksmith will deploy its own BOSH director to\n"
-	printf "facilitate the deployment of standalone services.\n"
-	printf "To do so, it needs  to know what IaaS to target\n\n"
+    Before deploying, please be sure to import the keypair generated for you from
+    Vault into AWS console.
 
-	printf "${red}NOTE: BLACKSMITH CURRENTLY ONLY SUPPORT${back} ${purple}VSPHERE${back}\n\n"
+    First run the following command to get the public key:
 
-	IAAS=vsphere
+      safe get secret/$GENESIS_VAULT_PREFIX/aws/ssh:public
 
-	case "${IAAS}" in
-	vsphere) prompt_for_iaas_vsphere ;;
-	*) panic "unhandled iaas '${IAAS}'"
-	esac
-}
+    Then go to EC2 > Key Pairs > Import Key Pair and:
 
-FORGE_LIST=
-prompt_for_forges() {
-	try=1
-	while true; do
-		if [[ $try == 1 ]]; then
-			printf "Blacksmith Forges allow you to deploy different\n"
-			printf "types of services, on-demand.  This kit provides\n"
-			printf "builtin support for the following:\n\n"
+      1. Type 'vcap@$GENESIS_ENVIRONMENT' in the 'Key pair name' input box
+      2. Paste the safe command output into the 'Public key contents' input box
+      3. Click 'Import' button
 
-			printf "  ${green}redis${back})       Redis Key-Value store (persistent or cache)\n"
-			printf "  ${green}postgresql${back})  PostgreSQL standalone and clustered databases\n"
-			printf "  ${green}rabbitmq${back})    RabbitMQ message bus clusters\n"
-			printf "  ${green}mariadb${back})     [EXPERIMENTAL] MariaDB / MySQL databases\n\n"
+    Now you can SSH into VMs deployed by this director using the generated key.
 
-			printf "Which ${cyan}Blacksmith Forges${back} would you like to activate?\n"
-			printf "(separate multiple forges with spaces)\n"
-		fi
-		try=$(( try + 1 ))
-
-		printf "> "
-		read -r FORGE_LIST
-		if [[ -n $FORGE_LIST ]]; then
-			local ok=1
-			for f in $FORGE_LIST; do
-				case "${f}" in
-				redis|postgresql|rabbitmq|mariadb) ;;
-				*) printf >&2 "  ${red}error${back}: unrecognized forge ${red}${f}${back}\n"
-				   ok=0
-				esac
-			done
-			if [[ $ok == 1 ]]; then
-				return
-			fi
-			printf "\n"
-		fi
-	done
-}
-
-BROKER_IP=
-prompt_for_broker_ip() {
-	while true; do
-		printf "What ${cyan}static IP${back} do you want Blacksmith to live at?\n"
-		printf "> "
-		read -r BROKER_IP
-		if [[ -n $BROKER_IP ]] && is_ipv4 $BROKER_IP; then
-			printf "using broker ip '${BROKER_IP}'\n"
-			printf "\n"
-			return
-		fi
-	done
-}
-
-prompt_for_iaas
-prompt_for_broker_ip
-prompt_for_forges
-
-echo; echo; echo
-printf "Generating your ${purple}new Genesis Environment${back}...\n\n\n"
-
-cat <<EOF
----
-kit:
-  features:
-    - $IAAS
 EOF
-for forge in $FORGE_LIST; do
+	;;
+
+vsphere)
+	prompt_for vsphere_address line \
+		'What is the IP address of your VMWare vCenter Server Appliance?' \
+		--validation ip
+	prompt_for vsphere_user line \
+		'What username should BOSH use to authenticate with vCenter?'
+	prompt_for $GENESIS_VAULT_PREFIX/vsphere:password secret-line \
+		'What is the password for the vCenter user?'
+	safe --quiet set secret/$GENESIS_VAULT_PREFIX/vsphere user="$vsphere_user" address="$vsphere_address"
+
+	prompt_for vsphere_dc line \
+		'What vCenter data center do you want to BOSH to deploy to?'
+	prompt_for vsphere_clusters multi-line -m 1 \
+		'What vCenter clusters do you want BOSH to deploy to?'
+
+	prompt_for vsphere_ephemerals multi-line -m 1 \
+		'What data stores do you wish to use for ephemeral (OS) disks?'
+	prompt_for same_datastores boolean \
+		'Do you wish to use these same data stores for persistent (data) disks?'
+	if [[ $same_datastores == 'false' ]]; then
+		prompt_for vsphere_persistents multi-line -m 1 \
+			'What data stores do you wish to use for persistent (data) disks?'
+	else
+		vsphere_persistents=("${vsphere_ephemerals[@]}")
+	fi
+	;;
+
+google)
+	prompt_for google_project_id line \
+		'What is your GCP project ID?'
+	prompt_for google_json_key block \
+		'What are your GCP credentials (generally supplied as a JSON block)?'
+	safe set --quiet secret/$GENESIS_VAULT_PREFIX/google json_key="$google_json_key"
+	;;
+
+azure)
+	prompt_for azure_client_id line \
+		'What is your Azure Client ID?'
+	prompt_for $GENESIS_VAULT_PREFIX/azure:client_secret secret-line \
+		'What is your Azure Client Secret?'
+	prompt_for azure_tenant_id line \
+		'What is your Azure Tenant ID?'
+	prompt_for azure_subscription_id line \
+		'What is your Azure Subscription ID?'
+	prompt_for azure_resource_group line \
+		'What Azure Resource Group will BOSH be deploying VMs into?'
+	safe --quiet set secret/$GENESIS_VAULT_PREFIX/azure client_id="$azure_client_id" \
+	                                      tenant_id="$azure_tenant_id" \
+	                                      subscription_id="$azure_subscription_id"
+
+	prompt_for azure_default_sg line \
+		'What security group should be used as the BOSH default security group?'
+	;;
+
+openstack)
+	prompt_for openstack_auth_url line \
+		'What is the Auth URL of your OpenStack cluster?'
+	prompt_for openstack_user line \
+		'What username will be used to authenticate with OpenStack?'
+	prompt_for $GENESIS_VAULT_PREFIX/openstack/creds:password secret-line \
+		'What password will be used to authenticate with OpenStack?'
+	prompt_for openstack_domain line \
+		'What OpenStack Domain will BOSH be deployed in?'
+	prompt_for openstack_project line \
+		'What OpenStack Project will BOSH be deployed in?'
+	safe set --quiet secret/$GENESIS_VAULT_PREFIX/openstack/creds username="$openstack_user" \
+	                                                domain="$openstack_domain" \
+	                                                project="$openstack_project"
+
+	prompt_for openstack_region line \
+		'What OpenStack Region is BOSH being deployed to?'
+	prompt_for openstack_ssh_key line \
+		'What is the name of the OpenStack SSH key that should be used to enable SSH access to BOSH-deployed VMs?'
+	prompt_for openstack_default_sgs multi-line \
+		'What default security groups should be applied to VMs created by BOSH?'
+	;;
+esac
+
+
+# Forges
+echo "Blacksmith Forges allow you to deploy different"
+echo "types of services, on-demand.  This kit provides"
+echo "builtin support for the following:"
+echo
+echo "  redis)       Redis Key-Value store (persistent or cache)"
+echo "  postgresql)  PostgreSQL standalone and clustered databases"
+echo "  rabbitmq)    RabbitMQ message bus clusters"
+echo "  mariadb)     MariaDB / MySQL standalone databases (EXPERIMENTAL)"
+echo
+
+declare -a forges
+prompt_for do_redis boolean \
+	'Do you want to offer on-demand *Redis* services?'
+[[ $do_redis == 'true' ]] && forges+=( redis )
+
+prompt_for do_postgresql boolean \
+	'Do you want to offer on-demand *PostgreSQL* services?'
+[[ $do_postgresql == 'true' ]] && forges+=( postgresql )
+
+prompt_for do_rabbitmq boolean \
+	'Do you want to offer on-demand *RabbitMQ* services?'
+[[ $do_rabbitmq == 'true' ]] && forges+=( rabbitmq )
+
+prompt_for do_mariadb boolean \
+	'Do you want to offer on-demand *MariaDB* / *MySQL* services?'
+[[ $do_mariadb == 'true' ]] && forges+=( mariadb )
+
+
+
+echo
+echo
+cat <<EOF
+  NOTE: You still need to define a cloud-config, tailored to
+        your specific IaaS / cloud provider, and your network
+        topology for services deployments.
+
+EOF
+
+(
+echo "---"
+echo "kit:"
+echo "  name:    $GENESIS_KIT_NAME"
+echo "  version: $GENESIS_KIT_VERSION"
+echo "  features:"
+echo "    - $iaas"
+
+for forge in ${forges[@]}; do
   echo "    - $forge"
 done
-cat <<EOF
 
-params:
-  ip: $BROKER_IP
-EOF
+echo
+echo "params:"
+echo "  env:   $GENESIS_ENVIRONMENT"
+echo
+echo "  ip: $ip"
+
+case $iaas in
+aws)
+	echo "  # AWS credentials are stored in the Vault at"
+	echo "  #   secret/$GENESIS_VAULT_PREFIX/aws"
+	echo "  #"
+	echo "  aws_region: $aws_region"
+	echo "  aws_default_sgs:"
+	for sg in ${aws_default_sgs[@]}; do
+		echo "    - $sg"
+	done
+	echo
+	;;
+
+vsphere)
+	echo "  # vCenter credentials are stored in the Vault at"
+	echo "  #   secret/$GENESIS_VAULT_PREFIX/vsphere"
+	echo "  #"
+	echo "  vsphere_datacenter: $vsphere_dc"
+	echo "  vsphere_clusters:"
+	for c in ${vsphere_clusters[@]}; do
+		echo "    - $c"
+	done
+	echo
+	echo "  vsphere_ephemeral_datastores:"
+	for ds in ${vsphere_ephemerals[@]}; do
+		echo "    - $ds"
+	done
+	echo "  vsphere_persistent_datastores:"
+	for ds in ${vsphere_persistents[@]}; do
+		echo "    - $ds"
+	done
+	echo
+	;;
+
+google)
+	echo "  # GCP credentials are stored in the Vault at"
+	echo "  #   secret/$GENESIS_VAULT_PREFIX/google"
+	echo "  #"
+	echo "  google_project: $google_project_id"
+	echo
+	;;
+
+azure)
+	echo "  # Azure credentials are stored in the Vault at"
+	echo "  #   secret/$GENESIS_VAULT_PREFIX/azure"
+	echo "  #"
+	echo "  azure_resource_group: $azure_resource_group"
+	echo "  azure_default_sg:     $azure_default_sg"
+	echo
+	;;
+
+openstack)
+	echo "  # Openstack credentials are stored in the Vault at"
+	echo "  #   secret/$GENESIS_VAULT_PREFIX/openstack/creds"
+	echo "  #"
+	echo "  openstack_auth_url: $openstack_auth_url"
+	echo "  openstack_region:   $openstack_region"
+	echo "  openstack_ssh_key:  $openstack_ssh_key"
+	echo "  openstack_default_security_groups:"
+	for sg in ${openstack_default_sgs[@]}; do
+		echo "    - $sg"
+	done
+	echo
+	;;
+esac
+) >$GENESIS_ROOT/$GENESIS_ENVIRONMENT.yml
+
+prompt_for edit boolean \
+	'Would you like to edit the environment file?'
+if [[ $edit = 'true' ]]; then
+	exec ${EDITOR:-vim} $GENESIS_ROOT/$GENESIS_ENVIRONMENT.yml
+fi

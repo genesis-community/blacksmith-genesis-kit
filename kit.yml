@@ -1,11 +1,10 @@
 ---
-name:     Blacksmith
-author:   James Hunt <james@niftylogic.com>
-homepage: https://github.com/cloudfoundry-community/blacksmith-boshrelease
-github:   https://github.com/genesis-community/blacksmith-genesis-kit
+name:   Blacksmith
+author: James Hunt <james@niftylogic.com>
+docs:   https://github.com/cloudfoundry-community/blacksmith-boshrelease
+code:   https://github.com/genesis-community/blacksmith-genesis-kit
 
-subkits: []
-params: {}
+genesis_version_min: 2.6.0
 
 certificates:
   base:
@@ -44,4 +43,6 @@ credentials:
     users/admin:        {password: random 64}
     users/hm:           {password: random 64}
     users/blacksmith:   {password: random 64}
+
+    registry:           {password: random 64}
 
