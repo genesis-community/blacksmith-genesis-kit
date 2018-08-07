@@ -33,6 +33,9 @@ safe rm -rf secret/genesis-ci/blacksmith
 safe cp -rf secret/genesis-ci/static/blacksmith secret/genesis-ci/blacksmith/ci/baseline
 
 header "Deploying BASELINE environment to verify functionality..."
+cd dev
+genesis compile-kit --name blacksmith -v 9.9.9 --force # make sure hooks are executable before screaming at shipit for failing.
+cd ..
 genesis secrets --vault da-vault add ci-baseline
 genesis deploy -n ci-baseline
 $BOSH -d ci-baseline-blacksmith instances --ps
