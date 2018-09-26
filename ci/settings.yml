@@ -2,8 +2,8 @@
 meta:
   kit:     blacksmith
   release: Blacksmith Genesis Kit
-  target:  buf
-  url:     https://10.200.131.2.netip.cc
+  target:  genesis@pipes
+  url:     https://pipes.starkandwayne.com
 
   initial_version: 0.0.4
 
@@ -29,7 +29,7 @@ meta:
     access_token: (( vault "secret/pipelines/shared/github/genesis-bot:access_token" ))
 
   slack:
-    webhook:  (( vault "secret/pipelines/blacksmith-genesis-kit/slack:webhook" ))
+    webhook:  (( vault "secret/slack/botspam:webhook" ))
     channel:  '#botspam'
     username: starkandwayne-ci
     icon:     https://www.starkandwayne.com/assets/images/shield-blue-50x50.png
