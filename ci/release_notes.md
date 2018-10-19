@@ -2,6 +2,12 @@
 
 - Update BOSH director to 268.1.0
 
+- Update Blacksmith to 1.0.3 of the BOSH release, and 0.4.2 of the
+  broker ([Release Notes](https://github.com/blacksmith-community/blacksmith/releases/tag/v0.4.2)]
+
+  This provides a smoother experience with `safe`, on-box, since
+  the Blacksmith broker now sets up a saferc and svtoken for you.
+
 - For **vSphere** Blacksmith implementations, the Blacksmith
   Director will now begin placing VMs, Disks, and Stemcells in a
   new directory that ends in `-blacksmith`, so that they are not
@@ -25,7 +31,7 @@
 | bosh-aws-cpi | [72](https://github.com/cloudfoundry/bosh-aws-cpi-release/releases/tag/v72) | - |
 | bosh-vsphere-cpi | [50](https://github.com/cloudfoundry/bosh-vsphere-cpi-release/releases/tag/v50) | - |
 | bosh-openstack-cpi | [39](https://github.com/cloudfoundry/bosh-openstack-cpi-release/releases/tag/v39) | - |
-| blacksmith | [1.0.2](https://github.com/blacksmith-community/blacksmith-boshrelease/releases/tag/v1.0.2) | - |
+| blacksmith | [1.0.3](https://github.com/blacksmith-community/blacksmith-boshrelease/releases/tag/v1.0.3) | - |
 | mariadb-forge | [0.0.1](https://github.com/blacksmith-community/mariadb-forge-boshrelease/releases/tag/v0.0.1) | - |
 | postgresql-forge | [0.1.1](https://github.com/blacksmith-community/postgresql-forge-boshrelease/releases/tag/v0.1.1) | - |
 | rabbitmq-forge | [0.1.2](https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/tag/v0.1.2) | - |
