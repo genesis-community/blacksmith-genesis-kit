@@ -14,6 +14,10 @@ certificates:
         valid_for: 1y
         names:
           - ${params.ip}
+      blobstore:
+        valid_for: 1y
+        names:
+          - ${params.ip}
 
     tls/nats:
       ca: {valid_for: 1y}

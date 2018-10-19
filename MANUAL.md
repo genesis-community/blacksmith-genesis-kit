@@ -16,10 +16,12 @@ new data services instances on behalf of end users.
 
 - `stemcell_os` - The operating system you want to deploy the
   Blacksmith service broker itself on.  This defaults to
-  `ubuntu-trusty`.
+  `ubuntu-xenial`.
 
 - `stemcell_version` - The version of the stemcell to deploy.
-  Defaults to `latest`, which is usually what you want.
+  Defaults to `97.latest`, which is usually what you want, since
+  this kit uses precompiled BOSH director releases that only work
+  on the 97.x ubuntu-xenial series.
 
 - `vm_type` - The name of the `vm_type` (per cloud-config) that
   will be used to deploy the blacksmith broker VM.  Defaults to

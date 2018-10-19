@@ -16,10 +16,10 @@ stemcells:
     sha1:    206b4de50512485c7e3011ddac36e2f0c798272a
 
 releases:
-- name:    bosh-openstack-cpi
-  version: '33'
-  url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-openstack-cpi-release?v=33
-  sha1:    86b8eedcb0a6be3e821a5d0042916180706262be
+  - name:    bosh-openstack-cpi
+    version: 39
+    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-openstack-cpi-release?v=39
+    sha1:    23d565ae5a90c0889e9832354589221ee8d41695
 
 instance_groups:
 - name: bosh

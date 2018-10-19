@@ -2,6 +2,7 @@
 instance_groups:
   - name: blacksmith
     jobs:
+      - { release: bpm,  name: bpm }
       - { release: bosh, name: nats }
       - { release: bosh, name: postgres-9.4 }
       - { release: bosh, name: blobstore }
@@ -46,6 +47,11 @@ instance_groups:
         agent:
           user:     agent
           password: (( vault meta.vault "/blobstore/agent:password" ))
+        tls:
+          cert:
+            ca:          (( vault meta.vault "/tls/ca:certificate" ))
+            certificate: (( vault meta.vault "/tls/blobstore:certificate" ))
+            private_key: (( vault meta.vault "/tls/blobstore:key" ))
 
       ## POSTGRES CONFIGURATION
       postgres: &db
@@ -97,6 +103,11 @@ instance_groups:
 
 releases:
   - name:    bosh
-    version: "264.5.0"
-    url:     https://s3.amazonaws.com/bosh-compiled-release-tarballs/bosh-264.5.0-ubuntu-trusty-3468.13-20171214-231004-994547171-20171214231009.tgz?versionId=66MJhlOuDZn3SM18oBXxVP6DuV2BOXZi
-    sha1:    0ff5b856bbdb901691e98283823fd1f112768569
+    version: "268.1.0"
+    url:     https://s3.amazonaws.com/bosh-compiled-release-tarballs/bosh-268.1.0-ubuntu-xenial-97.22-20181005-190759-007936197-20181005190803.tgz
+    sha1:    ad96e6d3a0d7ed9dc52cc4e7c33690b8d099b9fe
+
+  - name:    bpm
+    version: "0.12.3"
+    url:     https://s3.amazonaws.com/bosh-compiled-release-tarballs/bpm-0.12.3-ubuntu-xenial-97.17-20180919-183904-508666998-20180919183910.tgz?versionId=prHEVL4zedQ.NxMXbIOUGlwq6hidaqYq
+    sha1:    f57c590660fb00a55e23fa9a955e79d39ef21d1a
