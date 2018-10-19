@@ -11,6 +11,9 @@
   Existing VMs, disks and stemcells will stay where they are, and
   BOSH will be totally okay with that.
 
+- The `eden` addon has been replaced with the `boss` addon.
+  You can get `boss` at https://github.com/jhunt/boss/releases
+
 # Core Components
 
 | Release | Version | Release Date |

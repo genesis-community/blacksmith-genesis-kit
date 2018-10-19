@@ -4,9 +4,9 @@ vault="secret/$GENESIS_VAULT_PREFIX"
 
 ip=$(lookup params.ip)
 port=$(lookup params.port 3000)
-export SB_BROKER_URL=http://$ip:$port
-export SB_BROKER_USERNAME=blacksmith
-export SB_BROKER_PASSWORD=$(safe read $vault/broker:password)
+export BLACKSMITH_URL=http://$ip:$port
+export BLACKSMITH_USERNAME=blacksmith
+export BLACKSMITH_PASSWORD=$(safe read $vault/broker:password)
 
 export BOSH_ENVIRONMENT=https://$(lookup params.ip):25555
 export BOSH_CA_CERT=$(safe read $vault/tls/ca:certificate)
@@ -28,16 +28,16 @@ describe "  password: #G{$BOSH_CLIENT_SECRET}"
     echo
     echo
     echo "blacksmith web management UI"
-describe "  web url:   #C{$SB_BROKER_URL}"
-describe "  username:  #M{$SB_BROKER_USERNAME}"
-describe "  password:  #G{$SB_BROKER_PASSWORD}"
-describe "  clickable: #B{http://$SB_BROKER_USERNAME:$SB_BROKER_PASSWORD@$ip:$port}"
+describe "  web url:   #C{$BLACKSMITH_URL}"
+describe "  username:  #M{$BLACKSMITH_USERNAME}"
+describe "  password:  #G{$BLACKSMITH_PASSWORD}"
+describe "  clickable: #B{http://$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD@$ip:$port}"
     echo
     echo
     echo "blacksmith catalog"
-if ! command -v eden >/dev/null 2>&1; then
-    echo "  !!! install the 'eden' cli to query the blacksmith catalog"
-    echo "      (https://github.com/starkandwayne/eden)"
+if ! command -v boss >/dev/null 2>&1; then
+    echo "  !!! install the 'boss' cli to query the blacksmith catalog"
+    echo "      (https://github.com/jhunt/boss)"
 else
-         eden catalog | sed -e 's/^/  /';
+         boss catalog | sed -e 's/^/  /';
 fi

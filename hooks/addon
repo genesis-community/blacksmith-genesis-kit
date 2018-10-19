@@ -5,9 +5,9 @@ alias="$GENESIS_ENVIRONMENT-blacksmith"
 
 ip=$(lookup params.ip)
 port=$(lookup params.port 3000)
-export SB_BROKER_URL=http://$ip:$port
-export SB_BROKER_USERNAME=blacksmith
-export SB_BROKER_PASSWORD=$(safe read $vault/broker:password)
+export BLACKSMITH_URL=http://$ip:$port
+export BLACKSMITH_USERNAME=blacksmith
+export BLACKSMITH_PASSWORD=$(safe read $vault/broker:password)
 
 export BOSH_ENVIRONMENT=https://$(lookup params.ip):25555
 export BOSH_CA_CERT=$(safe read $vault/tls/ca:certificate)
@@ -30,7 +30,7 @@ list() {
   echo "  bosh      Set up a local alias for the Blacksmith"
   echo "            BOSH director and log into it"
   echo
-  echo "  eden      Interact with the broker via 'eden'"
+  echo "  boss      Interact with the broker via 'boss'"
   echo "            (must be installed separately)"
   echo
   echo "  curl      Issue raw HTTP requests (via curl) against"
@@ -85,7 +85,7 @@ visit)
     echo "The 'visit' addon script only works on macOS, currently."
     exit 1
   fi
-  open "http://$SB_BROKER_USERNAME:$SB_BROKER_PASSWORD@$ip:$port"
+  open "http://$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD@$ip:$port"
   ;;
 
 bosh)
@@ -93,12 +93,12 @@ bosh)
   login
   ;;
 
-eden)
-  if ! command -v eden >/dev/null 2>&1; then
-    echo "  !!! install the 'eden' cli first!"
-    echo "      (https://github.com/starkandwayne/eden)"
+boss)
+  if ! command -v boss>/dev/null 2>&1; then
+    echo "  !!! install the 'boss' cli first!"
+    echo "      (https://github.com/jhunt/boss)"
   else
-    exec eden "$@"
+    exec boss "$@"
   fi
   ;;
 
@@ -107,7 +107,7 @@ curl)
     echo "  !!! install curl first!"
   else
     path=$1; shift
-    exec curl -u "$SB_BROKER_USERNAME:$SB_BROKER_PASSWORD" "$SB_BROKER_URL$path" "$@" #| jq -r .
+    exec curl -u "$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD" "$BLACKSMITH_URL$path" "$@" #| jq -r .
   fi
   ;;
 
@@ -125,12 +125,12 @@ register)
    describe "creating service broker #M{$env-blacksmith}..."
    cf create-service-broker \
       $env-blacksmith       \
-      $SB_BROKER_USERNAME   \
-      $SB_BROKER_PASSWORD   \
-      $SB_BROKER_URL
+      $BLACKSMITH_USERNAME   \
+      $BLACKSMITH_PASSWORD   \
+      $BLACKSMITH_URL
 
    describe "enabling service access..."
-   for x in $(curl -Lsk -u "$SB_BROKER_USERNAME:$SB_BROKER_PASSWORD" "$SB_BROKER_URL/v2/catalog" \
+   for x in $(curl -Lsk -u "$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD" "$BLACKSMITH_URL/v2/catalog" \
                    -H Accept:application/json | jq -r '.services[].id'); do
      describe "  - #C{$x}"
      cf enable-service-access $x

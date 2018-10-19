@@ -286,12 +286,12 @@ params:
   to interact with the Blacksmith BOSH director, for
   troubleshooting and diagnostics.
 
-- `eden` - Runs `eden`, a command-line utility for interacting
+- `boss` - Runs `boss`, a command-line utility for interacting
   directly with Blacksmith via the Open Service Broker API,
   without needing a Cloud Foundry instance.
 
-  This requires that you have `eden` already installed.  You can
-  get `eden` from https://github.com/starkandwayne/eden/releases
+  This requires that you have `boss` already installed.  You can
+  get `boss` from https://github.com/jhunt/boss/releases
 
 - `curl` - Run arbitrary HTTP requests against the Blacksmith
   Broker and its API.  This is very useful for troubleshooting
