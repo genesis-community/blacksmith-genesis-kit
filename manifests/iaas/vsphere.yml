@@ -40,9 +40,9 @@ instance_groups:
           - name:     (( grab params.vsphere_datacenter ))
             clusters: (( grab params.vsphere_clusters   ))
 
-            vm_folder:       (( concat params.env "/vms"       ))
-            template_folder: (( concat params.env "/templates" ))
-            disk_path:       (( concat params.env "/disks"     ))
+            vm_folder:       (( concat params.env "-blacksmith/vms"       ))
+            template_folder: (( concat params.env "-blacksmith/templates" ))
+            disk_path:       (( concat params.env "-blacksmith/disks"     ))
 
             datastore_pattern:            (( concat "^(" meta.vsphere.ephemeral  ")$" ))
             persistent_datastore_pattern: (( concat "^(" meta.vsphere.persistent ")$" ))
