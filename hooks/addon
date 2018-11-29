@@ -112,7 +112,7 @@ curl)
   ;;
 
 register)
-  env=${1:$GENESIS_ENVIRONMENT}
+  env=${1:-$GENESIS_ENVIRONMENT}
   cf_api=$(exodus $env/cf api_url)
   cf_user=$(exodus $env/cf admin_username)
   cf_pass=$(exodus $env/cf admin_password)
