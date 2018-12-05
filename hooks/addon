@@ -117,9 +117,16 @@ register)
   cf_user=$(exodus $env/cf admin_username)
   cf_pass=$(exodus $env/cf admin_password)
 
+  CF_OPTIONS=""
+  cf_skip_ssl=$(exodus $env/cf self-signed)
+
+  if [[ "$cf_skip_ssl" == "1" ]] ; then
+    CF_OPTIONS="$CF_OPTIONS --skip-ssl-validation"
+  fi
+
   (export HOME=$(mktemp -d blacksmith.regXXXXXXX)
    describe "authenticating to #C{$cf_api} as #G{$cf_user}..."
-   cf api ${cf_api}
+   cf api ${cf_api} ${CF_OPTIONS}
    cf auth ${cf_user} ${cf_pass}
 
    describe "creating service broker #M{$env-blacksmith}..."
