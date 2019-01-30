@@ -11,16 +11,16 @@ params:
   aws_default_sgs: (( param "What security groups should VMs be placed in, if none are specified via Cloud Config?" ))
 
   stemcells:
-    - name:    bosh-aws-xen-hvm-ubuntu-trusty-go_agent
-      version: '3468.17'
-      url:     https://bosh.io/d/stemcells/bosh-aws-xen-hvm-ubuntu-trusty-go_agent?v=3468.17
-      sha1:    2fb1a3327987e8e2578e5c7c654c2439fab13c26
+    - name:    bosh-aws-xen-hvm-ubuntu-xenial-go_agent
+      version: '170.25'
+      url:     https://bosh.io/d/stemcells/bosh-aws-xen-hvm-ubuntu-xenial-go_agent?v=170.25
+      sha1:    33583a46ecc3eaa9f3be2a0187817a9b06367e36
 
 releases:
   - name:    bosh-aws-cpi
-    version: 72
-    sha1:    b7999e95115bb691a630c07f0439ef5b577884c2
-    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?v=72
+    version: 73
+    sha1:    350aa469deb281911b64d0be99faacfd26acdfaf
+    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?v=73
 
 instance_groups:
 - name: bosh

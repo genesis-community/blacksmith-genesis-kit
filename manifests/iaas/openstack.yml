@@ -10,16 +10,16 @@ params:
   openstack_default_security_groups: (( param "What OpenStack SGs are applied to VMs by default?" ))
 
 stemcells:
-  - name:    bosh-openstack-kvm-ubuntu-trusty-go_agent
-    version: '3468.17'
-    url:     https://bosh.io/stemcells/bosh-openstack-kvm-ubuntu-trusty-go_agent?v=3468.17
-    sha1:    206b4de50512485c7e3011ddac36e2f0c798272a
+  - name:    bosh-openstack-kvm-ubuntu-xenial-go_agent
+    version: '170.25'
+    url:     https://bosh.io/stemcells/bosh-openstack-kvm-ubuntu-xenial-go_agent?v=170.25
+    sha1:    7f3db7c4aab94df8410ff91d4e1b0fb11c741eaf
 
 releases:
   - name:    bosh-openstack-cpi
-    version: 39
-    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-openstack-cpi-release?v=39
-    sha1:    23d565ae5a90c0889e9832354589221ee8d41695
+    version: 41
+    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-openstack-cpi-release?v=41
+    sha1:    c5a8e16e11dce28e3f9ff1dbb1662040d1db0398
 
 instance_groups:
 - name: bosh

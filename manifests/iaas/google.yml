@@ -10,16 +10,16 @@ params:
     - time4.google.com
 
   stemcells:
-    - name:    bosh-google-kvm-ubuntu-trusty-go_agent
-      version: '3468.17'
-      url:     https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3468.17
-      sha1:    a5170583df951bff10a1e23183aae880890b8858
+    - name:    bosh-google-kvm-ubuntu-xenial-go_agent
+      version: '170.25'
+      url:     https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-xenial-go_agent?v=170.25
+      sha1:    f03d6263803ae88a50cbb54f2797207b0ea0d14a
 
 releases:
   - name:    bosh-google-cpi
-    version: 27.0.1
-    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=27.0.1
-    sha1:    1cd4e89aa2ba7479ad65a68ae520d104590a2c5b
+    version: 28.0.1
+    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=28.0.1
+    sha1:    0020f77fbb7ac6de0698bdb5e7a64d338f2ca181
 
 instance_groups:
 - name: bosh

@@ -5,16 +5,16 @@ params:
   azure_default_sg:     (( param "Specify the default security group for your Azure VMs" ))
 
   stemcells:
-    - name:    bosh-azure-hyperv-ubuntu-trusty-go_agent
-      version: '3468.17'
-      url:     https://bosh.io/d/stemcells/bosh-azure-hyperv-ubuntu-trusty-go_agent?v=3468.17
-      sha1:    dbda00669abca9ff9399b01626808dd0f8aa5587
+    - name:    bosh-azure-hyperv-ubuntu-xenial-go_agent
+      version: '170.25'
+      url:     https://bosh.io/d/stemcells/bosh-azure-hyperv-ubuntu-xenial-go_agent?v=170.25
+      sha1:    49b9bb63850985eb49a9a5761ebd179f459b6e6f
 
 releases:
   - name:    bosh-azure-cpi
-    version: "35.4.0"
-    sha1:    372c0220e2e38ca9201135eccb52ff912f2d0538
-    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-azure-cpi-release?v=35.4.0
+    version: "35.5.0"
+    sha1:    116a744c746c0fe7f32577323920ac379066fbe0
+    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-azure-cpi-release?v=35.5.0
 
 instance_groups:
 - name: bosh
