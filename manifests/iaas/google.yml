@@ -22,7 +22,7 @@ releases:
     sha1:    0020f77fbb7ac6de0698bdb5e7a64d338f2ca181
 
 instance_groups:
-- name: bosh
+- name: blacksmith
   jobs:
   - name: google_cpi
     release: bosh-google-cpi

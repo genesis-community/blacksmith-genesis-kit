@@ -23,7 +23,7 @@ releases:
     url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?v=73
 
 instance_groups:
-- name: bosh
+- name: blacksmith
   jobs:
   - name: aws_cpi
     release: bosh-aws-cpi
