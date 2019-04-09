@@ -17,7 +17,7 @@ releases:
     url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-azure-cpi-release?v=35.5.0
 
 instance_groups:
-- name: bosh
+- name: blacksmith
   jobs:
   - name: azure_cpi
     release: bosh-azure-cpi
