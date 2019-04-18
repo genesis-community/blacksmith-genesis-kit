@@ -102,12 +102,13 @@ instance_groups:
           ca_cert:  (( vault meta.vault "/tls/ca:certificate" ))
 
 releases:
-  - name:    bosh
-    version: "268.5.0"
-    url:     https://s3.amazonaws.com/bosh-compiled-release-tarballs/bosh-268.5.0-ubuntu-xenial-170.21-20190118-233542-282112939-20190118233548.tgz
-    sha1:    ff59fbe7a3b32930a2cb45ff3ed1d3a30e059420
+- name:     bosh
+  version: "268.6.0"
+  url:     https://s3.amazonaws.com/bosh-compiled-release-tarballs/bosh-268.6.0-ubuntu-xenial-250.17-20190306-225307-394348002-20190306225316.tgz
+  sha1:    3e37786c9dcb0a73a34ee55c89b3a43d84e72c25 
 
-  - name:    bpm
-    version: "1.0.2"
-    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bpm-release?v=1.0.2
-    sha1:    41cb53a672e59581577af5ed11abf04d61cf3887
+- name:    bpm
+  version: 0.12.3
+  url: https://s3.amazonaws.com/bosh-compiled-release-tarballs/bpm-0.12.3-ubuntu-xenial-250.17-20190306-224046-281277028-20190306224052.tgz
+  sha1: 782f31d0472e5e549f598ecddbb40e042c36ce1b
+
