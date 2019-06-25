@@ -1,6 +1,6 @@
 ---
 kit:
-  subkits:
+  features:
     - vsphere
     - redis
     - rabbitmq
@@ -8,16 +8,13 @@ kit:
 
 params:
   env:   ci-baseline
-  vault: genesis-ci/blacksmith/ci/baseline
   bosh:  genesis-ci
 
-  network: genesis-ci
-  ip: 10.200.190.128
+  ip: 10.128.8.144
 
   # vSphere
-  vsphere_ip: 10.200.129.1
-  vsphere_ephemeral_datastores:   [datastore3]
-  vsphere_persistent_datastores:  [datastore4]
+  vsphere_ephemeral_datastores:   [iSCSI-1]
+  vsphere_persistent_datastores:  [iSCSI-1]
   vsphere_clusters: [cluster1]
   vsphere_datacenter: Buffalo-Lab
 
