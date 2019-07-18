@@ -22,9 +22,10 @@ meta:
 
 releases:
   - name:    postgresql-forge
-    version: 0.2.0
-    url:     https://github.com/blacksmith-community/postgresql-forge-boshrelease/releases/download/v0.2.0/postgresql-forge-0.2.0.tgz
-    sha1:    ea31558261afee6618d8fa466286665b8fcaa39e
+    version: 0.2.1
+    url:     https://github.com/blacksmith-community/postgresql-forge-boshrelease/releases/download/v0.2.1/postgresql-forge-0.2.1.tgz
+    sha1:    0ed2122605e911e1ed96bafb02dbd1d764b60c8e
+
 params:
   releases:
     - (( append ))

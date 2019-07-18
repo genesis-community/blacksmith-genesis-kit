@@ -16,9 +16,9 @@ meta:
 
 releases:
   - name:    mariadb-forge
-    version: 0.1.0
-    url:     https://github.com/blacksmith-community/mariadb-forge-boshrelease/releases/download/v0.1.0/mariadb-forge-0.1.0.tgz
-    sha1:    ab3c43e554672e879c60b476af9a5b5d63ed9675
+    version: 0.1.1
+    url:     https://github.com/blacksmith-community/mariadb-forge-boshrelease/releases/download/v0.1.1/mariadb-forge-0.1.1.tgz
+    sha1:    6e7d2e96a358c36da1a21913f1964a0ac2ec14dc
 
 params:
   releases:
