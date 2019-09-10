@@ -15,8 +15,10 @@ meta:
         nodes:       3
 
 releases:
-  - name: kubernetes-forge
-    version: latest
+  - name:    kubernetes-forge
+    version: 1.0.0
+    url:     https://github.com/blacksmith-community/kubernetes-forge-boshrelease/releases/download/v1.0.0/kubernetes-forge-1.0.0.tgz
+    sha1:    01a04f6b80daafadfdfd3d5fcc83344193b83a81
 
 params:
   releases:
