@@ -1,0 +1,41 @@
+---
+meta:
+  default:
+    kubernetes_tags:
+      - blacksmith
+      - dedicated
+      - kubernetes
+
+    kubernetes_plans:
+      cluster:
+        name:        cluster
+        description: A 3-node Kubernetes cluster
+        limit:       7
+        type:        cluster
+        nodes:       3
+
+releases:
+  - name: kubernetes-forge
+    version: latest
+
+params:
+  releases:
+    - (( append ))
+    - name:    k8s
+      version: 1.14.0-build.3
+      url:     https://github.com/jhunt/k8s-boshrelease/releases/download/v1.14.0-build.3/k8s-1.14.0-build.3.tgz
+      sha1:    22c2b7e814e7c4e4093ae67ab9ffc8a7d4fd63d6
+
+instance_groups:
+  - name: blacksmith
+    jobs:
+      - release: kubernetes-forge
+        name:    kubernetes-blacksmith-plans
+        properties:
+          plans: (( grab params.kubernetes_plans || meta.default.kubernetes_plans ))
+          service:
+            id:          (( grab params.kubernetes_service_id          || "kubernetes" ))
+            name:        (( grab params.kubernetes_service_name        || params.kubernetes_service_id || "kubernetes" ))
+            description: (( grab params.kubernetes_service_description || "A Kubernetes cluster, deployed on-demand" ))
+            tags:        (( grab params.kubernetes_service_tags        || meta.default.kubernetes_tags ))
+            limit:       (( grab params.kubernetes_service_limit       || 0 ))

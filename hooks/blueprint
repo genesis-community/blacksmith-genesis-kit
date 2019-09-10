@@ -4,7 +4,7 @@ set -eu
 declare -a merge
 
 validate_features aws azure google openstack vsphere \
-                  rabbitmq redis postgresql mariadb
+                  rabbitmq redis postgresql mariadb kubernetes
 
 #
 # We always start out with the skeleton of a BOSH deployment,
@@ -34,7 +34,7 @@ forges=0
 for want in ${GENESIS_REQUESTED_FEATURES}; do
   case "$want" in
   # Forges
-  rabbitmq|redis|postgresql|mariadb)
+  rabbitmq|redis|postgresql|mariadb|kubernetes)
     forges=$(( forges + 1 ))
     merge+=( manifests/forges/$want.yml )
     ;;
