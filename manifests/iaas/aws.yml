@@ -12,9 +12,9 @@ params:
 
   stemcells:
     - name:    bosh-aws-xen-hvm-ubuntu-xenial-go_agent
-      version: '170.25'
-      url:     https://bosh.io/d/stemcells/bosh-aws-xen-hvm-ubuntu-xenial-go_agent?v=170.25
-      sha1:    33583a46ecc3eaa9f3be2a0187817a9b06367e36
+      version: '456.22'
+      url:     https://bosh.io/d/stemcells/bosh-aws-xen-hvm-ubuntu-xenial-go_agent?v=456.22
+      sha1:    c8635ccf8d42b3d937ebdd908de445322711f0e1
 
 releases:
   - name:    bosh-aws-cpi

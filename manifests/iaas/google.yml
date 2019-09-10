@@ -11,9 +11,9 @@ params:
 
   stemcells:
     - name:    bosh-google-kvm-ubuntu-xenial-go_agent
-      version: '170.25'
-      url:     https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-xenial-go_agent?v=170.25
-      sha1:    f03d6263803ae88a50cbb54f2797207b0ea0d14a
+      version: '456.22'
+      url:     https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-xenial-go_agent?v=456.22
+      sha1:    2f7ea727b95fe15911e1812836fe97c727493220
 
 releases:
   - name:    bosh-google-cpi
