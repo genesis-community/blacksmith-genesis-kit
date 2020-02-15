@@ -11,15 +11,15 @@ params:
 
   stemcells:
     - name:    bosh-google-kvm-ubuntu-xenial-go_agent
-      version: '456.22'
-      url:     https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-xenial-go_agent?v=456.22
-      sha1:    2f7ea727b95fe15911e1812836fe97c727493220
+      version: '621.55'
+      url:     https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-xenial-go_agent?v=621.55
+      sha1:    eadbbd43d09bef7e2877cde032d68321444d10df
 
 releases:
   - name:    bosh-google-cpi
-    version: 28.0.1
-    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=28.0.1
-    sha1:    0020f77fbb7ac6de0698bdb5e7a64d338f2ca181
+    version: 30.0.0
+    url:     https://bosh.io/d/github.com/cloudfoundry/bosh-google-cpi-release?v=30.0.0
+    sha1:    fe4643b66f56dfd8a58df70b647bdc7d7e0c1273
 
 instance_groups:
 - name: blacksmith

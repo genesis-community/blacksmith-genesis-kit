@@ -6,15 +6,15 @@ params:
 
   stemcells:
     - name:    bosh-azure-hyperv-ubuntu-xenial-go_agent
-      version: '456.22'
-      url:     https://bosh.io/d/stemcells/bosh-azure-hyperv-ubuntu-xenial-go_agent?v=456.22
-      sha1:    6c3f91420ba422b24ebf51da29970b090ecb5252
+      version: '621.55'
+      url:     https://bosh.io/d/stemcells/bosh-azure-hyperv-ubuntu-xenial-go_agent?v=621.55
+      sha1:    fc4abbd30ede17ca8c31c3a43750608966becfd3
 
 releases:
   - name:    bosh-azure-cpi
-    version: "35.5.0"
-    sha1:    116a744c746c0fe7f32577323920ac379066fbe0
-    url:     https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-azure-cpi-release?v=35.5.0
+    version: "37.1.0"
+    sha1:    849500c3709e97c3b7497d0f09c7a77279877b09
+    url:     https://bosh.io/d/github.com/cloudfoundry/bosh-azure-cpi-release?v=37.1.0
 
 instance_groups:
 - name: blacksmith
