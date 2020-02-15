@@ -22,9 +22,9 @@ meta:
 
 releases:
   - name:    postgresql-forge
-    version: 0.2.1
-    url:     https://github.com/blacksmith-community/postgresql-forge-boshrelease/releases/download/v0.2.1/postgresql-forge-0.2.1.tgz
-    sha1:    0ed2122605e911e1ed96bafb02dbd1d764b60c8e
+    version: 0.3.0
+    url:     https://github.com/blacksmith-community/postgresql-forge-boshrelease/releases/download/v0.3.0/postgresql-forge-0.3.0.tgz
+    sha1:    cf80cc1c431273e760ad7e288c00ad4aacb1cdee
 
 params:
   releases:
@@ -33,6 +33,10 @@ params:
       version: 2.0.0
       url:     https://github.com/cloudfoundry-community/postgres-boshrelease/releases/download/v2.0.0/postgres-2.0.0.tgz
       sha1:    dea5cad517c62afaf97a1b31df41ad691928d960
+    - name:    postgres
+      version: 3.2.1
+      url:     https://github.com/cloudfoundry-community/postgres-boshrelease/releases/download/v3.2.1/postgres-3.2.1.tgz
+      sha1:    b687753085f770807603642b4bae6c17a483900b
 
 instance_groups:
   - name: blacksmith
