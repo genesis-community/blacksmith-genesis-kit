@@ -9,6 +9,9 @@ new data services instances on behalf of end users.
 - `ip` - The static IP address to deploy the Blacksmith broker
   to.  This must exist within the static range of the `network`.
 
+- 'shareable` - When registering the service broker, advertise the
+  services as shareable or not.
+
 ## Sizing and Deployment Parameters
 
 - `network` - The name of the `network` (per cloud-config) where
@@ -278,6 +281,9 @@ params:
   Foundry instance (deployed by Genesis).  Optionally takes the
   name of the CF environment to register with.
 
+  If the service broker is already registered, this will run
+  update-service-broker instead.
+
 - `bosh` - Sets up a local alias for the Blacksmith (Internal)
   BOSH director, retrieves the X.509 CA Certificate and BOSH admin
   credentials, and authenticates to it.
@@ -314,6 +320,8 @@ params:
   env: acme-us-east-1-prod
 
   ip: 10.0.134.4
+
+  shareable: true
 
   # vSphere
   vsphere_ip:         10.0.0.254
