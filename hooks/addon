@@ -129,13 +129,26 @@ register)
    cf api ${cf_api} ${CF_OPTIONS}
    cf auth ${cf_user} ${cf_pass}
 
-   describe "creating service broker #M{$env-blacksmith}..."
-   cf create-service-broker \
-      $env-blacksmith       \
-      $BLACKSMITH_USERNAME   \
-      $BLACKSMITH_PASSWORD   \
-      $BLACKSMITH_URL
+   broker_registered=$(cf service-brokers |tail -n +4| awk '{ print $1 }'|grep -ic "$env-blacksmith")
 
+   if [[ "$broker_registered" == "1" ]] ; then
+       describe "updating service broker #M{$env-blacksmith}..."
+       cf update-service-broker \
+          $env-blacksmith       \
+          $BLACKSMITH_USERNAME   \
+          $BLACKSMITH_PASSWORD   \
+          $BLACKSMITH_URL
+
+   else
+
+       describe "creating service broker #M{$env-blacksmith}..."
+       cf create-service-broker \
+          $env-blacksmith       \
+          $BLACKSMITH_USERNAME   \
+          $BLACKSMITH_PASSWORD   \
+          $BLACKSMITH_URL
+
+   fi
    describe "enabling service access..."
    for x in $(curl -Lsk -u "$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD" "$BLACKSMITH_URL/v2/catalog" \
                    -H Accept:application/json | jq -r '.services[].id'); do
