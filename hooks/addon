@@ -129,10 +129,11 @@ register)
    cf api ${cf_api} ${CF_OPTIONS}
    cf auth ${cf_user} ${cf_pass}
 
-   broker_registered=$(cf service-brokers |tail -n +4| awk '{ print $1 }'|grep -ic "$env-blacksmith")
+   env_is_registered=$(cf curl /v2/service_brokers|jq --arg env_name "${env}-blacksmith" -r '.resources[].entity | select(.name==$env_name) | .name' )
 
-   if [[ "$broker_registered" == "1" ]] ; then
-       describe "updating service broker #M{$env-blacksmith}..."
+   if [[ -n $env_is_registered ]] ; then
+
+       describe "Found and updating service broker #M{$env-blacksmith}..."
        cf update-service-broker \
           $env-blacksmith       \
           $BLACKSMITH_USERNAME   \
