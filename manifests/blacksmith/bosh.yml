@@ -36,6 +36,19 @@ instance_groups:
             certificate: (( vault meta.vault "/tls/nats/hm:certificate" ))
             private_key: (( vault meta.vault "/tls/nats/hm:key"         ))
 
+      agent:
+        mbus: (( concat "nats://" instance_groups.blacksmith.properties.nats.user ":" instance_groups.blacksmith.properties.nats.password "@" params.ip ":4222" ))
+        env:
+          bosh:
+            blobstores:
+              - provider: dav
+                options:
+                  # FIXME: one day we should set this to https://, for full TLS
+                  endpoint: (( concat "http://" params.ip ":25250" ))
+                  user:     agent
+                  password: (( vault meta.vault "/blobstore/agent:password" ))
+
+
       ## BLOBSTORE CONFIGURATION
       blobstore:
         address: (( grab params.ip ))
