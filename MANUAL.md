@@ -9,7 +9,7 @@ new data services instances on behalf of end users.
 - `ip` - The static IP address to deploy the Blacksmith broker
   to.  This must exist within the static range of the `network`.
 
-- 'shareable` - When registering the service broker, advertise the
+- `shareable` - When registering the service broker, advertise the
   services as shareable or not.
 
 ## Sizing and Deployment Parameters
