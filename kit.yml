@@ -1,8 +1,11 @@
 ---
-name:   Blacksmith
-author: James Hunt <james@niftylogic.com>
-docs:   https://github.com/cloudfoundry-community/blacksmith-boshrelease
-code:   https://github.com/genesis-community/blacksmith-genesis-kit
+name:    blacksmith
+version: 0.7.1
+author:  James Hunt <james@niftylogic.com>
+docs:     https://github.com/cloudfoundry-community/blacksmith-boshrelease
+code:     https://github.com/genesis-community/blacksmith-genesis-kit
+
+description: Blacksmith
 
 genesis_version_min: 2.6.0
 
