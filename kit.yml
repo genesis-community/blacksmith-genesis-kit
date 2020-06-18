@@ -52,4 +52,3 @@ credentials:
     users/blacksmith:   {password: random 64}
 
     registry:           {password: random 64}
-

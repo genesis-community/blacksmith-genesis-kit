@@ -1,0 +1,30 @@
+---
+meta:
+  default_bosh_exodus_path:     (( concat $GENESIS_ENVIRONMENT "/bosh" ))
+  bosh_exodus_path:             (( grab params.bosh_exodus_path || meta.default_bosh_exodus_path ))
+  bosh_exodus_src:              (( concat $GENESIS_EXODUS_MOUNT meta.bosh_exodus_path ":" ))
+  
+  external_bosh_username: (( vault meta.bosh_exodus_src "blacksmith_user" ))
+  external_bosh_password: (( vault meta.bosh_exodus_src "blacksmith_password" ))
+  external_bosh_address: (( vault meta.bosh_exodus_src "url" ))
+  external_bosh_cacert: (( vault meta.bosh_exodus_src "ca_cert" ))
+
+exodus:
+  bosh_cacert: (( grab params.external_bosh.cacert || meta.external_bosh_cacert ))
+
+params:
+  cloud_config: []
+
+instance_groups:
+  - name: blacksmith
+    jobs:
+      - release: blacksmith
+        name: blacksmith
+        properties:
+          bosh:
+            username: (( grab params.external_bosh.username || meta.external_bosh_username ))
+            password: (( grab params.external_bosh.password || meta.external_bosh_password ))
+            address:  (( grab params.external_bosh.address || meta.external_bosh_address))
+            stemcells: []
+            releases: []
+            cloud-config: []

@@ -14,6 +14,10 @@ exodus:
   broker_url: (( concat "http://" params.ip ":" params.blacksmith_port || 3000 ))
   broker_username: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.broker.username ))
   broker_password: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.broker.password ))
+  bosh_username: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.username ))
+  bosh_password: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.password ))
+  bosh_address: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.address ))
+  bosh_cacert: (( vault meta.vault "/tls/ca:certificate" ))
 
 instance_groups:
   - name:      blacksmith
