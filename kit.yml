@@ -38,6 +38,15 @@ certificates:
         names:
           - default.hm.bosh-internal
 
+  broker-tls:
+    broker:
+      ca: {valid_for: 1y}
+      server:
+          valid_for: 1y
+          names:
+            - ${params.ip}
+
+
 credentials:
   base:
     broker:             {password: random 64}

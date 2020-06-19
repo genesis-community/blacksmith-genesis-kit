@@ -4,7 +4,7 @@ set -eu
 declare -a merge
 
 validate_features aws azure google openstack vsphere external-bosh \
-                  rabbitmq redis postgresql mariadb kubernetes
+                  rabbitmq redis postgresql mariadb kubernetes broker-tls
 
 #
 # We always start out with the skeleton of a BOSH deployment,
@@ -18,6 +18,10 @@ if want_feature "external-bosh" ; then
   iaas=$(( iaas + 1 ))
 else
   merge+=( manifests/blacksmith/bosh.yml )
+fi
+
+if want_feature "broker-tls" ; then
+  merge+=( manifests/blacksmith/broker-tls.yml )
 fi
 
 for want in ${GENESIS_REQUESTED_FEATURES}; do

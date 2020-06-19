@@ -1,0 +1,16 @@
+meta:
+  blacksmith_tls_certificate: (( vault meta.vault "/broker/server:certificate" ))
+  blacksmith_tls_key: (( vault meta.vault "/broker/server:key" ))
+
+instance_groups:
+  - name: blacksmith
+    jobs:
+    - name: blacksmith
+      properties:
+        broker:
+          port: (( grab params.blacksmith_port || 80 ))
+          tls:
+            enabled: true
+            port: (( grab params.blacksmith_tls_port || 443 ))
+            key: (( grab meta.blacksmith_tls_key || params.blacksmith_tls_key ))
+            certificate: (( grab meta.blacksmith_tls_certificate || params.blacksmith_tls_certificate )) 
