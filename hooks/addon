@@ -7,9 +7,11 @@ ip=$(lookup params.ip)
 if want_feature "broker-tls"; then
   port=$(lookup params.blacksmith_tls_port 443)
   export BLACKSMITH_URL=https://$ip:$port
+  scheme=https
 else
   port=$(lookup params.blacksmith_port 3000)
   export BLACKSMITH_URL=http://$ip:$port
+  scheme=http
 fi
 
 export BLACKSMITH_USERNAME=blacksmith
@@ -91,7 +93,7 @@ visit)
     echo "The 'visit' addon script only works on macOS, currently."
     exit 1
   fi
-  open "http://$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD@$ip:$port"
+  open "$scheme://$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD@$ip:$port"
   ;;
 
 bosh)

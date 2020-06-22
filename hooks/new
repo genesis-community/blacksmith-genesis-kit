@@ -11,7 +11,8 @@ prompt_for iaas select \
 	-o '[aws]       Amazon Web Services'   \
 	-o '[azure]     Microsoft Azure'       \
 	-o '[google]    Google Cloud Platform' \
-	-o '[openstack] OpenStack'
+	-o '[openstack] OpenStack'             \
+	-o '[external-bosh]  Deploy to an External Bosh Director'
 
 case $iaas in
 aws)
@@ -124,6 +125,11 @@ openstack)
 	;;
 esac
 
+# Broker TLS
+echo "The Blacksmith broker can be configured to use TLS by default."
+prompt_for broker_tls boolean \
+	'Would you like to access the broker api and WebUI using https?'
+
 
 # Forges
 echo "Blacksmith Forges allow you to deploy different"
@@ -175,6 +181,10 @@ echo "    - $iaas"
 for forge in ${forges[@]}; do
   echo "    - $forge"
 done
+
+if [[ $broker_tls == 'true' ]]; then
+	echo "    - broker-tls"
+fi
 
 echo
 echo "params:"

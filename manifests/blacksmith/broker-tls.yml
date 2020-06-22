@@ -12,5 +12,5 @@ instance_groups:
           tls:
             enabled: true
             port: (( grab params.blacksmith_tls_port || 443 ))
-            key: (( grab meta.blacksmith_tls_key || params.blacksmith_tls_key ))
-            certificate: (( grab meta.blacksmith_tls_certificate || params.blacksmith_tls_certificate )) 
+            key: (( grab params.blacksmith_tls_key || meta.blacksmith_tls_key ))
+            certificate: (( grab params.blacksmith_tls_certificate || meta.blacksmith_tls_certificate ))
