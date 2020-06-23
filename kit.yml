@@ -12,7 +12,7 @@ genesis_version_min: 2.6.0
 certificates:
   base:
     tls:
-      ca: {valid_for: 1y}
+      ca: {valid_for: 10y}
       director:
         valid_for: 1y
         names:
@@ -23,7 +23,7 @@ certificates:
           - ${params.ip}
 
     tls/nats:
-      ca: {valid_for: 1y}
+      ca: {valid_for: 10y}
       server:
         valid_for: 1y
         names:
@@ -37,6 +37,15 @@ certificates:
         valid_for: 1y
         names:
           - default.hm.bosh-internal
+
+  broker-tls:
+    broker:
+      ca: {valid_for: 10y}
+      server:
+          valid_for: 1y
+          names:
+            - ${params.ip}
+
 
 credentials:
   base:

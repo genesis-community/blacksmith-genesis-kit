@@ -42,6 +42,14 @@ new data services instances on behalf of end users.
 - `blacksmith_port` - The TCP port that Blacksmith will bind to
   This defaults to `3000`.
 
+- `blacksmith_tls_port` - The TCP port that Blacksmith will bind to for tls traffic
+  This defaults to `443`.
+
+- `blacksmith_tls_certificate` - The certificate blacksmith should present for
+  https traffic on the webui and api.
+
+- `blacksmith_tls_key` - The corresponding key for the above certificate.
+
 - `blacksmith_env` - An identifying string that will be used to
   differentiate Blacksmith brokers in their management UIs.
   Defaults to empty, but you probably want to set this.
