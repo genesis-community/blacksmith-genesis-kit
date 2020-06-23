@@ -12,12 +12,12 @@ validate_features aws azure google openstack vsphere external-bosh \
 merge=( manifests/blacksmith/blacksmith.yml )
 
 iaas=0
-if ! want_feature "external-bosh" ; then
-  merge+=( manifests/blacksmith/bosh.yml )
-else
+if want_feature "external-bosh" ; then
   merge+=( manifests/blacksmith/external-bosh.yml )
   # No IaaS Specification needed with external bosh
   iaas=$(( iaas + 1 ))
+else
+  merge+=( manifests/blacksmith/bosh.yml )
 fi
 
 for want in ${GENESIS_REQUESTED_FEATURES}; do
