@@ -9,10 +9,10 @@ export BLACKSMITH_URL=http://$ip:$port
 export BLACKSMITH_USERNAME=blacksmith
 export BLACKSMITH_PASSWORD=$(safe read $vault/broker:password)
 
-export BOSH_ENVIRONMENT=https://$(lookup params.ip):25555
-export BOSH_CA_CERT=$(safe read $vault/tls/ca:certificate)
-export BOSH_CLIENT="admin"
-export BOSH_CLIENT_SECRET="$(safe read ${vault}/users/admin:password)"
+export BOSH_ENVIRONMENT=$(exodus bosh_address)
+export BOSH_CA_CERT=$(exodus bosh_cacert)
+export BOSH_CLIENT=$(exodus bosh_username)
+export BOSH_CLIENT_SECRET="$(exodus bosh_password)"
 
 list() {
   echo "The following addons are defined:"
@@ -69,8 +69,8 @@ is_logged_in() {
 login() {
   bosh logout >/dev/null 2>&1
 
-  echo "Logging you in as user 'admin'..."
-  printf "%s\n%s\n" admin "$(safe read $vault/users/admin:password)" | \
+  echo "Logging you in as user '${BOSH_CLIENT}'..."
+  printf "%s\n%s\n" "${BOSH_CLIENT}" "${BOSH_CLIENT_SECRET}" | \
     BOSH_CLIENT="" BOSH_CLIENT_SECRET="" bosh login
 }
 

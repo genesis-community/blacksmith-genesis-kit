@@ -3,16 +3,23 @@ set -eu
 
 declare -a merge
 
-validate_features aws azure google openstack vsphere \
+validate_features aws azure google openstack vsphere external-bosh \
                   rabbitmq redis postgresql mariadb kubernetes
 
 #
 # We always start out with the skeleton of a BOSH deployment,
 # and add-in a local UAA and a Credhub
-merge=( manifests/blacksmith/blacksmith.yml
-        manifests/blacksmith/bosh.yml )
+merge=( manifests/blacksmith/blacksmith.yml )
 
 iaas=0
+if want_feature "external-bosh" ; then
+  merge+=( manifests/blacksmith/external-bosh.yml )
+  # No IaaS Specification needed with external bosh
+  iaas=$(( iaas + 1 ))
+else
+  merge+=( manifests/blacksmith/bosh.yml )
+fi
+
 for want in ${GENESIS_REQUESTED_FEATURES}; do
   case "$want" in
   # IaaS selector feature flags

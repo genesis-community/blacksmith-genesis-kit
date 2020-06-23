@@ -103,6 +103,26 @@ new data services instances on behalf of end users.
   - `vsphere_clusters` - A YAML list of vSphere cluster names
     where Blacksmith will deploy service VMs.
 
+
+- `external-bosh` (IaaS substitute) - Deploy the on-demand services to an
+  existing bosh director.  You will need to provide all of the information
+  Blacksmith needs to contact bosh director for deployments orchestration
+  purposes.
+
+  Activating this feature also activates the following parameters:
+
+  - `external_bosh.address` - The IP address of the external BOSH director to
+    deploy to.
+
+  - `external_bosh.cacert` - The CA certificate of the external BOSH director.
+
+  - `external_bosh.username` - The username to authenticate with the external
+    bosh director. This user must have permissions to manage its deployments,
+    upload releases and stemcells.
+
+  - `external_bosh.password` - The password for the above user to authenticate
+    against the external bosh director.
+
 - `postgresql` (Blacksmit Forge) - Enables the Blacksmith Service
   Broker to deploy PostgreSQL database services.
 
