@@ -121,21 +121,21 @@ curl)
 
 register)
   env=${1:-$GENESIS_ENVIRONMENT}
-  cf_api=$(exodus $env/cf api_url)
-  cf_user=$(exodus $env/cf admin_username)
-  cf_pass=$(exodus $env/cf admin_password)
+  cf_api=$(exodus "$env/cf" api_url)
+  cf_user=$(exodus "$env/cf" admin_username)
+  cf_pass=$(exodus "$env/cf" admin_password)
 
   CF_OPTIONS=""
-  cf_skip_ssl=$(exodus $env/cf self-signed)
+  cf_skip_ssl=$(exodus "$env/cf" self-signed)
 
-  if [[ "$cf_skip_ssl" == "1" ]] ; then
+  if [[ "$cf_skip_ssl" == "true" || "$cf_skip_ssl" == "1" ]] ; then
     CF_OPTIONS="$CF_OPTIONS --skip-ssl-validation"
   fi
 
-  (export HOME=$(mktemp -d blacksmith.regXXXXXXX)
+  (export HOME="$(mktemp -d blacksmith.regXXXXXXX)"
    describe "authenticating to #C{$cf_api} as #G{$cf_user}..."
-   cf api ${cf_api} ${CF_OPTIONS}
-   cf auth ${cf_user} ${cf_pass}
+   cf api "${cf_api}" ${CF_OPTIONS}
+   cf auth "${cf_user}" "${cf_pass}"
 
    env_is_registered=$(cf curl /v2/service_brokers|jq --arg env_name "${env}-blacksmith" -r '.resources[].entity | select(.name==$env_name) | .name' )
 
@@ -143,26 +143,26 @@ register)
 
        describe "Found and updating service broker #M{$env-blacksmith}..."
        cf update-service-broker \
-          $env-blacksmith       \
-          $BLACKSMITH_USERNAME   \
-          $BLACKSMITH_PASSWORD   \
-          $BLACKSMITH_URL
+          "${env}-blacksmith"       \
+          "$BLACKSMITH_USERNAME"   \
+          "$BLACKSMITH_PASSWORD"   \
+          "$BLACKSMITH_URL"
 
    else
 
        describe "creating service broker #M{$env-blacksmith}..."
        cf create-service-broker \
-          $env-blacksmith       \
-          $BLACKSMITH_USERNAME   \
-          $BLACKSMITH_PASSWORD   \
-          $BLACKSMITH_URL
+          "${env}-blacksmith"       \
+          "$BLACKSMITH_USERNAME"   \
+          "$BLACKSMITH_PASSWORD"   \
+          "$BLACKSMITH_URL"
 
    fi
    describe "enabling service access..."
    for x in $(curl -Lsk -u "$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD" "$BLACKSMITH_URL/v2/catalog" \
                    -H Accept:application/json | jq -r '.services[].id'); do
      describe "  - #C{$x}"
-     cf enable-service-access $x
+     cf enable-service-access "$x"
   done)
   ;;
 
