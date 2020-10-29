@@ -16,9 +16,9 @@ meta:
 
 releases:
   - name:    redis-forge
-    version: 0.4.3
-    url:     https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v0.4.3/redis-forge-0.4.3.tgz
-    sha1:    d27db4e23a27bc0a223c54e32b31439f2d43db44
+    version: 0.4.5
+    url:     https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v0.4.5/redis-forge-0.4.5.tgz
+    sha1:    020edc199fb3957bc6543db79c8eebae31e88135
 
 params:
   releases:
