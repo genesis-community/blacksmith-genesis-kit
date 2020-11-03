@@ -52,9 +52,9 @@ instance_groups:
 
 releases:
 - name:    blacksmith
-  version: 1.2.2
-  url:     https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v1.2.2/blacksmith-1.2.2.tgz
-  sha1:    f704b360dcacdb7e4d8f7b048b9f649053c8e606
+  version: 1.4.0
+  url:     https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v1.4.0/blacksmith-1.4.0.tgz
+  sha1:    515cb36fbe8d298df0c3e32d83b76b9ddb095c9b
 
 stemcells:
   - alias: default
