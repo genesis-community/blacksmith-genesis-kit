@@ -1,0 +1,54 @@
+secret/base/vsphere/blacksmith/blobstore/agent:
+  password: <!{meta.vault}/blobstore/agent:password!>
+secret/base/vsphere/blacksmith/blobstore/director:
+  password: <!{meta.vault}/blobstore/director:password!>
+secret/base/vsphere/blacksmith/broker:
+  password: <!{meta.vault}/broker:password!>
+secret/base/vsphere/blacksmith/db:
+  password: <!{meta.vault}/db:password!>
+secret/base/vsphere/blacksmith/nats:
+  password: <!{meta.vault}/nats:password!>
+secret/base/vsphere/blacksmith/registry:
+  password: <!{meta.vault}/registry:password!>
+secret/base/vsphere/blacksmith/tls/blobstore:
+  certificate: <!{meta.vault}/tls/blobstore:certificate!>
+  combined: <!{meta.vault}/tls/blobstore:combined!>
+  key: <!{meta.vault}/tls/blobstore:key!>
+secret/base/vsphere/blacksmith/tls/ca:
+  certificate: <!{meta.vault}/tls/ca:certificate!>
+  combined: <!{meta.vault}/tls/ca:combined!>
+  crl: <!{meta.vault}/tls/ca:crl!>
+  key: <!{meta.vault}/tls/ca:key!>
+  serial: <!{meta.vault}/tls/ca:serial!>
+secret/base/vsphere/blacksmith/tls/director:
+  certificate: <!{meta.vault}/tls/director:certificate!>
+  combined: <!{meta.vault}/tls/director:combined!>
+  key: <!{meta.vault}/tls/director:key!>
+secret/base/vsphere/blacksmith/tls/nats/ca:
+  certificate: <!{meta.vault}/tls/nats/ca:certificate!>
+  combined: <!{meta.vault}/tls/nats/ca:combined!>
+  crl: <!{meta.vault}/tls/nats/ca:crl!>
+  key: <!{meta.vault}/tls/nats/ca:key!>
+  serial: <!{meta.vault}/tls/nats/ca:serial!>
+secret/base/vsphere/blacksmith/tls/nats/director:
+  certificate: <!{meta.vault}/tls/nats/director:certificate!>
+  combined: <!{meta.vault}/tls/nats/director:combined!>
+  key: <!{meta.vault}/tls/nats/director:key!>
+secret/base/vsphere/blacksmith/tls/nats/hm:
+  certificate: <!{meta.vault}/tls/nats/hm:certificate!>
+  combined: <!{meta.vault}/tls/nats/hm:combined!>
+  key: <!{meta.vault}/tls/nats/hm:key!>
+secret/base/vsphere/blacksmith/tls/nats/server:
+  certificate: <!{meta.vault}/tls/nats/server:certificate!>
+  combined: <!{meta.vault}/tls/nats/server:combined!>
+  key: <!{meta.vault}/tls/nats/server:key!>
+secret/base/vsphere/blacksmith/users/admin:
+  password: <!{meta.vault}/users/admin:password!>
+secret/base/vsphere/blacksmith/users/blacksmith:
+  password: <!{meta.vault}/users/blacksmith:password!>
+secret/base/vsphere/blacksmith/users/hm:
+  password: <!{meta.vault}/users/hm:password!>
+secret/base/vsphere/blacksmith/vsphere:
+  address: <!{meta.vault}/vsphere:address!>
+  password: <!{meta.vault}/vsphere:password!>
+  user: <!{meta.vault}/vsphere:user!>

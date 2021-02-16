@@ -23,24 +23,27 @@ if want_feature vsphere; then
   done
 fi
 
-ip=$(lookup params.ip)
-describe "  checking if our certificates match the director static ip ($ip)..."
-vault="secret/$GENESIS_VAULT_PREFIX"
-for cert in tls/director \
-            tls/nats/server; do
-  if ! safe exists "$vault/$cert"; then
-    describe "    - $vault/$cert [#Y{MISSING}]"
-  else
-    if safe --quiet x509 validate "$vault/$cert" --for "$ip" >/dev/null 2>&1; then
-      describe "    - $vault/$cert [#G{OK}]"
+
+if [ ! $GENESIS_TESTING_CHECK_SECRETS_PRESENCE_ONLY ]; then
+  ip=$(lookup params.ip)
+  describe "  checking if our certificates match the director static ip ($ip)..."
+  vault="secret/$GENESIS_VAULT_PREFIX"
+  for cert in tls/director \
+              tls/nats/server; do
+    if ! safe exists "$vault/$cert"; then
+      describe "    - $vault/$cert [#Y{MISSING}]"
     else
-      describe "    - $vault/$cert [#R{INVALID}]"
-      safe x509 validate "$vault/$cert" --for "$ip" 2>&1 | sed -e 's/^/      /';
-      ok=no
-      echo
+      if safe --quiet x509 validate "$vault/$cert" --for "$ip" >/dev/null 2>&1; then
+        describe "    - $vault/$cert [#G{OK}]"
+      else
+        describe "    - $vault/$cert [#R{INVALID}]"
+        safe x509 validate "$vault/$cert" --for "$ip" 2>&1 | sed -e 's/^/      /';
+        ok=no
+        echo
+      fi
     fi
-  fi
-done
+  done
+fi
 
 if [[ "$ok" = "yes" ]]; then
   describe "  environment files [#G{OK}]"
