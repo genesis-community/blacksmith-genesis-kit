@@ -121,7 +121,12 @@ curl)
 
 register)
   env=${1:-$GENESIS_ENVIRONMENT}
-  cf_api=$(exodus "$env/cf" api_url)
+  cf_version=$(exodus "$env/cf" kit_version)
+  if new_enough "${cf_version}" "2.0.0-rc1" ; then
+    cf_api="https://$(exodus "$env/cf" api_domain)"
+  else
+    cf_api=$(exodus "$env/cf" api_url)
+  fi
   cf_user=$(exodus "$env/cf" admin_username)
   cf_pass=$(exodus "$env/cf" admin_password)
 
