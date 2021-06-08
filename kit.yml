@@ -1,6 +1,6 @@
 ---
 name:    blacksmith
-version: 0.7.1
+version: 0.8.0
 author:  James Hunt <james@niftylogic.com>
 docs:     https://github.com/cloudfoundry-community/blacksmith-boshrelease
 code:     https://github.com/genesis-community/blacksmith-genesis-kit
@@ -21,6 +21,8 @@ certificates:
         valid_for: 1y
         names:
           - ${params.ip}
+    tls/redis:
+      ca: {valid_for: 10y}
 
     tls/nats:
       ca: {valid_for: 10y}

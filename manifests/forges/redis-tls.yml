@@ -1,0 +1,12 @@
+instance_groups:
+  - name: blacksmith
+    jobs:
+      - release: redis-forge
+        name:    redis-blacksmith-plans
+        properties:
+          redis:
+            tls: 
+              enabled: true
+              ca: (( vault meta.vault "/tls/redis/ca:certificate" ))
+              ca_cert: (( vault meta.vault "/tls/redis/ca:certificate" ))
+              ca_key: (( vault meta.vault "/tls/redis/ca:key" ))

@@ -147,6 +147,9 @@ prompt_for do_redis boolean \
 	'Do you want to offer on-demand *Redis* services?'
 [[ $do_redis == 'true' ]] && forges+=( redis )
 
+prompt_for do_redis_tls boolean \
+	'Do you want to offer TLS for on-demand *Redis* services(Redis 6 only)?'
+
 prompt_for do_postgresql boolean \
 	'Do you want to offer on-demand *PostgreSQL* services?'
 [[ $do_postgresql == 'true' ]] && forges+=( postgresql )
@@ -184,6 +187,10 @@ done
 
 if [[ $broker_tls == 'true' ]]; then
 	echo "    - broker-tls"
+fi
+
+if [[ $do_redis_tls == 'true' ]]; then
+	echo "    - redis-tls"
 fi
 
 echo
