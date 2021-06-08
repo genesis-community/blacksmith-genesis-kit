@@ -24,6 +24,10 @@ if want_feature "broker-tls"; then
   merge+=( manifests/blacksmith/broker-tls.yml )
 fi
 
+if want_feature "redis-tls"; then
+  merge+=( manifests/forges/redis-tls.yml )
+fi
+
 for want in ${GENESIS_REQUESTED_FEATURES}; do
   case "$want" in
   # IaaS selector feature flags
