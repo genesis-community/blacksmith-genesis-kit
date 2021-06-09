@@ -3,7 +3,7 @@ set -eu
 
 declare -a merge
 
-validate_features aws azure google openstack vsphere external-bosh \
+validate_features aws azure google openstack vsphere external-bosh redis-tls \
                   rabbitmq redis postgresql mariadb kubernetes broker-tls
 
 #
