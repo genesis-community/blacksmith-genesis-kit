@@ -11,9 +11,9 @@ params:
 
 stemcells:
   - name:    bosh-openstack-kvm-ubuntu-xenial-go_agent
-    version: '621.55'
-    url:     https://bosh.io/d/stemcells/bosh-openstack-kvm-ubuntu-xenial-go_agent?v=621.55
-    sha1:    8070011eab1e675d0bef6409a7079a9eceea07d8
+    version: '621.125'
+    url:     https://bosh.io/d/stemcells/bosh-openstack-kvm-ubuntu-xenial-go_agent?v=621.125
+    sha1:    4ac4a2b5e1c2f210ec952eaa73df2691a6525e67
 
 releases:
   - name:    bosh-openstack-cpi

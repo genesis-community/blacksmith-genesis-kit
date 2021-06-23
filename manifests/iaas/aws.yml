@@ -12,15 +12,15 @@ params:
 
   stemcells:
     - name:    bosh-aws-xen-hvm-ubuntu-xenial-go_agent
-      version: '621.55'
-      url:     https://bosh.io/d/stemcells/bosh-aws-xen-hvm-ubuntu-xenial-go_agent?v=621.55
-      sha1:    b699fdce479c823378053f05e3611c3c26b4e63e
+      version: '621.125'
+      url:     https://bosh.io/d/stemcells/bosh-aws-xen-hvm-ubuntu-xenial-go_agent?v=621.125
+      sha1:    a21e4f88d84f8fc8d7b3318cca712de2b6fd0b61
 
 releases:
   - name:    bosh-aws-cpi
-    version: 80
-    sha1:    7be7577c063d8528864711a257891ebd245a6969
-    url:     https://bosh.io/d/github.com/cloudfoundry/bosh-aws-cpi-release?v=80
+    version: 87
+    url:     https://bosh.io/d/github.com/cloudfoundry/bosh-aws-cpi-release?v=87
+    sha1:    a920cd1bdead3d6167273e763912becca2225ba6
 
 instance_groups:
 - name: blacksmith

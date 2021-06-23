@@ -12,15 +12,15 @@ params:
 
   stemcells:
     - name:    bosh-vsphere-esxi-ubuntu-xenial-go_agent
-      version: '621.55'
-      url:     https://bosh.io/d/stemcells/bosh-vsphere-esxi-ubuntu-xenial-go_agent?v=621.55
-      sha1:    8111c8e6ab9fdcc2a116c12002776c2f1e59938c
+      version: '621.125'
+      url:     https://bosh.io/d/stemcells/bosh-vsphere-esxi-ubuntu-xenial-go_agent?v=621.125
+      sha1:    7724ce4272dd8f19b44584a17d31595eac7595e5
 
 releases:
   - name:    bosh-vsphere-cpi
-    version: '53.0.5'
-    url:     https://bosh.io/d/github.com/cloudfoundry/bosh-vsphere-cpi-release?v=53.0.5
-    sha1:    03a1d969dbd08e7d801c53cf5f5a4230c1451455
+    version: '59'
+    url:     https://bosh.io/d/github.com/cloudfoundry/bosh-vsphere-cpi-release?v=59
+    sha1: "132a1548f244866e09c6ef770b248ad703b844ba"
 
 instance_groups:
   - name: blacksmith
