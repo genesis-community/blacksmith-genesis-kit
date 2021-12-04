@@ -11,10 +11,10 @@ params:
   vsphere_datacenter:            (( param "Please specify your vSphere Datacenter Name" ))
 
   stemcells:
-    - name:    bosh-vsphere-esxi-ubuntu-xenial-go_agent
-      version: '621.125'
-      url:     https://bosh.io/d/stemcells/bosh-vsphere-esxi-ubuntu-xenial-go_agent?v=621.125
-      sha1:    7724ce4272dd8f19b44584a17d31595eac7595e5
+    - name:    bosh-vsphere-esxi-ubuntu-bionic-go_agent
+      version: '1.36'
+      url:     https://storage.googleapis.com/bosh-core-stemcells/1.36/bosh-stemcell-1.36-vsphere-esxi-ubuntu-bionic-go_agent.tgz
+      sha1:    4cf0de2078b94dfdeb01ac6e3af7a32c31df5171
 
 releases:
   - name:    bosh-vsphere-cpi

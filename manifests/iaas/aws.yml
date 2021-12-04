@@ -11,10 +11,10 @@ params:
   aws_default_sgs: (( param "What security groups should VMs be placed in, if none are specified via Cloud Config?" ))
 
   stemcells:
-    - name:    bosh-aws-xen-hvm-ubuntu-xenial-go_agent
-      version: '621.125'
-      url:     https://bosh.io/d/stemcells/bosh-aws-xen-hvm-ubuntu-xenial-go_agent?v=621.125
-      sha1:    a21e4f88d84f8fc8d7b3318cca712de2b6fd0b61
+    - name:    bosh-aws-xen-hvm-ubuntu-bionic-go_agent
+      version: '1.36'
+      url:     https://storage.googleapis.com/bosh-aws-light-stemcells/1.36/light-bosh-stemcell-1.36-aws-xen-hvm-ubuntu-bionic-go_agent.tgz
+      sha1:    4278c71c23a2f0345e445825baa9f631f15ad520
 
 releases:
   - name:    bosh-aws-cpi

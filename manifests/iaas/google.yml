@@ -10,10 +10,10 @@ params:
     - time4.google.com
 
   stemcells:
-    - name:    bosh-google-kvm-ubuntu-xenial-go_agent
-      version: '621.125'
-      url:     https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-xenial-go_agent?v=621.125
-      sha1:    acd1bda34939c523a047d6274843bbdde2efb8b7
+    - name:    bosh-google-kvm-ubuntu-bionic-go_agent
+      version: '1.36'
+      url:     https://storage.googleapis.com/bosh-gce-light-stemcells/1.36/light-bosh-stemcell-1.36-google-kvm-ubuntu-bionic-go_agent.tgz
+      sha1:    962c958e17012bd8bd003568f7978c465d83d12b
 
 releases:
   - name:    bosh-google-cpi
