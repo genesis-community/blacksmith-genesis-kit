@@ -52,13 +52,13 @@ instance_groups:
 
 releases:
 - name:    blacksmith
-  version: 1.4.2
-  url:     https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v1.4.2/blacksmith-1.4.2.tgz
-  sha1:    1fe5913ba4ce1bde0b90bbe56017f411d60b4325
+  version: 1.5.0
+  url:     https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v1.5.0/blacksmith-1.5.0.tgz
+  sha1:    65a12c44cad9766b798f2e7f3990127b90f39d59
 
 stemcells:
   - alias: default
-    os:      (( grab params.stemcell_os      || "ubuntu-xenial"))
+    os:      (( grab params.stemcell_os      || "ubuntu-bionic"))
     version: (( grab params.stemcell_version || "latest" ))
 
 update:
