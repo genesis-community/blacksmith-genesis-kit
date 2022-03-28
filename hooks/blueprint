@@ -3,10 +3,10 @@ set -eu
 
 declare -a merge
 
-validate_features aws azure google openstack vsphere external-bosh redis-tls \
-                  rabbitmq redis postgresql mariadb kubernetes broker-tls
+validate_features aws azure google openstack vsphere external-bosh \
+                  redis-tls redis-dual-mode rabbitmq redis postgresql \
+                  mariadb kubernetes broker-tls
 
-#
 # We always start out with the skeleton of a BOSH deployment,
 # and add-in a local UAA and a Credhub
 merge=( manifests/blacksmith/blacksmith.yml )
@@ -22,6 +22,10 @@ fi
 
 if want_feature "broker-tls"; then
   merge+=( manifests/blacksmith/broker-tls.yml )
+fi
+
+if want_feature "redis-dual-mode"; then
+  merge+=( manifests/forges/redis-dual-mode.yml )
 fi
 
 if want_feature "redis-tls"; then
