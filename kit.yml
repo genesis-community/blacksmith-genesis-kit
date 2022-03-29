@@ -24,6 +24,9 @@ certificates:
     tls/redis:
       ca: {valid_for: 10y}
 
+    tls/rabbitmq:
+      ca: {valid_for: 10y}
+
     tls/nats:
       ca: {valid_for: 10y}
       server:

@@ -16,9 +16,9 @@ meta:
 
 releases:
   - name:    rabbitmq-forge
-    version: 0.4.0
-    url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v0.4.0/rabbitmq-forge-0.4.0.tgz
-    sha1:    3c4096834bc9c72c2499c2eb05ebbb53b2dc08b3
+    version: 0.5.1
+    url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v0.5.1/rabbitmq-forge-0.5.1.tgz
+    sha1:    65d86e15ed9a4ab2de01e34bf438db9f030b44bc
 
 params:
   releases:
@@ -38,3 +38,4 @@ instance_groups:
             description: (( grab params.rabbitmq_service_description || "A dedicated RabbitMQ instance, deployed on-demand" ))
             tags:        (( grab params.rabbitmq_service_tags        || meta.default.rabbitmq_tags ))
             limit:       (( grab params.rabbitmq_service_limit       || 0 ))
+

@@ -158,10 +158,12 @@ prompt_for do_rabbitmq boolean \
 	'Do you want to offer on-demand *RabbitMQ* services?'
 [[ $do_rabbitmq == 'true' ]] && forges+=( rabbitmq )
 
+prompt_for do_rabbitmq_tls boolean \
+	'Do you want to offer TLS for on-demand *Rabbitmq* services?'
+
 prompt_for do_mariadb boolean \
 	'Do you want to offer on-demand *MariaDB* / *MySQL* services?'
 [[ $do_mariadb == 'true' ]] && forges+=( mariadb )
-
 
 
 echo
@@ -191,6 +193,10 @@ fi
 
 if [[ $do_redis_tls == 'true' ]]; then
 	echo "    - redis-tls"
+fi
+
+if [[ $do_rabbitmq_tls == 'true' ]]; then
+	echo "    - rabbitmq-tls"
 fi
 
 echo
