@@ -25,22 +25,6 @@ if want_feature "broker-tls"; then
   merge+=( manifests/blacksmith/broker-tls.yml )
 fi
 
-if want_feature "redis-dual-mode"; then
-  merge+=( manifests/forges/redis-dual-mode.yml )
-fi
-
-if want_feature "redis-tls"; then
-  merge+=( manifests/forges/redis-tls.yml )
-fi
-
-if want_feature "rabbitmq-dual-mode"; then
-  merge+=( manifests/forges/rabbitmq-dual-mode.yml )
-fi
-
-if want_feature "rabbitmq-tls"; then
-  merge+=( manifests/forges/rabbitmq-tls.yml )
-fi
-
 for want in ${GENESIS_REQUESTED_FEATURES}
 do
   case "$want" in
@@ -68,6 +52,22 @@ for want in ${GENESIS_REQUESTED_FEATURES}; do
     ;;
   esac
 done
+
+if want_feature "redis-tls"; then
+  merge+=( manifests/forges/redis-tls.yml )
+fi
+
+if want_feature "redis-dual-mode"; then
+  merge+=( manifests/forges/redis-dual-mode.yml )
+fi
+
+if want_feature "rabbitmq-tls"; then
+  merge+=( manifests/forges/rabbitmq-tls.yml )
+fi
+
+if want_feature "rabbitmq-dual-mode"; then
+  merge+=( manifests/forges/rabbitmq-dual-mode.yml )
+fi
 
 # Sanity Check Time!
 # If we haven't chosen an IaaS, that's a problem.
