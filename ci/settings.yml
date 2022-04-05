@@ -60,7 +60,7 @@ meta:
     owner:        genesis-community
     repo:         blacksmith-genesis-kit
     branch:       develop
-    main-branch:  master
+    main-branch:  main
     private_key:  ((github.private_key))
     access_token: ((github.access_token))
 
