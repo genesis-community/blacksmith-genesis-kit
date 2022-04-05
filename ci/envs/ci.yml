@@ -1,3 +1,8 @@
 ---
 kit:
   name: dev
+  version: latest
+  features:
+    - redis
+    - rabbitmq
+    - postgresql

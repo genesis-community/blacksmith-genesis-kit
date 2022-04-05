@@ -1,10 +1,8 @@
 ---
 kit:
   features:
+    ((append))
     - vsphere
-    - redis
-    - rabbitmq
-    - postgresql
 
 params:
   env:   ci-baseline

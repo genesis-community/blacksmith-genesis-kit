@@ -2,15 +2,51 @@
 meta:
   kit:     blacksmith
   release: Blacksmith Genesis Kit
-  target:  genesis@pipes
-  url:     https://pipes.starkandwayne.com
-  exposed: yes
+  target:  cloudpipes/genesis
+  url:     https://cloudpipes.starkandwayne.com
+  iaas:    gcp
+  version_file:    version
+  initial_version: 0.12.0
+  exposed: false
+
+  upstream:
+    TODO_bosh_releases: # TODO!!!
+      - name:  bosh
+        notes: https://github.com/cloudfoundry/bosh/releases/tag/v${version}
+      - name:  bpm
+        label: bpm (new)
+        notes: https://github.com/cloudfoundry-incubator/bpm-release/releases/tag/v${version}
+      - name:  bosh-azure-cpi
+        notes: https://github.com/cloudfoundry/bosh-azure-cpi-release/releases/tag/v${version}
+      - name:  bosh-google-cpi
+        notes: https://github.com/cloudfoundry/bosh-google-cpi-release/releases/tag/v${version}
+      - name:  bosh-aws-cpi
+        notes: https://github.com/cloudfoundry/bosh-aws-cpi-release/releases/tag/v${version}
+      - name:  bosh-vsphere-cpi
+        notes: https://github.com/cloudfoundry/bosh-vsphere-cpi-release/releases/tag/v${version}
+      - name:  bosh-openstack-cpi
+        notes: https://github.com/cloudfoundry/bosh-openstack-cpi-release/releases/tag/v${version}
+      - name:  blacksmith
+        notes: https://github.com/blacksmith-community/blacksmith-boshrelease/releases/tag/v${version}
+      - name:  mariadb-forge
+        notes: https://github.com/blacksmith-community/mariadb-forge-boshrelease/releases/tag/v${version}
+      - name:  postgresql-forge
+        notes: https://github.com/blacksmith-community/postgresql-forge-boshrelease/releases/tag/v${version}
+      - name:  rabbitmq-forge
+        notes: https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/tag/v${version}
+      - name:  redis-forge
+        notes: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/tag/v${version}
 
   bosh:
     uri:      ((bosh.uri))
     username: ((bosh.username))
     password: ((bosh.password))
     cacert:   ((bosh.ca))
+
+  credhub:
+    url:      ((bosh.credhub_url))
+    username: ((bosh.credhub_username))
+    password: ((bosh.credhub_password))
 
   vault:
     url:       ((vault.url))
@@ -23,7 +59,8 @@ meta:
   github:
     owner:        genesis-community
     repo:         blacksmith-genesis-kit
-    branch:       master
+    branch:       develop
+    main-branch:  master
     private_key:  ((github.private_key))
     access_token: ((github.access_token))
 
@@ -31,3 +68,4 @@ meta:
     url:      ((shout.url)
     username: ((shout.username))
     password: ((shout.password))
+

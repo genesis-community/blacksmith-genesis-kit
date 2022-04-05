@@ -31,9 +31,9 @@ certificates:
     tls/rabbitmq:
       ca: {valid_for: 10y}
       server:
-        valid_for: 1y
-        names:
-          - ${params.ip}
+          valid_for: 5y
+          names:
+            - server.rabbitmq.bosh-internal
 
     tls/nats:
       ca: {valid_for: 10y}

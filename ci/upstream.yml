@@ -1,41 +1,53 @@
----
-# This file contains patterns for generating links to upstream release notes,
-# for constituent releases.
+sections:
+  - name:  core
+    label: Cloud Foundry Components
+  - name:  buildpacks
+    label: Buildpacks 
 
 core:
-  - name:  bosh
-    notes: https://github.com/cloudfoundry/bosh/releases/tag/v${version}
+  app-autoscaler: {}
+  bpm: {}
+  bosh-dns-aliases: {}
+  capi: {}
+  cf-cli: {}
+  cf-networking: {}
+  cf-smoke-tests: {}
+  cf-syslog-drain: {}
+  cflinuxfs2: {}
+  cflinuxfs3: {}
+  credhub: {}
+  diego: {}
+  garden-runc: {}
+  haproxy: {}
+  loggregator: {}
+  loggregator-agent: {}
+  log-cache: {}
+  mapfs: {}
+  metrics-discovery: {}
+  nats: {}
+  nfs-volume: {}
+  postgres: {}
+  pxc: {}
+  routing: {}
+  statsd-injector: {}
+  uaa: {}
+  silk: {}
+  smb-volume: {}
+  winc: {}
+  windows-resize-root-disk: {}
+  windows-utilities: {}
+  windowsfs: {}
 
-  - name:  bpm
-    label: bpm (new)
-    notes: https://github.com/cloudfoundry-incubator/bpm-release/releases/tag/v${version}
-
-  - name:  bosh-azure-cpi
-    notes: https://github.com/cloudfoundry/bosh-azure-cpi-release/releases/tag/v${version}
-
-  - name:  bosh-google-cpi
-    notes: https://github.com/cloudfoundry/bosh-google-cpi-release/releases/tag/v${version}
-
-  - name:  bosh-aws-cpi
-    notes: https://github.com/cloudfoundry/bosh-aws-cpi-release/releases/tag/v${version}
-
-  - name:  bosh-vsphere-cpi
-    notes: https://github.com/cloudfoundry/bosh-vsphere-cpi-release/releases/tag/v${version}
-
-  - name:  bosh-openstack-cpi
-    notes: https://github.com/cloudfoundry/bosh-openstack-cpi-release/releases/tag/v${version}
-
-  - name:  blacksmith
-    notes: https://github.com/blacksmith-community/blacksmith-boshrelease/releases/tag/v${version}
-
-  - name:  mariadb-forge
-    notes: https://github.com/blacksmith-community/mariadb-forge-boshrelease/releases/tag/v${version}
-
-  - name:  postgresql-forge
-    notes: https://github.com/blacksmith-community/postgresql-forge-boshrelease/releases/tag/v${version}
-
-  - name:  rabbitmq-forge
-    notes: https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/tag/v${version}
-
-  - name:  redis-forge
-    notes: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/tag/v${version}
+buildpacks:
+  binary-buildpack: {}
+  dotnet-core-buildpack: {}
+  go-buildpack: {}
+  hwc-buildpack: {}
+  java-buildpack: {}
+  nginx-buildpack: {}
+  nodejs-buildpack: {}
+  php-buildpack: {}
+  python-buildpack: {}
+  r-buildpack: {}
+  ruby-buildpack: {}
+  staticfile-buildpack: {}

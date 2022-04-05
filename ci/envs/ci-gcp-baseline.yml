@@ -1,0 +1,64 @@
+---
+kit:
+  features:
+    ((append))
+    - redis-tls
+    - redis-dual-mode
+    - rabbitmq-tls
+    - rabbitmq-dual-mode
+
+genesis:
+  env:   ci-gcp-baseline
+
+params:
+  ip: 10.4.8.144
+  disk_type:          blacksmith
+  availability_zones: [z1, z2, z3]
+
+  # see https://github.com/blacksmith-community/redis-forge-boshrelease/blob/master/README.md
+  redis_plans:
+    dedicated-persistent:
+      type:    standalone
+      vm_type: redis
+      network: blacksmith
+      limit:   2
+      persist: true
+
+    dedicated-cache:
+      type:    standalone
+      vm_type: redis
+      network: blacksmith
+      limit:   2
+      persist: false
+
+  # see https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/blob/master/README.md
+  rabbitmq_plans:
+    dedicated:
+      type:    standalone
+      vm_type: rabbitmq
+      network: blacksmith
+      limit:   2
+
+    # for backing a shared RabbitMQ cluster
+    cluster:
+      type:    cluster
+      vm_type: rabbitmq
+      network: blacksmith
+      limit:   1
+      instances: 3
+
+  # see https://github.com/blacksmith-community/postgresql-forge-boshrelease/blob/master/README.md
+  postgresql_plans:
+    standalone:
+      type:    standalone
+      vm_type: postgres
+      network: blacksmith
+      limit:   2
+
+    small-cluster:
+      type:    cluster
+      vm_type: postgres
+      network: blacksmith
+      limit:   1
+      instances: 3
+
