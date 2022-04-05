@@ -4,8 +4,9 @@ set -eu
 declare -a merge
 
 validate_features aws azure google openstack vsphere external-bosh \
-                  redis-tls redis-dual-mode rabbitmq redis postgresql \
-                  mariadb kubernetes broker-tls
+                  redis redis-tls redis-dual-mode \
+                  rabbitmq rabbitmq-tls rabbitmq-dual-mode \
+                  postgresql mariadb kubernetes broker-tls
 
 # We always start out with the skeleton of a BOSH deployment,
 # and add-in a local UAA and a Credhub
@@ -24,28 +25,20 @@ if want_feature "broker-tls"; then
   merge+=( manifests/blacksmith/broker-tls.yml )
 fi
 
-if want_feature "redis-dual-mode"; then
-  merge+=( manifests/forges/redis-dual-mode.yml )
-fi
-
-if want_feature "redis-tls"; then
-  merge+=( manifests/forges/redis-tls.yml )
-fi
-
-for want in ${GENESIS_REQUESTED_FEATURES}; do
+for want in ${GENESIS_REQUESTED_FEATURES}
+do
   case "$want" in
-  # IaaS selector feature flags
-  aws|azure|google|openstack|vsphere)
-    iaas=$(( iaas + 1 ))
-    merge+=( manifests/iaas/$want.yml )
-
-    case $want in
-    vsphere) ;; # vSphere doesn't need a registry
-    *)          # but everyone else does...
-      merge+=( manifests/addons/registry.yml )
+    # IaaS selector feature flags
+    (aws|azure|google|openstack|vsphere)
+      iaas=$(( iaas + 1 ))
+      merge+=( manifests/iaas/$want.yml )
+      case $want in
+        (vsphere) ;; # vSphere doesn't need a registry
+        (*)          # but everyone else does...
+          merge+=( manifests/addons/registry.yml )
+          ;;
+      esac
       ;;
-    esac
-    ;;
   esac
 done
 
@@ -53,12 +46,28 @@ forges=0
 for want in ${GENESIS_REQUESTED_FEATURES}; do
   case "$want" in
   # Forges
-  rabbitmq|redis|postgresql|mariadb|kubernetes)
+  (rabbitmq|redis|postgresql|mariadb|kubernetes)
     forges=$(( forges + 1 ))
     merge+=( manifests/forges/$want.yml )
     ;;
   esac
 done
+
+if want_feature "redis-tls"; then
+  merge+=( manifests/forges/redis-tls.yml )
+fi
+
+if want_feature "redis-dual-mode"; then
+  merge+=( manifests/forges/redis-dual-mode.yml )
+fi
+
+if want_feature "rabbitmq-tls"; then
+  merge+=( manifests/forges/rabbitmq-tls.yml )
+fi
+
+if want_feature "rabbitmq-dual-mode"; then
+  merge+=( manifests/forges/rabbitmq-dual-mode.yml )
+fi
 
 # Sanity Check Time!
 # If we haven't chosen an IaaS, that's a problem.

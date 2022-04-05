@@ -83,12 +83,12 @@ login() {
 }
 
 case $GENESIS_ADDON_SCRIPT in
-list)
+(list)
   list
   exit 0
   ;;
 
-visit)
+(visit)
   if ! command -v open >/dev/null 2>&1; then
     echo "The 'visit' addon script only works on macOS, currently."
     exit 1
@@ -96,21 +96,21 @@ visit)
   open "$scheme://$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD@$ip:$port"
   ;;
 
-bosh)
+(bosh)
   has_alias || setup_alias
   login
   ;;
 
-boss)
+(boss)
   if ! command -v boss>/dev/null 2>&1; then
     echo "  !!! install the 'boss' cli first!"
-    echo "      (https://github.com/jhunt/boss)"
+    echo "      (https://github.com/blacksmith-community/boss)"
   else
     exec boss "$@"
   fi
   ;;
 
-curl)
+(curl)
   if ! command -v curl >/dev/null 2>&1; then
     echo "  !!! install curl first!"
   else
@@ -119,7 +119,7 @@ curl)
   fi
   ;;
 
-register)
+(register)
   env=${1:-$GENESIS_ENVIRONMENT}
   cf_version=$(exodus "$env/cf" kit_version)
   if new_enough "${cf_version}" "2.0.0-rc1" ; then
@@ -171,7 +171,7 @@ register)
   done)
   ;;
 
-*)
+(*)
   echo "Unrecognized Blacksmith Genesis Kit addon."
   list
   exit 1

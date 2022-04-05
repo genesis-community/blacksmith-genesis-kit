@@ -23,6 +23,17 @@ certificates:
           - ${params.ip}
     tls/redis:
       ca: {valid_for: 10y}
+      server:
+        valid_for: 1y
+        names:
+          - ${params.ip}
+
+    tls/rabbitmq:
+      ca: {valid_for: 10y}
+      server:
+        valid_for: 1y
+        names:
+          - ${params.ip}
 
     tls/nats:
       ca: {valid_for: 10y}
