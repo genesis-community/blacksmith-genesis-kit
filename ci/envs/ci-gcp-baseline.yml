@@ -62,3 +62,6 @@ params:
       limit:   1
       instances: 3
 
+  cloud_config:
+    azs: [z1,z2,z3]
+
