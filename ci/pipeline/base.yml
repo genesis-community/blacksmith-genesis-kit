@@ -84,7 +84,7 @@ groups:
   - name: (( grab meta.pipeline ))
     jobs:
     - build-kit
-    - spec-tests
+    #- spec-tests
     - spec-check
     - ship-prerelease
     - deploy
