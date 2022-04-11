@@ -22,13 +22,13 @@ releases:
     sha1:    723cbba1e027bf9b628fe413ba16d90415057edc
 
 instance_groups:
-  - name: blacksmith
-    jobs:
-      - name: google_cpi
-        release: bosh-google-cpi
-        properties:
-          google:
-            project: (( grab params.google_project ))
-            json_key: (( vault meta.vault "/google:json_key" ))
-          director:
-            cpi_job: google_cpi
+- name: blacksmith
+  jobs:
+  - name: google_cpi
+    elease: bosh-google-cpi
+  properties:
+    google:
+      project: (( grab params.google_project ))
+      json_key: (( vault meta.vault "/google:json_key" ))
+    director:
+      cpi_job: google_cpi
