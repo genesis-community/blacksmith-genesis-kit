@@ -14,6 +14,7 @@ params:
   ip: 10.4.8.144
   disk_type:          blacksmith
   availability_zones: [z1, z2, z3]
+  google_project:     snw-ocf-products
 
   # see https://github.com/blacksmith-community/redis-forge-boshrelease/blob/master/README.md
   redis_plans:
