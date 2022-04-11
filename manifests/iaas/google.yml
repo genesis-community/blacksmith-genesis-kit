@@ -26,9 +26,9 @@ instance_groups:
   jobs:
   - name: google_cpi
     release: bosh-google-cpi
-  properties:
-    google:
-      project: (( grab params.google_project ))
-      json_key: (( vault meta.vault "/google:json_key" ))
+    properties:
+      google:
+        project: (( grab params.google_project ))
+        json_key: (( vault meta.vault "/google:json_key" ))
     director:
       cpi_job: google_cpi
