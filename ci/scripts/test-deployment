@@ -68,7 +68,6 @@ cleanup() {
 	done
 }
 
-set -x
 # Replace this with genesis lookup --env once its available (2.8.5)
 cat <<'EOF' > get-env.pl
 #!/usr/bin/env perl
@@ -194,4 +193,3 @@ if [[ "$SKIP_CLEAN" == "false" ]]; then
 else
 	echo "Skipping CLEANUP"
 fi
-set +x
