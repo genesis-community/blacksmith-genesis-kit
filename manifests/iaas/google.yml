@@ -25,7 +25,7 @@ instance_groups:
 - name: blacksmith
   jobs:
   - name: google_cpi
-    elease: bosh-google-cpi
+    release: bosh-google-cpi
   properties:
     google:
       project: (( grab params.google_project ))
