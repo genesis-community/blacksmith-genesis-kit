@@ -15,10 +15,10 @@ meta:
         vm_type: default
 
 releases:
-  - name:    rabbitmq-forge
-    version: 0.5.1
-    url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v0.5.1/rabbitmq-forge-0.5.1.tgz
-    sha1:    65d86e15ed9a4ab2de01e34bf438db9f030b44bc
+- name:    rabbitmq-forge
+  version: 0.5.13
+  url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v0.5.13/rabbitmq-forge-0.5.13.tgz
+  sha1:    74866b6ec5a2c577ead599e0ed34bb94b8b6a754
 
 params:
   releases:
