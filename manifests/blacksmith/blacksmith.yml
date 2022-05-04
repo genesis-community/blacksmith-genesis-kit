@@ -11,10 +11,10 @@ meta:
     azs: [z1]
     host: (( grab params.fqdn || params.ip ))
     scheme: http
-    blacksmith_port: 3000
+    blacksmith_port: (( grab params.blacksmith_port || 3000 ))
 
 exodus:
-  broker_url: (( concat meta.scheme "://" meta.host ":" params.blacksmith_port ))
+  broker_url: (( concat meta.default.scheme "://" meta.default.host ":" meta.default.blacksmith_port ))
   broker_username: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.broker.username ))
   broker_password: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.broker.password ))
   bosh_username: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.username ))
