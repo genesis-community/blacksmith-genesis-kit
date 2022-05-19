@@ -1,10 +1,9 @@
 ---
 meta:
   environment: (( grab genesis.env || params.env ))
-  bosh_exodus_path: (( grab params.bosh_exodus_path || genesis.bosh || params.bosh || genesis.env || params.env ))
 
   cf:
-    exodus_path: (( concat "secret/exodus/" meta.bosh_exodus_path "/cf" ))
+    exodus_path: (( concat "secret/exodus/" meta.environment "/cf" ))
     deployment_name: (( concat meta.environment "-cf" ))
     system_domain: (( vault meta.cf.exodus_path ":system_domain" ))
     api_url:    (( concat "https://api." meta.cf.system_domain ))
@@ -20,7 +19,7 @@ meta:
     rabbitmq_plans:
       standalone:
         name: standalone
-        description: A dedicated RabbitMQ server, with no redundancy or replication
+        :q: A dedicated RabbitMQ server, with no redundancy or replication
         limit: 7
         type: standalone
         vm_type: default
@@ -43,7 +42,6 @@ instance_groups:
         name:    rabbitmq-blacksmith-plans
         properties:
           environment: (( grab meta.environment ))
-          bosh_exodus_path: (( grab meta.bosh_exodus_path ))
           cf:
             exodus_path: (( grab meta.cf.exodus_path ))
             deployment_name: (( grab meta.cf.deployment_name ))
