@@ -26,9 +26,9 @@ meta:
 
 releases:
 - name:    rabbitmq-forge
-  version: 0.5.15n
-  url:     https://github.com/itsouvalas/rabbitmq-forge-boshrelease/releases/download/v0.5.15n/rabbitmq-forge-0.5.15n.tgz
-  sha1:    7183b9703e4260bd8546f1553e2ea4bd765701ed
+  version: 0.5.15o
+  url:     https://github.com/itsouvalas/rabbitmq-forge-boshrelease/releases/download/v0.5.15o/rabbitmq-forge-0.5.15o.tgz
+  sha1:    a37a53a07335ea74ea73d64740eb29c891676cc1
 
 params:
   releases:
