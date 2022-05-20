@@ -26,9 +26,9 @@ meta:
 
 releases:
 - name:    rabbitmq-forge
-  version: 0.5.15l
-  url:     https://github.com/itsouvalas/rabbitmq-forge-boshrelease/releases/download/v0.5.15l/rabbitmq-forge-0.5.15l.tgz
-  sha1:    caf09fcd70d1c936856b7f38625f73ed72a2804b
+  version: 0.5.15m
+  url:     https://github.com/itsouvalas/rabbitmq-forge-boshrelease/releases/download/v0.5.15m/rabbitmq-forge-0.5.15m.tgz
+  sha1:    7897606f0020ad705e91f701acf13e43be75d497
 
 params:
   releases:
@@ -49,6 +49,23 @@ instance_groups:
             api_url:    (( grab meta.cf.api_url ))
             username:   (( grab meta.cf.username ))
             password:   (( grab meta.cf.password ))
+          loggregator:
+            tls:
+              ca_cert: (( vault meta.cf.exodus_path ":loggregator_ca" ))
+              agent:
+                cert: (( vault meta.cf.exodus_path ":loggregator_tls_agent_cert" ))
+                key: (( vault meta.cf.exodus_path ":loggregator_tls_agent_key" ))
+          metrics:
+            ca_cert: (( vault meta.vault "/loggregator-agent/certs/ca:certificate" ))
+            cert:    (( vault meta.vault "/loggregator-agent/certs/metrics:certificate" ))
+            key:     (( vault meta.vault "/loggregator-agent/certs/metrics:key" ))
+          rabbitmq_metrics_emitter:
+            cloud_foundry:
+              api:    (( grab meta.cf.api_url ))
+              skip_ssl_validation: (( grab params.cf_skip_ssl_validation ))
+              username:   (( vault meta.cf.exodus_path ":admin_username" ))
+              password:   (( vault meta.cf.exodus_path ":admin_password" ))
+          
 
           plans: (( grab params.rabbitmq_plans || meta.default.rabbitmq_plans ))
           service:
