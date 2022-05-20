@@ -34,6 +34,7 @@ params:
   releases:
     - (( append ))
     - (( grab releases.rabbitmq-forge ))
+  cf_skip_ssl_validation: false
 
 instance_groups:
   - name: blacksmith
@@ -55,10 +56,10 @@ instance_groups:
               agent:
                 cert: (( vault meta.cf.exodus_path ":loggregator_tls_agent_cert" ))
                 key: (( vault meta.cf.exodus_path ":loggregator_tls_agent_key" ))
-          metrics:
-            ca_cert: (( vault meta.vault "/loggregator-agent/certs/ca:certificate" ))
-            cert:    (( vault meta.vault "/loggregator-agent/certs/metrics:certificate" ))
-            key:     (( vault meta.vault "/loggregator-agent/certs/metrics:key" ))
+#          metrics:
+#            ca_cert: (( vault meta.vault "/loggregator-agent/certs/ca:certificate" ))
+#            cert:    (( vault meta.vault "/loggregator-agent/certs/metrics:certificate" ))
+#            key:     (( vault meta.vault "/loggregator-agent/certs/metrics:key" ))
           rabbitmq_metrics_emitter:
             cloud_foundry:
               api:    (( grab meta.cf.api_url ))
