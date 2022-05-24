@@ -26,9 +26,9 @@ meta:
 
 releases:
 - name:    rabbitmq-forge
-  version: 0.5.16b
-  url:     https://github.com/itsouvalas/rabbitmq-forge-boshrelease/releases/download/v0.5.16b/rabbitmq-forge-0.5.16b.tgz
-  sha1:    947a9eba3e5e9c043c1eee9aece0186fcb2d74c2
+  version: 0.5.16c
+  url:     https://github.com/itsouvalas/rabbitmq-forge-boshrelease/releases/download/v0.5.16c/rabbitmq-forge-0.5.16c.tgz
+  sha1:    6bb79c6f54f9091418085ba3253924dd2af6643b
 
 params:
   releases:
