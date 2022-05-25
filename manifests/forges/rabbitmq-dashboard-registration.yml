@@ -1,0 +1,26 @@
+---
+meta:
+  cf:
+    exodus: (( concat $GENESIS_EXODUS_MOUNT params.cf.deployment_env "/" params.cf.deployment_type ))
+  bosh:
+    exodus_path: (( grab params.bosh_exodus_path || genesis.bosh || params.bosh || genesis.env || params.env ))
+params:
+  cf: &cf
+    deployment_env:  (( grab genesis.env )) # assume the same env name as cf env
+    deployment_type: cf # for crazy people using an non-"cf" cf deployment name
+    deployment_name: (( concat params.cf.deployment_env "-" params.cf.deployment_type ))
+    core_network:    (( vault meta.cf.exodus ":core_network" ))
+    system_domain:   (( vault meta.cf.exodus ":system_domain" ))
+
+instance_groups:
+  - name: blacksmith
+    jobs:
+    - name: rabbitmq-blacksmith-plans
+      properties:
+        cf:
+          <<: *cf
+        bosh:
+          deployment_name: ((grab meta.bosh.exodus_path))
+        rabbitmq:
+           route_registrar:
+             enabled: true
