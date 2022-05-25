@@ -3,10 +3,12 @@ set -eu
 
 declare -a merge
 
-validate_features aws azure google openstack vsphere external-bosh \
-                  redis redis-tls redis-dual-mode \
-                  rabbitmq rabbitmq-tls rabbitmq-dual-mode \
-                  postgresql mariadb kubernetes broker-tls
+# TODO: Refactor instead of using validate_features to use loops enabling ops/ dir.
+
+#validate_features aws azure google openstack vsphere external-bosh \
+#                  redis redis-tls redis-dual-mode \
+#                  rabbitmq rabbitmq-tls rabbitmq-dual-mode rabbitmq-dashboard-registration \
+#                  postgresql mariadb kubernetes broker-tls
 
 # We always start out with the skeleton of a BOSH deployment,
 # and add-in a local UAA and a Credhub
@@ -50,6 +52,11 @@ for want in ${GENESIS_REQUESTED_FEATURES}; do
     forges=$(( forges + 1 ))
     merge+=( manifests/forges/$want.yml )
     ;;
+  (*)
+    if [[ -f "$GENESIS_ROOT/ops/$want.yml" ]] ; then
+      merge+=( "$GENESIS_ROOT/ops/$want.yml" )
+    fi
+    ;;
   esac
 done
 
@@ -67,6 +74,10 @@ fi
 
 if want_feature "rabbitmq-dual-mode"; then
   merge+=( manifests/forges/rabbitmq-dual-mode.yml )
+fi
+
+if want_feature "rabbitmq-dashboard-registration"; then
+  merge+=( manifests/forges/rabbitmq-dashboard-registration.yml )
 fi
 
 # Sanity Check Time!
