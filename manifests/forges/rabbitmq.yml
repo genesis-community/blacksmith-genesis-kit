@@ -29,6 +29,7 @@ variables:
   type: certificate
   options:
     is_ca: true
+    common_name: (( concat meta.environment "-blacksmith-rabbitmq-services.bosh" ))
 
 releases:
 - name:    rabbitmq-forge
