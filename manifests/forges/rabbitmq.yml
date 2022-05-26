@@ -33,9 +33,9 @@ variables:
 
 releases:
 - name:    rabbitmq-forge
-  version: 0.5.16g
-  url:     https://github.com/itsouvalas/rabbitmq-forge-boshrelease/releases/download/v0.5.16g/rabbitmq-forge-0.5.16g.tgz
-  sha1:    474aec08a272b342e234f2e8776cd63ca9dd5447
+  version: 0.5.16h
+  url:     https://github.com/itsouvalas/rabbitmq-forge-boshrelease/releases/download/v0.5.16h/rabbitmq-forge-0.5.16h.tgz
+  sha1:    f0c6ebec4b40106ea52959608c46cb31399b9354
 
 params:
   releases:
@@ -71,6 +71,9 @@ instance_groups:
               password:   (( vault meta.cf.exodus_path ":admin_password" ))
             rmq_management:
               skip_ssl_validation: (( grab params.emitter_skip_ssl_validation ))
+              mgmt_port: (( grab params.emitter_mgmt_port ))
+              mgmt_scheme: (( grab params.emitter_scheme ))
+              mgmt_host: (( grab params.emitter_mgmt_host ))
           blacksmith_rabbitmq_services:
             tls:
               ca_cert: ((blacksmith_rabbitmq_services_ca.certificate))
