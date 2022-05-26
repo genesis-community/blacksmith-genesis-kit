@@ -70,10 +70,10 @@ instance_groups:
               username:   (( vault meta.cf.exodus_path ":admin_username" ))
               password:   (( vault meta.cf.exodus_path ":admin_password" ))
             rmq_management:
-              skip_ssl_validation: (( grab params.emitter_skip_ssl_validation ))
-              mgmt_port: (( grab params.emitter_mgmt_port ))
-              mgmt_scheme: (( grab params.emitter_scheme ))
-              mgmt_host: (( grab params.emitter_mgmt_host ))
+              skip_ssl_validation: (( grab params.emitter_skip_ssl_validation || true ))
+              mgmt_port: (( grab params.emitter_mgmt_port || "15671" ))
+              mgmt_scheme: (( grab params.emitter_scheme || "https" ))
+              mgmt_host: (( grab params.emitter_mgmt_host || "localhost" ))
           blacksmith_rabbitmq_services:
             tls:
               ca_cert: ((blacksmith_rabbitmq_services_ca.certificate))
