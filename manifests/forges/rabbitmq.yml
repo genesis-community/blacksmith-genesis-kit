@@ -33,9 +33,9 @@ variables:
 
 releases:
 - name:    rabbitmq-forge
-  version: 0.5.16h
-  url:     https://github.com/itsouvalas/rabbitmq-forge-boshrelease/releases/download/v0.5.16h/rabbitmq-forge-0.5.16h.tgz
-  sha1:    f0c6ebec4b40106ea52959608c46cb31399b9354
+  version: 0.5.16i
+  url:     https://github.com/itsouvalas/rabbitmq-forge-boshrelease/releases/download/v0.5.16i/rabbitmq-forge-0.5.16i.tgz
+  sha1:    6e56150050bd79bd173f2edee01659271e3011bb
 
 params:
   releases:
