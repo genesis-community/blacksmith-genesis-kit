@@ -61,7 +61,7 @@ instance_groups:
             cloud-config: (( grab params.cloud_config ))
         blacksmith_services_ca:
           tls:
-            ca_cert: ((blacksmith_services_ca.certificate))
+            ca_cert: ((blacksmith_services_ca.ca))
 
 releases:
 - name:    blacksmith
