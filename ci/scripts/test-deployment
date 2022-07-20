@@ -155,6 +155,8 @@ else
 	echo "Skipping replacing secrets"
 fi
 
+set -x
+
 if [[ "$SKIP_DEPLOY" == "false" ]]; then
 	header "Deploying ${DEPLOY_ENV} environment to verify functionality..."
 	genesis "do" "${DEPLOY_ENV}" -- list
