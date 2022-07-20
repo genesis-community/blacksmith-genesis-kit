@@ -160,9 +160,9 @@ set -x
 if [[ "$SKIP_DEPLOY" == "false" ]]; then
 	header "Deploying ${DEPLOY_ENV} environment to verify functionality..."
 	genesis "do" "${DEPLOY_ENV}" -- list
-	genesis add-secrets "${DEPLOY_ENV}"
+	genesis add-secrets "${DEPLOY_ENV}" -D
 
-	genesis deploy -y "${DEPLOY_ENV}"
+	genesis deploy -y "${DEPLOY_ENV}" -D
 
 	if [[ -f .genesis/manifests/${DEPLOY_ENV}-state.yml ]] ; then
 		echo $'\n'"${DEPLOY_ENV} state file:"
