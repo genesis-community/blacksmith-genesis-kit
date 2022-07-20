@@ -1,7 +1,6 @@
 ---
 params:
   google_project: (( param "Enter the project name that your BOSH will be deployed into" ))
-  service_account: (( param "Specify the Service Account Name for Google Cloud"  ))
   
   ntp: # use GCP ntp
     - (( replace ))
@@ -30,7 +29,6 @@ instance_groups:
   properties:
     google:
       project: (( grab params.google_project ))
-      service_account_name: (( grab params.service_account ))
       json_key: (( vault meta.vault "/google:json_key" ))
     director:
       cpi_job: google_cpi
