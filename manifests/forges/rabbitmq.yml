@@ -24,18 +24,12 @@ meta:
         type: standalone
         vm_type: default
 
-variables:
-- name: blacksmith_rabbitmq_services_ca
-  type: certificate
-  options:
-    is_ca: true
-    common_name: (( concat meta.environment "-blacksmith-rabbitmq-services.bosh" ))
 
 releases:
 - name:    rabbitmq-forge
-  version: 0.5.16q
-  url:     https://github.com/itsouvalas/rabbitmq-forge-boshrelease/releases/download/v0.5.16q/rabbitmq-forge-0.5.16q.tgz
-  sha1:    2a8de8dcff413f230abc43017eb3bab26cc0b6a5
+  version: 0.5.18f
+  url:     https://github.com/itsouvalas/rabbitmq-forge-boshrelease/releases/download/v0.5.18f/rabbitmq-forge-0.5.18f.tgz
+  sha1:    22eccc12afb40ff0e1afe4649c903e8de25f22ba
 
 params:
   releases:
@@ -74,9 +68,6 @@ instance_groups:
               mgmt_port: (( grab params.emitter_mgmt_port || "15671" ))
               mgmt_scheme: (( grab params.emitter_scheme || "https" ))
               mgmt_host: (( grab params.emitter_mgmt_host || "localhost" ))
-          blacksmith_rabbitmq_services:
-            tls:
-              ca_cert: ((blacksmith_rabbitmq_services_ca.certificate))
 
           plans: (( grab params.rabbitmq_plans || meta.default.rabbitmq_plans ))
           service:
