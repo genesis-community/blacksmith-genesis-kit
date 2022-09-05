@@ -1,0 +1,7 @@
+#!/bin/bash
+set -eu
+
+echo "Pre-deploy called..."
+
+read value
+echo "Testing deployment flow... (value: $value)"
