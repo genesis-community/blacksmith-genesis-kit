@@ -74,3 +74,5 @@ credentials:
     users/blacksmith:   {password: random 64}
 
     registry:           {password: random 64}
+
+    shield/password:    {password: random 64}
