@@ -24,13 +24,12 @@ meta:
         type: standalone
         vm_type: default
 
-
 releases:
 - name:    rabbitmq-forge
-  version: 0.5.18f
-  url:     https://github.com/itsouvalas/rabbitmq-forge-boshrelease/releases/download/v0.5.18f/rabbitmq-forge-0.5.18f.tgz
-  sha1:    22eccc12afb40ff0e1afe4649c903e8de25f22ba
-
+  version: 0.7.0
+  url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v0.7.0/rabbitmq-forge-0.7.0.tgz
+  sha1:    efd951065ee74546338d215a55f02ad349967f73
+  
 params:
   releases:
     - (( append ))
