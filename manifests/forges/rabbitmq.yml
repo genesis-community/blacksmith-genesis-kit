@@ -1,7 +1,7 @@
 ---
 meta:
-  environment: (( grab genesis.bosh_env || params.env ))
-
+  environment: (( grab genesis.env || params.env ))
+  bosh_env: (( grab genesis.bosh_env || params.bosh_env))
   cf:
     exodus_path: (( concat "secret/exodus/" meta.environment "/cf" ))
     deployment_name: (( concat meta.environment "-cf" ))
@@ -43,6 +43,7 @@ instance_groups:
         name:    rabbitmq-blacksmith-plans
         properties:
           environment: (( grab meta.environment ))
+          bosh_env: (( grab meta.bosh_env ))
           cf:
             exodus_path: (( grab meta.cf.exodus_path ))
             deployment_name: (( grab meta.cf.deployment_name ))
