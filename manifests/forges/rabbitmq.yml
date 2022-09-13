@@ -1,6 +1,6 @@
 ---
 meta:
-  environment: (( grab genesis.env || params.env ))
+  environment: (( grab genesis.bosh_env || params.env ))
 
   cf:
     exodus_path: (( concat "secret/exodus/" meta.environment "/cf" ))
