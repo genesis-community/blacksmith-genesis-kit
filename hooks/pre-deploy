@@ -1,7 +1,26 @@
 #!/bin/bash
 set -eu
 
-echo "Pre-deploy called..."
+if want_feature "shield-backups"; then
+    if ! [ -x "$(command -v shield)" ]; then
+        echo 'error: shield is not installed.' >&2
+        exit 1
+    fi
 
-read value
-echo "Testing deployment flow... (value: $value)"
+    SHIELD_ADMIN_USERNAME="admin"
+    SHIELD_ADMIN_PASSWRD="shield"
+
+    SHIELD_ADDRESS="$(lookup --merged meta.shield.address)"
+
+    BLACKSMITH_SHIELD_USERNAME="$(lookup --merged params.shield.username)"
+    BLACKSMITH_SHIELD_PASSWORD="$(lookup --merged params.shield.password)"
+    BLACKSMITH_SHIELD_TENANT="$(lookup --merged params.shield.tenant)"
+
+    shield api $SHIELD_ADDRESS blacksmith-shield -k
+    shield login -c blacksmith-shield --username $SHIELD_ADMIN_USERNAME --password $SHIELD_ADMIN_PASSWRD
+
+    TEMP_DIR=$(mktemp -d)
+
+    spruce manifests/templates/shield-backups-import.yml > $TEMP_DIR/output.yml
+    shield import $TEMP_DIR/output.yml
+fi

@@ -2,13 +2,16 @@
 meta:
   shield:
     exodus: (( concat $GENESIS_EXODUS_MOUNT params.shield.deployment_env "/" params.shield.deployment_type ":" ))
+    # get from shield exodus the BOSH director url -> shield kit should be updated to support that
 
     address:  (( vault meta.shield.exodus "url" ))
     agent:    (( vault meta.vault "/shield:agent" )) # TODO: this value is not set by the SHIELD kit.
 
-    username: (( vault meta.vault "/shield:username" || "blacksmith" ))
+params:
+  shield:
+    username: blacksmith
     password: (( vault meta.vault "/shield:password" ))
-    tenant:   (( vault meta.vault "/shield:tenant" || "blacksmith" ))
+    tenant:   blacksmith
     store:    (( vault meta.vault "/shield:store" ))
 
 instance_groups:
@@ -22,9 +25,9 @@ instance_groups:
             address: (( grab params.shield.address || meta.shield.address ))
             agent: (( grab params.shield.agent || meta.shield.agent ))
             auth_method: local # Only local authentication method is supported for this kit feature.
-            username: (( grab params.shield.username || meta.shield.username ))
-            password: (( grab params.shield.password || meta.shield.password ))
-            tenant: (( grab params.shield.tenant || meta.shield.tenant ))
-            store:  (( grab params.shield.store || meta.shield.store ))
-            schedule: (( grab params.shield.schedule ))
-            retain: (( grab params.shield.retain ))
+            username: (( grab params.shield.username ))
+            password: (( grab params.shield.password ))
+            tenant: (( grab params.shield.tenant ))
+            store:  (( grab params.shield.store ))
+            schedule: (( grab params.shield.schedule || "" ))
+            retain: (( grab params.shield.retain || "" ))
