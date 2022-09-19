@@ -12,15 +12,15 @@ if want_feature "shield-backups"; then
 
     SHIELD_ADDRESS="$(lookup --merged meta.shield.address)"
 
-    BLACKSMITH_SHIELD_USERNAME="$(lookup --merged params.shield.username)"
-    BLACKSMITH_SHIELD_PASSWORD="$(lookup --merged params.shield.password)"
-    BLACKSMITH_SHIELD_TENANT="$(lookup --merged params.shield.tenant)"
+    export BLACKSMITH_SHIELD_USERNAME="$(lookup --merged params.shield.username)"
+    export BLACKSMITH_SHIELD_PASSWORD="$(lookup --merged params.shield.password)"
+    export BLACKSMITH_SHIELD_TENANT="$(lookup --merged params.shield.tenant)"
 
     shield api $SHIELD_ADDRESS blacksmith-shield -k
     shield login -c blacksmith-shield --username $SHIELD_ADMIN_USERNAME --password $SHIELD_ADMIN_PASSWRD
 
     TEMP_DIR=$(mktemp -d)
 
-    spruce manifests/templates/shield-backups-import.yml > $TEMP_DIR/output.yml
-    shield import $TEMP_DIR/output.yml
+    spruce merge manifests/templates/shield-backups-import.yml > $TEMP_DIR/output.yml
+    shield import -c blacksmith-shield $TEMP_DIR/output.yml
 fi
