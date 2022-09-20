@@ -8,7 +8,7 @@ if want_feature "shield-backups"; then
     fi
 
     SHIELD_ADMIN_USERNAME="$(lookup --merged meta.shield.admin_username)"
-    SHIELD_ADMIN_PASSWRD="$(lookup --merged meta.shield.admin_password)"
+    SHIELD_ADMIN_PASSWORD="$(lookup --merged meta.shield.admin_password)"
 
     SHIELD_ADDRESS="$(lookup --merged meta.shield.address)"
 
@@ -17,7 +17,7 @@ if want_feature "shield-backups"; then
     export BLACKSMITH_SHIELD_TENANT="$(lookup --merged params.shield.tenant)"
 
     shield api $SHIELD_ADDRESS blacksmith-shield -k
-    shield login -c blacksmith-shield --username $SHIELD_ADMIN_USERNAME --password $SHIELD_ADMIN_PASSWRD
+    shield login -c blacksmith-shield --username $SHIELD_ADMIN_USERNAME --password $SHIELD_ADMIN_PASSWORD
 
     TEMP_DIR=$(mktemp -d)
 
