@@ -7,8 +7,8 @@ if want_feature "shield-backups"; then
         exit 1
     fi
 
-    SHIELD_ADMIN_USERNAME="admin"
-    SHIELD_ADMIN_PASSWRD="shield"
+    SHIELD_ADMIN_USERNAME="$(lookup --merged meta.shield.admin_username)"
+    SHIELD_ADMIN_PASSWRD="$(lookup --merged meta.shield.admin_password)"
 
     SHIELD_ADDRESS="$(lookup --merged meta.shield.address)"
 

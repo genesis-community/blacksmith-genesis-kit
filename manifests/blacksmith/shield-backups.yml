@@ -2,7 +2,9 @@
 meta:
   shield:
     exodus: (( concat $GENESIS_EXODUS_MOUNT params.shield.deployment_env "/" params.shield.deployment_type ":" ))
-    # get from shield exodus the BOSH director url -> shield kit should be updated to support that
+
+    admin_username:  (( params.shield.admin_username || vault meta.shield.exodus "admin_username" ))
+    admin_password:  (( params.shield.admin_password || vault meta.shield.exodus "admin_password" ))
 
     address:  (( vault meta.shield.exodus "url" ))
     agent:    (( vault meta.vault "/shield:agent" )) # TODO: this value is not set by the SHIELD kit.
