@@ -280,6 +280,11 @@ new data services instances on behalf of end users.
     of per-plan limits.  `0` (the default) imposes no global
     limit.
 
+- `shield-backups` Enables automatic Blacksmith Service backups
+  via S.H.I.E.L.D. scheduled backups.
+
+  This feature requires the `shield` CLI to be available in the
+  instance where `genesis deploy` is invoked.
 
 # Cloud Configuration
 
