@@ -165,6 +165,17 @@ prompt_for do_mariadb boolean \
 	'Do you want to offer on-demand *MariaDB* / *MySQL* services?'
 [[ $do_mariadb == 'true' ]] && forges+=( mariadb )
 
+prompt_for do_shield_backups boolean \
+	'Do you want to enable automatic service backups via *S.H.I.E.L.D.*?'
+
+if [[ $do_shield_backups == 'true' ]]; then
+	prompt_for shield_agent line \
+		'What agent (IP:PORT) should S.H.I.E.L.D. use to store backups?'
+	prompt_for shield_store line \
+		'What store (UUID or name) should S.H.I.E.L.D. use to store backups?'
+	
+	safe --quiet set secret/$GENESIS_VAULT_PREFIX/shield agent="$shield_agent" store="$shield_store"
+fi
 
 echo
 echo
@@ -197,6 +208,10 @@ fi
 
 if [[ $do_rabbitmq_tls == 'true' ]]; then
 	echo "    - rabbitmq-tls"
+fi
+
+if [[ $do_shield_backups == 'true' ]]; then
+	echo "    - shield-backups"
 fi
 
 echo

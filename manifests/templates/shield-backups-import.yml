@@ -1,0 +1,10 @@
+users:
+  - name:     Blacksmith
+    username: (( grab $BLACKSMITH_SHIELD_USERNAME ))
+    password: (( grab $BLACKSMITH_SHIELD_PASSWORD ))
+
+tenants:
+  - name: (( grab $BLACKSMITH_SHIELD_TENANT ))
+    members:
+      - user: (( concat $BLACKSMITH_SHIELD_USERNAME "@local" ))
+        role: admin

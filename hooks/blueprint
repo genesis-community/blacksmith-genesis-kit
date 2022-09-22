@@ -27,6 +27,10 @@ if want_feature "broker-tls"; then
   merge+=( manifests/blacksmith/broker-tls.yml )
 fi
 
+if want_feature "shield-backups"; then
+  merge+=( manifests/blacksmith/shield-backups.yml )
+fi
+
 for want in ${GENESIS_REQUESTED_FEATURES}
 do
   case "$want" in

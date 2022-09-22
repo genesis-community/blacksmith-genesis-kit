@@ -74,3 +74,15 @@ credentials:
     users/blacksmith:   {password: random 64}
 
     registry:           {password: random 64}
+
+  shield-backups:
+    shield:             {password: random 64}
+
+provided:
+  shield-backups:
+    shield:
+      keys:
+        agent:
+          prompt: "External S.H.I.E.L.D agent IP:PORT"
+        store:
+          prompt: "External S.H.I.E.L.D store UUID or exact name"
