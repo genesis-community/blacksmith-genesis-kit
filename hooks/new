@@ -168,6 +168,15 @@ prompt_for do_mariadb boolean \
 prompt_for do_shield_backups boolean \
 	'Do you want to enable automatic service backups via *S.H.I.E.L.D.*?'
 
+if [[ $do_shield_backups == 'true' ]]; then
+	prompt_for shield_agent line \
+		'What agent (IP:PORT) should S.H.I.E.L.D. use to store backups?'
+	prompt_for shield_store line \
+		'What store (UUID or name) should S.H.I.E.L.D. use to store backups?'
+	
+	safe --quiet set secret/$GENESIS_VAULT_PREFIX/shield agent="$shield_agent" store="$shield_store"
+fi
+
 echo
 echo
 cat <<EOF
