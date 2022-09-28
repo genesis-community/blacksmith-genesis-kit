@@ -21,9 +21,9 @@ meta:
         vm_type: default
 releases:
 - name:    redis-forge
-  version: 0.8.9
-  url:     https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v0.8.9/redis-forge-0.8.9.tgz
-  sha1:    1337ee1fe71f9dba7036b8e825c0aa9c3d2215fa
+  version: 0.8.10
+  url:     https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v0.8.10/redis-forge-0.8.10.tgz
+  sha1:    a85ba353d634ce64e41fa885f6531ba298c91e72
 
 params:
   releases:
