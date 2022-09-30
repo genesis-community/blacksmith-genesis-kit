@@ -1,5 +1,8 @@
 ---
 meta:
+  environment: (( grab genesis.env || params.env ))
+  bosh_env: (( grab genesis.bosh_env || params.bosh_env || params.env ))
+
   default:
     redis_tags:
       - blacksmith
@@ -36,6 +39,9 @@ instance_groups:
       - release: redis-forge
         name:    redis-blacksmith-plans
         properties:
+          environment: (( grab meta.environment ))
+          bosh_env: (( grab meta.bosh_env ))
+
           plans: (( grab params.redis_plans || meta.default.redis_plans ))
           service:
             id:          (( grab params.redis_service_id          || "redis" ))
