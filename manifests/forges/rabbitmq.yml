@@ -1,5 +1,15 @@
 ---
 meta:
+  environment: (( grab genesis.env || params.env ))
+  bosh_env: (( grab genesis.bosh_env || params.bosh_env || params.env ))
+  cf:
+    exodus_path: (( concat "secret/exodus/" meta.environment "/cf" ))
+    deployment_name: (( concat meta.environment "-cf" ))
+    system_domain: (( vault meta.cf.exodus_path ":system_domain" ))
+    api_url:    (( concat "https://api." meta.cf.system_domain ))
+    username:   (( vault meta.cf.exodus_path ":admin_username" ))
+    password:   (( vault meta.cf.exodus_path ":admin_password" ))
+
   default:
     rabbitmq_tags:
       - blacksmith
@@ -16,14 +26,15 @@ meta:
 
 releases:
 - name:    rabbitmq-forge
-  version: 0.5.13
-  url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v0.5.13/rabbitmq-forge-0.5.13.tgz
-  sha1:    74866b6ec5a2c577ead599e0ed34bb94b8b6a754
-
+  version: 0.7.12
+  url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v0.7.12/rabbitmq-forge-0.7.12.tgz
+  sha1:    07d4f2d90ab162b9811f22a115f064f9ffd2c873
+  
 params:
   releases:
     - (( append ))
     - (( grab releases.rabbitmq-forge ))
+  cf_skip_ssl_validation: false
 
 instance_groups:
   - name: blacksmith
@@ -31,6 +42,33 @@ instance_groups:
       - release: rabbitmq-forge
         name:    rabbitmq-blacksmith-plans
         properties:
+          environment: (( grab meta.environment ))
+          bosh_env: (( grab meta.bosh_env ))
+          cf:
+            exodus_path: (( grab meta.cf.exodus_path ))
+            deployment_name: (( grab meta.cf.deployment_name ))
+            system_domain: (( grab meta.cf.system_domain ))
+            api_url:    (( grab meta.cf.api_url ))
+            username:   (( grab meta.cf.username ))
+            password:   (( grab meta.cf.password ))
+          loggregator:
+            tls:
+              ca_cert: (( vault meta.cf.exodus_path ":loggregator_ca" ))
+              agent:
+                cert: (( vault meta.cf.exodus_path ":loggregator_tls_agent_cert" ))
+                key: (( vault meta.cf.exodus_path ":loggregator_tls_agent_key" ))
+          rabbitmq_metrics_emitter:
+            cloud_foundry:
+              api:    (( grab meta.cf.api_url ))
+              skip_ssl_validation: (( grab params.cf_skip_ssl_validation ))
+              username:   (( vault meta.cf.exodus_path ":admin_username" ))
+              password:   (( vault meta.cf.exodus_path ":admin_password" ))
+            rmq_management:
+              skip_ssl_validation: (( grab params.emitter_skip_ssl_validation || true ))
+              mgmt_port: (( grab params.emitter_mgmt_port || "15671" ))
+              mgmt_scheme: (( grab params.emitter_scheme || "https" ))
+              mgmt_host: (( grab params.emitter_mgmt_host || "localhost" ))
+
           plans: (( grab params.rabbitmq_plans || meta.default.rabbitmq_plans ))
           service:
             id:          (( grab params.rabbitmq_service_id          || "rabbitmq" ))
