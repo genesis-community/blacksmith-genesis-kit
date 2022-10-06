@@ -1,0 +1,82 @@
+---
+params:
+  ip:           (( grab meta.blacksmith.ip ))
+  cloud_config: (( grab meta.blacksmith.cloud_config ))
+
+  releases: []
+  stemcells: []
+
+exodus:
+  broker_url:      (( concat meta.blacksmith.scheme "://" meta.blacksmith.domain ":" meta.blacksmith.port ))
+  broker_username: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.broker.username ))
+  broker_password: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.broker.password ))
+
+  bosh_username: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.username ))
+  bosh_password: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.password ))
+  bosh_address:  (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.address ))
+  bosh_cacert:   (( vault meta.vault "/tls/ca:certificate" ))
+
+variables:
+- name: blacksmith_services_ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: (( concat genesis.env "-blacksmith-ca.bosh" ))
+
+instance_groups:
+  - name:      blacksmith
+    instances: 1
+    stemcell:  default
+    azs:       (( grab params.availability_zones || meta.default.azs ))
+    vm_type:   (( grab params.vm_type   || "blacksmith" ))
+    networks:
+      - name:  (( grab params.network || "blacksmith" ))
+        static_ips:
+          - (( grab meta.blacksmith.ip ))
+    persistent_disk: (( grab params.disk_size || 20480 ))
+
+  ip:
+    jobs:
+      - release: blacksmith
+        name:    blacksmith
+        properties:
+          debug:     (( grab params.blacksmith_debug || false ))
+          env:       (( grab genesis.env ))
+          shareable: (( grab params.shareable || false ))
+
+          broker:
+            port:     (( grab meta.blacksmith.port ))
+            username: blacksmith
+            password: (( vault meta.vault "/broker:password" ))
+
+          bosh:
+            username:     blacksmith
+            password:     (( vault meta.vault "/users/blacksmith:password" ))
+            address:      (( concat "https://" params.ip ":25555" ))
+            stemcells:    (( grab params.stemcells ))
+            releases:     (( grab params.releases ))
+            cloud-config: (( grab params.cloud_config ))
+
+          blacksmith_services_ca:
+            tls:
+              ca_cert: ((blacksmith_services_ca.certificate))
+
+releases:
+- name:    blacksmith
+  version: 1.6.5
+  url:     https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v1.6.5/blacksmith-1.6.5.tgz
+  sha1:    1def8e4e21d3ea95aaf16339d4dec64667538ae9
+
+stemcells:
+  - alias:   default
+    os:      (( grab params.stemcell_os      || "ubuntu-bionic"))
+    version: (( grab params.stemcell_version || "latest" ))
+
+update:
+  serial: false
+  canaries: 1
+  canary_watch_time: 30000-600000
+  update_watch_time: 5000-600000
+  max_in_flight: 1
+  max_errors: 1
+

@@ -1,0 +1,11 @@
+---
+releases:
+  - name:    bosh
+    version: "270.12.0"
+    sha1:    ecb69fdc834e962cc66747f2a9f57470a57401f9
+    url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/bosh?v=" releases.bosh.version ))
+
+  - name:    bpm
+    version: "1.1.12"
+    sha1:    502e9446fa34accaf122ad2b28b6ffa543d5bbca
+    url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=" releases.bpm.version ))
