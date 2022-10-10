@@ -32,7 +32,7 @@ variables:
 instance_groups:
   - name:      blacksmith
     instances: 1
-    stemcell:  default
+    stemcell:  bionic
     azs:             (( grab params.availability_zones || meta.default.azs ))
     vm_type:         (( grab params.vm_type   || "blacksmith" ))
     persistent_disk: (( grab params.disk_size || 20480 ))
@@ -63,17 +63,6 @@ instance_groups:
             tls:
               ca_cert: ((blacksmith_services_ca.certificate))
 
-releases:
-- name:    blacksmith
-  version: 1.6.5
-  url:     https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v1.6.5/blacksmith-1.6.5.tgz
-  sha1:    1def8e4e21d3ea95aaf16339d4dec64667538ae9
-
-stemcells:
-  - alias: default
-    os:      (( grab params.stemcell_os      || "ubuntu-bionic"))
-    version: (( grab params.stemcell_version || "latest" ))
-
 update:
   serial: false
   canaries: 1
@@ -82,3 +71,7 @@ update:
   max_in_flight: 1
   max_errors: 1
 
+stemcells:
+  - alias: bionic
+    os:      (( grab params.stemcell_os      || "ubuntu-bionic"))
+    version: (( grab params.stemcell_version || "latest" ))

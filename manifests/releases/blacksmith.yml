@@ -1,5 +1,10 @@
 ---
 releases:
+  - name:    blacksmith
+    version: "1.6.5"
+    sha1:    1def8e4e21d3ea95aaf16339d4dec64667538ae9
+    url:     (( concat https://bosh.io/d/github.com/blacksmith-community/blacksmith-boshrelease?v= releases.blacksmith.version ))
+
   - name:    bosh
     version: "270.12.0"
     sha1:    ecb69fdc834e962cc66747f2a9f57470a57401f9

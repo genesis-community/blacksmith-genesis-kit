@@ -12,16 +12,28 @@ meta:
         - (( vault genesis.secrets_mount "certs/org:ca" )) # Organization CA, if exists
         - (( vault genesis.secrets_mount "certs/dbs:ca" )) # External Databases CA
 
+  stemcell:
+    name:    (( grab params.stemcell_name    || "bionic" ))
+    os:      (( grab params.stemcell_os      || "ubuntu-bionic" ))
+    version: (( grab params.stemcell_version || "latest" ))
+
   blacksmith:
     cloud_config: {} # TODO: OCFP Reference Arch based Cloud Config
 
-    scheme: https # TODO: double check this
-    domain: (( vault meta.ocfp.vault.tf "/lbs/blacksmith:domain" ))
-    ip:     (( vault meta.ocfp.vault.tf "/bosh/.../0/ips/reserved:blacksmith_ip" ))
-    port:   (( grab params.blacksmith_port || 3000 ))
+    domain: (( vault meta.ocfp.vault.tf "/net/blacksmith:fqdn" ))
+    ip:     (( vault meta.ocfp.vault.tf "/net/blacksmith:ip" ))
+    az:     (( vault meta.ocfp.vault.tf "/bosh/iaas/subnets/ocfp/0:availability_zone" ))
 
-    azs: # TODO: Check what these are - if it's for services we need 2-3 if for blacksmith it's 1, also... shouldn't CC do this?
-      - (( vault meta.ocfp.vault.tf "bosh/iaas/subnets/0:availability_zone" )) # TODO: double check contract
+    disk_type:  (( concat "blacksmith-" meta.ocfp.env.scale ))
+    vm_type:    (( concat "blacksmith-" meta.ocfp.env.scale ))
+    network:    (( concat genesis.env "-blacksmith" ))
 
-    host: (( grab params.fqdn || params.ip ))
+    debug:      false
+    shareable:  false
 
+    broker:
+      # NOTE: TLS is always enabled as broker-tls is included by default.
+      url: (( "https://" meta.blacksmith.domain ))
+
+      username: blacksmith
+      password: (( vault meta.vault "/broker:password" ))
