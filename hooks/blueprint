@@ -96,12 +96,12 @@ fi
 
 if want_feature "ocfp" ; then # Things that should be true for production envs
   if want_feature "redis" ; then
-    merge+=( "manifests/forges/redis-tls" )
+    merge+=( "manifests/forges/redis-tls.yml" )
   fi
 
   if want_feature "rabbitmq" ; then
     merge+=(
-    "manifests/forges/rabbitmq-tls"
+    "manifests/forges/rabbitmq-tls.yml"
     "manifests/forges/rabbitmq-dashboard-registration.yml" 
     )
   fi 
