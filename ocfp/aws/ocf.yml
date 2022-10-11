@@ -16,7 +16,7 @@ exodus:
   bosh_address: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.address ))
 
 variables:
-  - name: blacksmith_services_ca
+  - name: blacksmith_ca_certificate
     type: certificate
     options:
       is_ca: true
@@ -57,7 +57,7 @@ instance_groups:
 
           blacksmith_services_ca:
             tls:
-              ca_cert: ((blacksmith_services_ca.certificate))
+              ca_cert: ((blacksmith_ca_certificate.certificate))
 
 update:
   serial: false

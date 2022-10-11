@@ -26,7 +26,7 @@ meta:
 
     disk_type:  (( concat "blacksmith-" meta.ocfp.env.scale ))
     vm_type:    (( concat "blacksmith-" meta.ocfp.env.scale ))
-    network:    (( concat genesis.env "-blacksmith" ))
+    network:    (( concat genesis.env "-ocf" ))
 
     debug:      false
     shareable:  false
