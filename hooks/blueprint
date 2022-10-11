@@ -26,7 +26,7 @@ do
     (ocfp)
       external_bosh=$(( external_bosh + 1 )) # OCFP Ref Arch requires external bosh
       merge+=( 
-      #"manifests/blacksmith/broker-tls.yml" # 
+      #"manifests/blacksmith/broker-tls.yml"
       #"manifests/blacksmith/external-bosh.yml"
       "ocfp/meta.yml"
       "ocfp/ocfp.yml"
@@ -105,7 +105,7 @@ else
   if want_feature "aws" ; then
     merge+=( "manifests/iaas/$want.yml" )
   fi
-  if ! want_feature "vsphere" then
+  if ! want_feature "vsphere" ; then
     # vSphere doesn't need a registry, but everyone else does...
     merge+=( manifests/addons/registry.yml )
   fi
