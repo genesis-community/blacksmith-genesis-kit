@@ -20,7 +20,7 @@ meta:
   blacksmith:
     cloud_config: {} # TODO: OCFP Reference Arch based Cloud Config
 
-    domain: (( vault meta.ocfp.vault.tf "/net/blacksmith:fqdn" ))
+    domain: (( vault meta.ocfp.vault.tf "/ocf/fqdns:blacksmith" ))
     ip:     (( vault meta.ocfp.vault.tf "/net/blacksmith:ip" ))
     az:     (( vault meta.ocfp.vault.tf "/bosh/iaas/subnets/ocfp/0:availability_zone" ))
 
