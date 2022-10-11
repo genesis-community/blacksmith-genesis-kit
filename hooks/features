@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+for feature in ${GENESIS_REQUESTED_FEATURES} ; do
+  case "$feature" in
+    (ocfp)
+      echo "broker-tls"
+      echo "external-bosh"
+      # if want_feature "redis" ; then ... ; fi
+      # if want_feature "rabbitmq" ; then ... ; fi
+      ;;
+  esac
+  echo "$feature"
+done
+

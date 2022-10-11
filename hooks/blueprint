@@ -26,8 +26,8 @@ do
     (ocfp)
       external_bosh=$(( external_bosh + 1 )) # OCFP Ref Arch requires external bosh
       merge+=( 
-      "manifests/blacksmith/broker-tls.yml"
-      "manifests/blacksmith/external-bosh.yml"
+      #"manifests/blacksmith/broker-tls.yml" # 
+      #"manifests/blacksmith/external-bosh.yml"
       "ocfp/meta.yml"
       "ocfp/ocfp.yml"
       "ocfp/${OCFP_IAAS}/ocf.yml"
