@@ -39,6 +39,7 @@ do
       ;;
 
     (aws|azure|google|openstack|vsphere) # IaaS selector feature flags
+      OCFP_IAAS="$want"
       iaas=$(( iaas + 1 ))
       merge+=( "manifests/iaas/$want.yml" )
       case $want in

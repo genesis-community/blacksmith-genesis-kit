@@ -7,7 +7,7 @@ code:     https://github.com/genesis-community/blacksmith-genesis-kit
 
 description: Blacksmith
 
-genesis_version_min: 2.6.0
+genesis_version_min: 2.8.5
 
 certificates:
   base:
