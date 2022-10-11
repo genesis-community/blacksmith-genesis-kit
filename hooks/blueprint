@@ -24,6 +24,7 @@ for want in ${GENESIS_REQUESTED_FEATURES}
 do
   case "$want" in
     (ocfp)
+      external_bosh=$(( external_bosh + 1 )) # OCFP Ref Arch requires external bosh
       merge+=( 
       "manifests/blacksmith/broker-tls.yml"
       "manifests/blacksmith/external-bosh.yml"
@@ -35,6 +36,7 @@ do
 
     (external-bosh)
       merge+=( "manifests/blacksmith/external-bosh.yml" )
+      external_bosh=$(( external_bosh + 1 ))
       iaas=$(( iaas + 1 )) # No IaaS Specification needed with external bosh
       ;;
 

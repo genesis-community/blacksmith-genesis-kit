@@ -24,9 +24,9 @@ meta:
     ip:     (( vault meta.ocfp.vault.tf "/net/blacksmith:ip" ))
     az:     (( vault meta.ocfp.vault.tf "/bosh/iaas/subnets/ocfp/0:availability_zone" ))
 
-    disk_type:  (( concat "blacksmith-" meta.ocfp.env.scale ))
-    vm_type:    (( concat "blacksmith-" meta.ocfp.env.scale ))
-    network:    (( concat genesis.env "-ocf" ))
+    disk_type: (( concat "blacksmith-" meta.ocfp.env.scale ))
+    vm_type:   (( concat "blacksmith-" meta.ocfp.env.scale ))
+    network:   (( concat genesis.env "-ocf" ))
 
     debug:      false
     shareable:  false
