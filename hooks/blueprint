@@ -43,13 +43,6 @@ do
     (aws|azure|google|openstack|vsphere) # IaaS selector feature flags
       OCFP_IAAS="$want"
       iaas=$(( iaas + 1 ))
-      merge+=( "manifests/iaas/$want.yml" )
-      case $want in
-        (vsphere) ;; # vSphere doesn't need a registry
-        (*)          # but everyone else does...
-          merge+=( manifests/addons/registry.yml )
-          ;;
-      esac
       ;;
 
     (broker-tls)
@@ -108,6 +101,14 @@ if want_feature "ocfp" ; then # Things that should be true for production envs
     "manifests/forges/rabbitmq-dashboard-registration.yml" 
     )
   fi 
+else
+  if want_feature "aws" ; then
+    merge+=( "manifests/iaas/$want.yml" )
+  fi
+  if ! want_feature "vsphere" then
+    # vSphere doesn't need a registry, but everyone else does...
+    merge+=( manifests/addons/registry.yml )
+  fi
 fi
 
 # TODO: Move the below checks to hooks/check.
