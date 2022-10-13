@@ -3,6 +3,10 @@ params:
   ip:           (( grab meta.blacksmith.ip ))
   cloud_config: (( grab meta.blacksmith.cloud_config ))
 
+  disk_type:    (( grab meta.blacksmith.disk_type ))
+  vm_type:      (( grab meta.blacksmith.vm_type ))
+  network:      (( grab meta.blacksmith.network ))
+
   releases: []
   stemcells: []
 
@@ -28,15 +32,15 @@ instance_groups:
     azs:
       - (( grab meta.blacksmith.az ))
 
-    persistent_disk_type: (( grab meta.blacksmith.disk_type ))
-    vm_type:              (( grab meta.blacksmith.vm_type ))
+    persistent_disk_type: (( grab params.disk_type ))
+    vm_type:              (( grab params.vm_type ))
 
     stemcell:  bionic
 
     networks:
-      - name: (( grab meta.blacksmith.network ))
+      - name: (( grab params.network ))
         static_ips:
-          - (( grab meta.blacksmith.ip ))
+          - (( grab params.ip ))
 
     jobs:
       - release: blacksmith
@@ -68,6 +72,6 @@ update:
   max_errors: 1
 
 stemcells:
-  - alias:   (( grab meta.stemcell.name ))
-    os:      (( grab meta.stemcell.os   ))
-    version: (( grab meta.stemcell.name ))
+  - alias:   (( grab meta.stemcell.name    ))
+    os:      (( grab meta.stemcell.os      ))
+    version: (( grab meta.stemcell.version ))
