@@ -22,7 +22,7 @@ meta:
 
     domain: (( vault meta.ocfp.vault.tf "/ocf/fqdns:blacksmith" ))
     ip:     (( vault meta.ocfp.vault.tf "/net/blacksmith:ip" ))
-    az:     (( vault meta.ocfp.vault.tf "/bosh/iaas/subnets/ocfp/0:availability_zone" ))
+    az:     (( grab genesis.env "-z1" ))
 
     disk_type: (( concat "blacksmith-" meta.ocfp.env.scale ))
     vm_type:   (( concat "blacksmith-" meta.ocfp.env.scale ))
