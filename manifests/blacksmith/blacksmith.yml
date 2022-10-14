@@ -35,7 +35,7 @@ instance_groups:
     stemcell:  bionic
     azs:             (( grab params.availability_zones || meta.default.azs ))
     vm_type:         (( grab params.vm_type   || "blacksmith" ))
-    persistent_disk: (( grab params.disk_size || 20480 ))
+    disk_type:       (( grab params.disk_type || "blacksmith" ))
     networks:
       - name:       (( grab params.network || "blacksmith" ))
         static_ips: [(( grab params.ip ))]
