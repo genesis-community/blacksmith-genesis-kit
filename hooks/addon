@@ -2,11 +2,11 @@
 
 set -eu
 
-vault="secret/$GENESIS_VAULT_PREFIX"
+vault="$GENESIS_SECRETS_MOUNT/$GENESIS_VAULT_PREFIX"
 alias="$GENESIS_ENVIRONMENT-blacksmith"
 
-ip=$(lookup params.ip)
-fqdn=$(lookup params.fqdn)
+ip=$(lookup --partial params.ip)
+fqdn=$(lookup --partial params.fqdn)
 
 if [[ -n "${fqdn}" ]]
 then host=${fqdn}
@@ -14,10 +14,10 @@ else host=${ip}
 fi
 
 if want_feature "broker-tls"; then
-  port=$(lookup params.blacksmith_tls_port 443)
+  port=$(lookup --partial params.blacksmith_tls_port 443)
   scheme=https
 else
-  port=$(lookup params.blacksmith_port 3000)
+  port=$(lookup --partial params.blacksmith_port 3000)
   scheme=http
 fi
 

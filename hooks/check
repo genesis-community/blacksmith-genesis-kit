@@ -3,8 +3,8 @@
 # Cloud Config checks
 if [[ -n "$GENESIS_CLOUD_CONFIG" ]] ; then
   if ! want_feature proto; then
-    cloud_config_needs vm_type    $(lookup params.vm_type blacksmith)
-    cloud_config_needs network    $(lookup params.network blacksmith)
+    cloud_config_needs vm_type    $(lookup --partial params.vm_type blacksmith)
+    cloud_config_needs network    $(lookup --partial params.network blacksmith)
     check_cloud_config && describe "  cloud-config [#G{OK}]"
   fi
 fi
@@ -23,9 +23,9 @@ if want_feature vsphere; then
   done
 fi
 
-ip=$(lookup params.ip)
+ip=$(lookup --partial params.ip)
 describe "  checking if our certificates match the director static ip ($ip)..."
-vault="secret/$GENESIS_VAULT_PREFIX"
+vault="$GENESIS_SECRETS_MOUNT/$GENESIS_VAULT_PREFIX"
 for cert in tls/director \
             tls/nats/server; do
   if ! safe exists "$vault/$cert"; then

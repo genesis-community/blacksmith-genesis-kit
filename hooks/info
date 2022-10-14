@@ -1,16 +1,16 @@
 #!/bin/bash
 set -eu
-vault="secret/$GENESIS_VAULT_PREFIX"
 
-ip=$(lookup params.ip)
-ip=$(lookup params.ip)
+vault="$GENESIS_SECRETS_MOUNT/$GENESIS_VAULT_PREFIX"
+
+ip=$(lookup --partial params.ip)
 if want_feature "broker-tls"; then
-  port=$(lookup params.blacksmith_tls_port 443)
+  port=$(lookup --partial params.blacksmith_tls_port 443)
   scheme=https
   export BLACKSMITH_URL=https://$ip:$port
   export BLACKSMITH_SKIP_VERIFY=true
 else
-  port=$(lookup params.blacksmith_port 3000)
+  port=$(lookup --partial params.blacksmith_port 3000)
   scheme=http
   export BLACKSMITH_URL=http://$ip:$port
 fi

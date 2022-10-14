@@ -20,8 +20,8 @@ meta:
   blacksmith:
     cloud_config: {} # TODO: OCFP Reference Arch based Cloud Config
 
-    domain: (( vault meta.ocfp.vault.tf "/ocf/fqdns:blacksmith" ))
     ip:     (( vault meta.ocfp.vault.tf "/net/blacksmith:ip" ))
+    fqdn:   (( vault meta.ocfp.vault.tf "/ocf/fqdns:blacksmith" ))
     az:     (( concat genesis.env "-z1" ))
 
     disk_type: (( concat "blacksmith-" meta.ocfp.env.scale ))
@@ -33,7 +33,7 @@ meta:
 
     broker:
       # NOTE: TLS is always enabled as broker-tls is included by default.
-      url: (( "https://" meta.blacksmith.domain ))
+      url: (( "https://" meta.blacksmith.fqdn ))
 
       username: blacksmith
       password: (( vault meta.vault "/broker:password" ))
