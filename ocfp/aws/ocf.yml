@@ -38,6 +38,7 @@ instance_groups:
     stemcell:  bionic
 
     networks:
+      - (( replace )) 
       - name: (( grab params.network ))
         static_ips:
           - (( grab params.ip ))
