@@ -4,6 +4,7 @@
 if [[ -n "$GENESIS_CLOUD_CONFIG" ]] ; then
   if ! want_feature proto; then
     cloud_config_needs vm_type    $(lookup --partial params.vm_type blacksmith)
+    cloud_config_needs disk_type  $(lookup --partial params.disk_type blacksmith)
     cloud_config_needs network    $(lookup --partial params.network blacksmith)
     check_cloud_config && describe "  cloud-config [#G{OK}]"
   fi

@@ -88,8 +88,8 @@ if [[ $external_bosh == 0 ]] ; then
 fi
 
 # Add the IaaS manifest only if we are not using the OCFP feature.
-if ! want_feature "ocfp" ; then
-  merge+=( "manifests/iaas/$want.yml" )
+if ! want_feature "ocfp" && [[ $iaas != 0 ]] ; then
+  merge+=( "manifests/iaas/${OCFP_IAAS}.yml" )
 
   if ! want_feature "vsphere" ; then
     # vSphere doesn't need a registry, but everyone else does...
