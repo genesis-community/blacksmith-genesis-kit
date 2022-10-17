@@ -55,5 +55,5 @@ if ! command -v boss >/dev/null 2>&1; then
     echo "  !!! install the 'boss' cli to query the blacksmith catalog"
     echo "      (https://github.com/jhunt/boss)"
 else
-    boss catalog | sed -e 's/^/  /';
+         boss catalog | sed -e 's/^/  /';
 fi

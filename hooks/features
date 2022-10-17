@@ -5,10 +5,14 @@ for feature in ${GENESIS_REQUESTED_FEATURES} ; do
     (ocfp)
       echo "broker-tls"
       echo "external-bosh"
-      # if want_feature "redis" ; then ... ; fi
-      # if want_feature "rabbitmq" ; then ... ; fi
+      if want_feature "redis" ; then
+        echo "redis-tls"
+      fi
+      if want_feature "rabbitmq" ; then
+        echo "rabbitmq-tls"
+        echo "rabbitmq-dashboard-registration"
+      fi
       ;;
   esac
   echo "$feature"
 done
-

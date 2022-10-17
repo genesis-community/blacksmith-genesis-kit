@@ -26,18 +26,15 @@ do
     (ocfp)
       external_bosh=$(( external_bosh + 1 )) # OCFP Ref Arch requires external bosh
       merge+=( 
-      #"manifests/blacksmith/broker-tls.yml"
-      #"manifests/blacksmith/external-bosh.yml"
-      "ocfp/meta.yml"
-      "ocfp/ocfp.yml"
-      "ocfp/${OCFP_IAAS}/ocf.yml"
+        "ocfp/meta.yml"
+        "ocfp/ocfp.yml"
+        "ocfp/${OCFP_IAAS}/ocf.yml"
       )
       ;;
 
     (external-bosh)
       merge+=( "manifests/blacksmith/external-bosh.yml" )
       external_bosh=$(( external_bosh + 1 ))
-      # iaas=$(( iaas + 1 )) # No IaaS Specification needed with external bosh
       ;;
 
     (aws|azure|google|openstack|vsphere) # IaaS selector feature flags
@@ -59,19 +56,19 @@ do
       ;;
 
     (redis-tls)
-      merge+=( manifests/forges/redis-tls.yml )
+      merge+=( "manifests/forges/redis-tls.yml" )
       ;;
 
     (redis-dual-mode)
-      merge+=( manifests/forges/redis-dual-mode.yml )
+      merge+=( "manifests/forges/redis-dual-mode.yml" )
       ;;
 
     (rabbitmq-tls)
-      merge+=( manifests/forges/rabbitmq-tls.yml )
+      merge+=( "manifests/forges/rabbitmq-tls.yml" )
       ;;
 
     (rabbitmq-dual-mode)
-      merge+=( manifests/forges/rabbitmq-dual-mode.yml )
+      merge+=( "manifests/forges/rabbitmq-dual-mode.yml" )
       ;;
 
     (rabbitmq-dashboard-registration)
@@ -86,28 +83,17 @@ do
   esac
 done
 
-if [[ ${external_bosh} == 0 ]] ; then
+if [[ $external_bosh == 0 ]] ; then
   merge+=( "manifests/blacksmith/bosh.yml" )
 fi
 
-if want_feature "ocfp" ; then # Things that should be true for production envs
-  if want_feature "redis" ; then
-    merge+=( "manifests/forges/redis-tls.yml" )
-  fi
+# Add the IaaS manifest only if we are not using the OCFP feature.
+if ! want_feature "ocfp" ; then
+  merge+=( "manifests/iaas/$want.yml" )
 
-  if want_feature "rabbitmq" ; then
-    merge+=(
-    "manifests/forges/rabbitmq-tls.yml"
-    "manifests/forges/rabbitmq-dashboard-registration.yml" 
-    )
-  fi 
-else
-  if want_feature "aws" ; then
-    merge+=( "manifests/iaas/$want.yml" )
-  fi
   if ! want_feature "vsphere" ; then
     # vSphere doesn't need a registry, but everyone else does...
-    merge+=( manifests/addons/registry.yml )
+    merge+=( "manifests/addons/registry.yml" )
   fi
 fi
 
@@ -115,7 +101,7 @@ fi
 
 # Sanity Check Time!
 # If we haven't chosen an IaaS, that's a problem.
-if [[ $iaas == 0 ]]; then
+if [[ $iaas == 0 && $external_bosh == 0 ]]; then
   echo >&2 "You have not enabled an IaaS feature flag."
   exit 1
 fi
