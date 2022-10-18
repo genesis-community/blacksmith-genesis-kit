@@ -16,8 +16,8 @@ releases:
     url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=" releases.bpm.version ))
 
   - name:    routing
-    version: "0.237.0"
-    sha1:    0024f2d9f8bb3c624a162db4c3a5919388c6d800
+    version: "0.225.0"
+    sha1:    a5b7f3b746cfa169f466c2b682db296ab8dcd0ad
     url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/routing-release?v=" releases.routing.version ))
 
   - name:    bosh-dns-aliases
