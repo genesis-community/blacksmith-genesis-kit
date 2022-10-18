@@ -1,6 +1,6 @@
 ---
 params:
-  ip:           (( grab meta.blacksmith.ip ))
+  ip:           (( grab meta.blacksmith.fqdn ))
   fqdn:         (( grab meta.blacksmith.fqdn ))
   cloud_config: (( grab meta.blacksmith.cloud_config ))
 

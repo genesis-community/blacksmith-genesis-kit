@@ -101,7 +101,7 @@ case $GENESIS_ADDON_SCRIPT in
       echo "The 'visit' addon script only works on macOS, currently."
       exit 1
     fi
-    open "$scheme://$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD@$ip:$port"
+    open "$scheme://$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD@$host:$port"
     ;;
   
   (bosh)
