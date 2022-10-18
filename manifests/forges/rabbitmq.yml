@@ -26,10 +26,10 @@ meta:
 
 releases:
 - name:    rabbitmq-forge
-  version: 0.7.12
-  url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v0.7.12/rabbitmq-forge-0.7.12.tgz
-  sha1:    07d4f2d90ab162b9811f22a115f064f9ffd2c873
-  
+  version: 0.8.7
+  url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v0.8.7/rabbitmq-forge-0.8.7.tgz
+  sha1:    83a25264f43e42c03e5864adaecbdd88db8fa327
+
 params:
   releases:
     - (( append ))

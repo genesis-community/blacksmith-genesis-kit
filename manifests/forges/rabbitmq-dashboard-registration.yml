@@ -24,5 +24,7 @@ instance_groups:
         bosh:
           deployment_name: ((grab meta.bosh.env_name))
         rabbitmq:
-           route_registrar:
-             enabled: true
+          route_registrar:
+            enabled: true
+            tls:
+              enabled: (( grab params.route_registrar_tls_enabled || false ))
