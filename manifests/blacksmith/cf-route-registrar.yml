@@ -1,7 +1,7 @@
 ---
 meta:
   blacksmith:
-    port: (( grab params.blackmith_tls_port || params.blacksmith_port ))
+    port: (( grab meta.blackmith_tls_port || meta.blacksmith_port ))
 
   cf:
     exodus_path:     (( concat $GENESIS_EXODUS_MOUNT genesis.env "/cf" ))
