@@ -75,6 +75,10 @@ do
       merge+=( "manifests/forges/rabbitmq-dashboard-registration.yml" )
       ;;
 
+    (cf-route-registrar)
+      merge+=( "manifests/blacksmith/cf-route-registrar.yml" )
+      ;;
+
     (*)
       if [[ -f "$GENESIS_ROOT/ops/$want.yml" ]] ; then
         merge+=( "$GENESIS_ROOT/ops/$want.yml" )

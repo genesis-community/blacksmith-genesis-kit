@@ -5,6 +5,8 @@ for feature in ${GENESIS_REQUESTED_FEATURES} ; do
     (ocfp)
       echo "broker-tls"
       echo "external-bosh"
+      echo "cf-route-registrar"
+
       if want_feature "redis" ; then
         echo "redis-tls"
       fi
