@@ -20,7 +20,6 @@ meta:
   blacksmith:
     cloud_config: {} # TODO: OCFP Reference Arch based Cloud Config
 
-    # ip:     (( vault meta.ocfp.vault.tf "/net/blacksmith:ip" ))
     fqdn:   (( vault meta.ocfp.vault.tf "/ocf/fqdns:blacksmith" ))
     az:     (( concat genesis.env "-z1" ))
 
