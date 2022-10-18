@@ -138,16 +138,9 @@ case $GENESIS_ADDON_SCRIPT in
     cf_user=$(exodus "$env/cf" admin_username)
     cf_pass=$(exodus "$env/cf" admin_password)
   
-    CF_OPTIONS=""
-    cf_skip_ssl=$(exodus "$env/cf" self-signed)
-  
-    if [[ "$cf_skip_ssl" == "true" || "$cf_skip_ssl" == "1" ]] ; then
-      CF_OPTIONS="$CF_OPTIONS --skip-ssl-validation"
-    fi
-  
     (export HOME="$(mktemp -d blacksmith.regXXXXXXX)"
      describe "authenticating to #C{$cf_api} as #G{$cf_user}..."
-     cf api "${cf_api}" ${CF_OPTIONS}
+     cf api "${cf_api}" --skip-ssl-validation
      cf auth "${cf_user}" "${cf_pass}"
   
      env_is_registered=$(cf curl /v2/service_brokers|jq --arg env_name "${env}-blacksmith" -r '.resources[].entity | select(.name==$env_name) | .name' )
