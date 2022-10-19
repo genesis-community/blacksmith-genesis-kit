@@ -2,6 +2,7 @@
 kit:
   features:
     - ((append))
+    - external-bosh
     - redis-tls
     - redis-dual-mode
     - rabbitmq-tls

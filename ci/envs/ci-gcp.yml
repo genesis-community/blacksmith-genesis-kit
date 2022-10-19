@@ -2,8 +2,8 @@
 kit:
   features:
     - ((append))
-    - google
-
+#    - google 
+# ^ using external bosh director instead
 genesis:
   bosh_env:  gcp-uswest2-genesis-ci
 
