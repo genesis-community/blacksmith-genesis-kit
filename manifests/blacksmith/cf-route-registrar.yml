@@ -58,7 +58,8 @@ addons:
       route_registrar:
         routes:
         - name: blacksmith
-          port: (( grab meta.blacksmith.port ))
+          port: (( grab meta.blacksmith_port ))
+          tls_port: (( grab meta.blacksmith_tls_port || "" ))
           registration_interval: 10s
           uris:
             - (( grab params.fqdn ))
