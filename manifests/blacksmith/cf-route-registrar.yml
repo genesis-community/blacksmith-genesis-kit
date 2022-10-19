@@ -47,8 +47,6 @@ addons:
         from:       nats-tls
         deployment: (( grab meta.cf.deployment_name ))
     properties:
-      router:
-        client_ca_certs: (( grab params.blacksmith_tls_certificate || meta.blacksmith_tls_certificate ))
       nats:
         tls:
           enabled: true
@@ -70,4 +68,4 @@ addons:
   value:
     name: bpm
     release: bpm
-
+---

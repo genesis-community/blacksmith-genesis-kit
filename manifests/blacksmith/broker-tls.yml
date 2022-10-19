@@ -5,6 +5,9 @@ meta:
   blacksmith_tls_port: (( grab params.blacksmith_tls_port || 443 ))
   blacksmith_port: (( grab params.blacksmith_port || 80 ))
 
+exodus:
+  blacksmith_ca: (( vault meta.vault "/broker/ca:certificate" ))
+
 instance_groups:
   - name: blacksmith
     jobs:
@@ -17,4 +20,3 @@ instance_groups:
             port: (( grab meta.blacksmith_tls_port ))
             key: (( grab params.blacksmith_tls_key || meta.blacksmith_tls_key ))
             certificate: (( grab params.blacksmith_tls_certificate || meta.blacksmith_tls_certificate ))
-
