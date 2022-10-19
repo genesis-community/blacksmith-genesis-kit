@@ -1,8 +1,5 @@
 ---
 meta:
-  blacksmith:
-    port: (( grab meta.blacksmith_tls_port || meta.blacksmith_port ))
-
   cf:
     exodus_path:     (( concat $GENESIS_EXODUS_MOUNT genesis.env "/cf" ))
     deployment_name: (( concat genesis.env "-cf" ))
@@ -50,6 +47,8 @@ addons:
         from:       nats-tls
         deployment: (( grab meta.cf.deployment_name ))
     properties:
+      router:
+        client_ca_certs: (( grab params.blacksmith_tls_certificate || meta.blacksmith_tls_certificate ))
       nats:
         tls:
           enabled: true
@@ -58,8 +57,9 @@ addons:
       route_registrar:
         routes:
         - name: blacksmith
-          port: (( grab meta.blacksmith_port ))
+          port: (( grab meta.blacksmith_port || params.blacksmith_port ))
           tls_port: (( grab meta.blacksmith_tls_port || "" ))
+          server_cert_domain_san: (( grab params.fqdn ))
           registration_interval: 10s
           uris:
             - (( grab params.fqdn ))
