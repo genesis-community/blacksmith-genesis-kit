@@ -29,7 +29,7 @@ releases:
   version: 0.8.7
   url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v0.8.7/rabbitmq-forge-0.8.7.tgz
   sha1:    83a25264f43e42c03e5864adaecbdd88db8fa327
-
+  
 params:
   releases:
     - (( append ))
