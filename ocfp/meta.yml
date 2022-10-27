@@ -34,8 +34,8 @@ meta:
     vm_type:   (( concat "blacksmith-" meta.ocfp.env.scale ))
     network:   (( concat genesis.env "-ocf" ))
 
-    debug:      false
-    shareable:  false
+    debug:      (( grab params.blacksmith_debug || false ))
+    shareable:  (( grab params.blacksmith_sharable || false ))
 
     broker:
       # NOTE: TLS is always enabled as broker-tls is included by default.
