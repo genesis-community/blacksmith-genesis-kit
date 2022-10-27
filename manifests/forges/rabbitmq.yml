@@ -2,13 +2,6 @@
 meta:
   environment: (( grab genesis.env || params.env ))
   bosh_env: (( grab genesis.bosh_env || params.bosh_env || params.env ))
-#  cf:
-#    exodus_path: (( concat $GENESIS_EXODUS_MOUNT meta.environment "/cf" ))
-#    deployment_name: (( concat meta.environment "-cf" ))
-#    system_domain: (( vault meta.cf.exodus_path ":system_domain" ))
-#    api_url:    (( concat "https://api." meta.cf.system_domain ))
-#    username:   (( vault meta.cf.exodus_path ":admin_username" ))
-#    password:   (( vault meta.cf.exodus_path ":admin_password" ))
 
   default:
     rabbitmq_tags:

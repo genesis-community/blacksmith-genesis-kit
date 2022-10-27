@@ -17,6 +17,13 @@ meta:
     os:      (( grab params.stemcell_os      || "ubuntu-bionic" ))
     version: (( grab params.stemcell_version || "latest" ))
 
+  cf: 
+    exodus_path: (( concat genesis.secrets_mount genesis.env "/cf" ))
+
+  bosh:
+    exodus_path: (( concat genesis.secrets_mount genesis.env "/bosh" ))
+    env_name:    (( grab genesis.env ))
+
   blacksmith:
     cloud_config: {} # TODO: OCFP Reference Arch based Cloud Config
 

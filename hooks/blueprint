@@ -25,11 +25,7 @@ do
   case "$want" in
     (ocfp)
       external_bosh=$(( external_bosh + 1 )) # OCFP Ref Arch requires external bosh
-      merge+=( 
-        "ocfp/meta.yml"
-        "ocfp/ocfp.yml"
-        "ocfp/${OCFP_IAAS}/ocf.yml"
-      )
+      true
       ;;
 
     (external-bosh)
@@ -107,6 +103,13 @@ if want_feature "rabbitmq-autoscale"; then
   merge+=( "manifests/forges/rabbitmq-autoscale.yml" )
 fi
 
+if want_feature "ocfp"; then
+  merge+=( 
+    "ocfp/meta.yml"
+    "ocfp/ocfp.yml"
+    "ocfp/${OCFP_IAAS}/ocf.yml"
+  )
+fi
 # Sanity Check Time!
 # If we haven't chosen an IaaS, that's a problem.
 if [[ $iaas == 0 && $external_bosh == 0 ]]; then

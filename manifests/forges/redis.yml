@@ -50,3 +50,4 @@ instance_groups:
             description: (( grab params.redis_service_description || "A dedicated Redis instance, deployed on-demand" ))
             tags:        (( grab params.redis_service_tags        || meta.default.redis_tags ))
             limit:       (( grab params.redis_service_limit       || 0 ))
+

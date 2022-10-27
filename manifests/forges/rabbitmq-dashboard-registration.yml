@@ -28,3 +28,4 @@ instance_groups:
             enabled: true
             tls:
               enabled: (( grab params.route_registrar_tls_enabled || false ))
+

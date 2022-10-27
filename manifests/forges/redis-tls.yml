@@ -8,6 +8,6 @@ instance_groups:
           redis:
             tls: 
               enabled: true
-              ca: (( vault meta.vault "/tls/redis/ca:combined" ))
+              ca:      (( vault meta.vault "/tls/redis/ca:combined" ))
               ca_cert: (( vault meta.vault "/tls/redis/ca:certificate" ))
-              ca_key: (( vault meta.vault "/tls/redis/ca:key" ))
+              ca_key:  (( vault meta.vault "/tls/redis/ca:key" ))
