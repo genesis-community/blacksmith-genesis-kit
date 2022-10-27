@@ -1,4 +1,10 @@
 ---
+meta:
+  default:
+    azs:
+      - (( concat genesis.env "-z1" ))
+      - (( concat genesis.env "-z2" ))
+      - (( concat genesis.env "-z3" ))
 params:
   ip:           (( grab meta.blacksmith.fqdn ))
   fqdn:         (( grab meta.blacksmith.fqdn ))
