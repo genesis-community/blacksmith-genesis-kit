@@ -10,7 +10,7 @@ external_bosh=0
 
 #validate_features aws azure google openstack vsphere external-bosh \
 #                  redis redis-tls redis-dual-mode \
-#                  rabbitmq rabbitmq-tls rabbitmq-dual-mode rabbitmq-dashboard-registration \
+#                  rabbitmq rabbitmq-tls rabbitmq-dual-mode rabbitmq-dashboard-registration rabbitmq-autoscale \
 #                  postgresql mariadb kubernetes broker-tls
 
 # We always start out with the skeleton of a BOSH deployment,
@@ -102,6 +102,10 @@ if ! want_feature "ocfp" && [[ $iaas != 0 ]] ; then
 fi
 
 # TODO: Move the below checks to hooks/check.
+
+if want_feature "rabbitmq-autoscale"; then
+  merge+=( manifests/forges/rabbitmq-autoscale.yml )
+fi
 
 # Sanity Check Time!
 # If we haven't chosen an IaaS, that's a problem.

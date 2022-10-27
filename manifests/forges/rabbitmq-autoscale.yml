@@ -1,0 +1,48 @@
+---
+meta:
+  cf:
+    exodus_path: (( concat "secret/exodus/" meta.environment "/cf" ))
+    deployment_name: (( concat meta.environment "-cf" ))
+    system_domain: (( vault meta.cf.exodus_path ":system_domain" ))
+    api_url:    (( concat "https://api." meta.cf.system_domain ))
+    username:   (( vault meta.cf.exodus_path ":admin_username" ))
+    password:   (( vault meta.cf.exodus_path ":admin_password" ))
+
+params:
+  cf_skip_ssl_validation: false
+
+instance_groups:
+  - name: blacksmith
+    jobs:
+      - release: rabbitmq-forge
+        name: rabbitmq-blacksmith-plans
+        properties:
+          rabbitmq:
+            autoscale:
+              enabled: true
+          cf:
+            exodus_path: (( grab meta.cf.exodus_path ))
+            deployment_name: (( grab meta.cf.deployment_name ))
+            system_domain: (( grab meta.cf.system_domain ))
+            api_url:    (( grab meta.cf.api_url ))
+            username:   (( grab meta.cf.username ))
+            password:   (( grab meta.cf.password ))
+          loggregator:
+            tls:
+              ca_cert: (( vault meta.cf.exodus_path ":loggregator_ca" ))
+              agent:
+                cert: (( vault meta.cf.exodus_path ":loggregator_tls_agent_cert" ))
+                key: (( vault meta.cf.exodus_path ":loggregator_tls_agent_key" ))
+          rabbitmq_metrics_emitter:
+            cloud_foundry:
+              api:    (( grab meta.cf.api_url ))
+              skip_ssl_validation: (( grab params.cf_skip_ssl_validation ))
+              username:   (( vault meta.cf.exodus_path ":admin_username" ))
+              password:   (( vault meta.cf.exodus_path ":admin_password" ))
+            rmq_management:
+              skip_ssl_validation: (( grab params.emitter_skip_ssl_validation || true ))
+              mgmt_port: (( grab params.emitter_mgmt_port || "15671" ))
+              mgmt_scheme: (( grab params.emitter_scheme || "https" ))
+              mgmt_host: (( grab params.emitter_mgmt_host || "localhost" ))
+
+
