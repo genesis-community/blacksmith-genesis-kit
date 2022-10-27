@@ -18,10 +18,10 @@ meta:
     version: (( grab params.stemcell_version || "latest" ))
 
   cf: 
-    exodus_path: (( concat genesis.secrets_mount genesis.env "/cf" ))
+    exodus_path: (( concat genesis.exodus_mount genesis.env "/cf" ))
 
   bosh:
-    exodus_path: (( concat genesis.secrets_mount genesis.env "/bosh" ))
+    exodus_path: (( concat genesis.exodus_mount genesis.env "/bosh" ))
     env_name:    (( grab genesis.env ))
 
   blacksmith:
