@@ -104,7 +104,7 @@ fi
 # TODO: Move the below checks to hooks/check.
 
 if want_feature "rabbitmq-autoscale"; then
-  merge+=( manifests/forges/rabbitmq-autoscale.yml )
+  merge+=( "manifests/forges/rabbitmq-autoscale.yml" )
 fi
 
 # Sanity Check Time!

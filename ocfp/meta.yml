@@ -36,3 +36,4 @@ meta:
 
       username: blacksmith
       password: (( vault meta.vault "/broker:password" ))
+
