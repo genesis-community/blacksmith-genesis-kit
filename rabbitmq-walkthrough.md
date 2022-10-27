@@ -9,7 +9,7 @@ So you've turned to Blacksmith once again to deploy your precious managed servic
 Blacksmith used to exist all by itself, firing up its own bosh director to deploy and manage the service instances. This was introducing another resource to be managed and maintained, while adding little if anything to the service broker's usability. Given the detached status between blacksmith's director, and the director hosting most if not all of the resources using its services, it was hindering interconnectivity between the blacksmith's deployed services and the ones available to bosh director hosting our cloudfoundry deployment. That said, a decision has been made to use `- external-bosh` as the default feature in deploying blacksmith. This is expecting `blacksmith_user` and `blacksmith_password` under `secret/exodus/dev/bosh` (where dev is the environment name) with credentials to the bosh director.
 
 ### Cloudfoundry
-Rabbitmq forge has gone a long way since its first introduction. A lot of changes and features where added with the most prominent one being autoscaling based on rabbitmq's queue depth. Given its dependencies, when `rabbitmq` feature and plans are added to blacksmith, it is expecting a cloudfoundry deployment with the `- app-autoscaler-integration` feature enabled.
+Rabbitmq forge has gone a long way since its first introduction. A lot of changes and features where added with the most prominent one being autoscaling based on rabbitmq's queue depth. Given its dependencies, when `rabbitmq-autoscale` feature and plans are added to blacksmith, it is expecting a cloudfoundry deployment with the `- app-autoscaler-integration` feature enabled.
 
 
 ## Deploying rabbitmq
@@ -24,7 +24,8 @@ kit:
     - rabbitmq
     - rabbitmq-tls  
     - rabbitmq-dual-mode
-    - rabbitmq-dashboard-registration ## Needs CF
+    - rabbitmq-dashboard-registration ## Needs cf
+    - rabbitmq-autoscale ## Needs cf-app-autoscaler
 exodus:
   broker_url: (( concat "https://" params.fqdn ))
 meta:
@@ -527,6 +528,7 @@ standalone/6271104d-30d9-4175-9222-cc9f12c2432d:~$
 * export/source environment variables required to interact with `rabbitmqctl`
 
 `source /var/vcap/jobs/rabbitmq/env`
+
 `export RABBITMQ_ERLANG_COOKIE='insecure-erlang-cookie'`
 
 * list users
@@ -734,7 +736,7 @@ dynamic                 succeeded       2->3                    2022-10-21T14:21
 
 * `watch` for messages ready metrics
 
-`watch -c -n30 "cf autoscaling-metrics dummy_queue_messages_ready"`
+`watch -c -n30 "cf autoscaling-metrics rabbitmq dummy_queue_messages_ready"`
 
 ```
 Retrieving aggregated dummy_queue_messages_ready metrics for app rabbitmq...

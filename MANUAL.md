@@ -73,6 +73,16 @@ new data services instances on behalf of end users.
   since Forge manifests will rarely be in a position to anticipate
   your IaaS choices.
 
+### Rabbitmq Parameters
+
+- `emitter_skip_ssl_validation` - When `rabbitmq-autoscale` feature
+  is selected, assuming that your are using self signed certificates,
+  you would like to set it to `true`.
+
+- `cf_skip_ssl_validation` - When `rabbitmq-autoscale` feature
+  is selected, assuming that your are using self signed certificates,
+  you would like to set it to `true`.
+
 ## HTTP(S) Proxy Parameters
 
 - `http_proxy` - (Optional) URL of an HTTP proxy to use for any
@@ -169,7 +179,8 @@ new data services instances on behalf of end users.
     limit.
 
 - `rabbitmq` (Blacksmith Forge) - Enables the Blacksmith Service
-  Broker to deploy RabbitMQ messaging clusters.
+  Broker to deploy RabbitMQ messaging clusters. A comprehensive 
+  walkthrough can be found [here](rabbitmq-walkthrough.md)
 
   Activating this feature also activates the following parameters:
 
@@ -203,6 +214,21 @@ new data services instances on behalf of end users.
     service instances _total_ that can be provisioned, regardless
     of per-plan limits.  `0` (the default) imposes no global
     limit.
+
+- `rabbitmq-tls` - Enables tls communication to rabbitmq while
+  disabling non-tls communication latogether
+
+- `rabbitmq-dual-mode` - When enabled along `rabbitmq-tls` it also
+  allows non-tls communication
+
+- `rabbitmq-dashboard-registration` - It adds a routable dns record
+  on cf for the service instances. It requires a cf deployment 
+  already in place.
+
+- `rabbitmq-autoscale` - Enables autoscaling based on rabbitmq's
+  queue depth. It requires a cf deployment already in place
+  along with the `- app-autoscaler-integration` feature enabled.
+  Autoscaling itself requires cf-app-autoscaler-genesis-kit.
 
 - `redis` (Blacksmith Forge) - Enables the Blacksmith Service
   Broker to deploy Redis key-value instances that are either
