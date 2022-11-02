@@ -13,7 +13,7 @@ meta:
         - (( vault genesis.secrets_mount "certs/dbs:ca" )) # External Databases CA
 
   stemcell:
-    name:    (( grab params.stemcell_name    || "bionic" ))
+    name:    (( grab params.stemcell_name    || "default" ))
     os:      (( grab params.stemcell_os      || "ubuntu-bionic" ))
     version: (( grab params.stemcell_version || "latest" ))
 
