@@ -35,15 +35,13 @@ variables:
       common_name: (( concat genesis.env "-blacksmith-ca.bosh" ))
 
 instance_groups:
-  - name:      blacksmith
+  - name: blacksmith
+    persistent_disk_pool: (( concat "blacksmith-" meta.ocfp.env.scale ))
+    vm_type:              (( grab params.vm_type ))
+    stemcell:  default
     instances: 1
     azs:
       - (( grab meta.blacksmith.az ))
-
-    persistent_disk_type: (( grab params.disk_type ))
-    vm_type:              (( grab params.vm_type ))
-
-    stemcell:  bionic
 
     networks:
       - (( replace )) 
