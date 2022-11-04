@@ -13,7 +13,7 @@ instance_groups:
         release: shield
         properties:
           shield: 
-            shield-url: (( vault params.exodus_path "/shield:url" )) 
+            shield-url: (( vault params.exodus_path "/shield:api_url" )) 
             require-shield-core: false
             core:
               ca: (( vault params.exodus_path "/shield:ca" ))
