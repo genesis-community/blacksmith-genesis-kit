@@ -6,8 +6,9 @@ meta:
     admin_username:  (( vault params.shield_exodus_path "admin_username" ))
     admin_password:  (( vault params.shield_exodus_path "admin_password" ))
 
-    address:  (( vault params.shield_exodus_path "api_url" ))
-    address:  (( vault params.shield_exodus_path "agent_ip" ))
+    address:   (( vault params.shield_exodus_path "api_url" ))
+    agent_ip:  (( vault params.shield_exodus_path "agent_ip" ))
+    agent:     (( concat meta.shield.agent_ip ":5444" ))
 
 params:
   shield_exodus_path: (( grab meta.shield.default_exodus ))
