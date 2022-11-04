@@ -4,35 +4,23 @@ meta:
   shield:
     default_exodus: (( concat $GENESIS_EXODUS_MOUNT params.shield.deployment_env "/" params.shield.deployment_type ":" ))
 
-    admin_username:  (( vault params.shield_exodus_path "admin_username" ))
-    admin_password:  (( vault params.shield_exodus_path "admin_password" ))
-
-    address:  (( vault params.shield_exodus_path "url" ))
-    agent:    (( vault meta.vault "/shield:agent" )) # TODO: this value is not set by the SHIELD kit.
-
 params:
   shield_exodus_path: (( grab meta.shield.default_exodus ))
-
-  shield_username: blacksmith
-  shield_password: (( vault meta.vault "/shield:password" ))
-  shield_tenant:   blacksmith
-  shield_store:    (( vault meta.vault "/shield:store" ))
 
 instance_groups:
   - name: blacksmith
     jobs:
-      - name:    blacksmith
-        release: blacksmith
+      - name:    shield-agent
+        release: shield
         properties:
-          shield:
-            enabled: true
-            address: (( grab params.shield_address || meta.shield.address ))
-            agent: (( grab params.shield_agent || meta.shield.agent ))
-            auth_method: local # Only local authentication method is supported for this kit feature.
-            username: (( grab params.shield_username ))
-            password: (( grab params.shield_password ))
-            tenant: (( grab params.shield_tenant ))
-            store:  (( grab params.shield_store ))
-            schedule: (( grab params.shield_schedule || "" ))
-            retain: (( grab params.shield_retain || "" ))
-
+          shield: 
+            shield-url: (( vault params.shield_exodus_path "url" )) 
+            require-shield-core: false
+            core:
+              ca: (( vault params.shield_exodus_path "ca" ))
+            agent:
+              key: (( vault params.shield_exodus_path "key" ))
+            env:
+              http_proxy: ""
+              https_proxy: ""
+              no_proxy: ""
