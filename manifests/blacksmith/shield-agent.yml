@@ -18,7 +18,7 @@ instance_groups:
             core:
               ca: (( vault params.exodus_path "/shield:ca" ))
             agent:
-              key: (( vault params.exodus_path "/shield:key" ))
+              key: (( vault params.exodus_path "/shield:agent_pubkey" ))
             env:
               http_proxy: ""
               https_proxy: ""
