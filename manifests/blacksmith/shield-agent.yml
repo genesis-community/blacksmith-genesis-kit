@@ -1,11 +1,10 @@
 ---
-# TODO: Add colocated shield agent + configuration here
 meta:
   shield:
-    default_exodus: (( concat $GENESIS_EXODUS_MOUNT params.shield.deployment_env "/" params.shield.deployment_type ":" ))
+    exodus_path: (( concat $GENESIS_EXODUS_MOUNT params.shield.deployment_env ))
 
 params:
-  shield_exodus_path: (( grab meta.shield.default_exodus ))
+  exodus_path: (( grab meta.shield.exodus_path ))
 
 instance_groups:
   - name: blacksmith
@@ -14,12 +13,12 @@ instance_groups:
         release: shield
         properties:
           shield: 
-            shield-url: (( vault params.shield_exodus_path "url" )) 
+            shield-url: (( vault params.exodus_path "/shield:url" )) 
             require-shield-core: false
             core:
-              ca: (( vault params.shield_exodus_path "ca" ))
+              ca: (( vault params.exodus_path "/shield:ca" ))
             agent:
-              key: (( vault params.shield_exodus_path "key" ))
+              key: (( vault params.exodus_path "/shield:key" ))
             env:
               http_proxy: ""
               https_proxy: ""

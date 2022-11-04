@@ -1,2 +1,5 @@
 ---
-# TODO: Values setting for shield-agent feature
+meta:
+  shield:
+    exodus: (( concat $GENESIS_EXODUS_MOUNT genesis.env "/shield" ))
+
