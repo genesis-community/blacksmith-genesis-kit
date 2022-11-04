@@ -46,6 +46,10 @@ do
       merge+=( "manifests/blacksmith/shield-backups.yml" )
       ;;
 
+    (shield-agent)
+      merge+=( "manifests/blacksmith/shield-agent.yml" )
+      ;;
+
     (rabbitmq|redis|postgresql|mariadb|kubernetes) # Forges
       forges=$(( forges + 1 ))
       merge+=( "manifests/forges/$want.yml" )
