@@ -113,10 +113,14 @@ if want_feature "ocfp"; then
     "ocfp/ocfp.yml"
     "ocfp/${OCFP_IAAS}/ocf.yml"
   )
+  if want_feature shield-backups ; then
+    merge+=( "ocfp/shield-backups.yml" )
+  fi
   if want_feature shield-agent ; then
     merge+=( "ocfp/shield-agent.yml" )
   fi
 fi
+
 # Sanity Check Time!
 # If we haven't chosen an IaaS, that's a problem.
 if [[ $iaas == 0 && $external_bosh == 0 ]]; then

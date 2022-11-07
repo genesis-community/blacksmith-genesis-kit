@@ -1,0 +1,5 @@
+---
+params:
+  shield:
+    deployment_env:  (( genesis.env ))
+    deployment_type: shield
