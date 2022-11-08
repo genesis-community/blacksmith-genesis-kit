@@ -12,7 +12,6 @@ instance_groups:
       - name:    shield-agent
         release: shield
         properties:
-          shield: 
             shield-url: (( vault params.exodus_path "/shield:api_url" )) 
             require-shield-core: false
             core:
