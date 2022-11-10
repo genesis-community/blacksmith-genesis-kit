@@ -2,6 +2,8 @@
 set -eu
 
 declare -a merge
+declare -a opsfiles
+
 iaas=0
 forges=0
 external_bosh=0
@@ -81,7 +83,7 @@ do
 
     (*)
       if [[ -f "$GENESIS_ROOT/ops/$want.yml" ]] ; then
-        merge+=( "$GENESIS_ROOT/ops/$want.yml" )
+        opsfiles+=( "$GENESIS_ROOT/ops/$want.yml" )
       fi
       ;;
   esac
@@ -101,8 +103,6 @@ if ! want_feature "ocfp" && [[ $iaas != 0 ]] ; then
   fi
 fi
 
-# TODO: Move the below checks to hooks/check.
-
 if want_feature "rabbitmq-autoscale"; then
   merge+=( "manifests/forges/rabbitmq-autoscale.yml" )
 fi
@@ -121,6 +121,7 @@ if want_feature "ocfp"; then
   fi
 fi
 
+# TODO: Move the below checks to hooks/check.
 # Sanity Check Time!
 # If we haven't chosen an IaaS, that's a problem.
 if [[ $iaas == 0 && $external_bosh == 0 ]]; then
@@ -137,5 +138,9 @@ if [[ $forges == 0 ]]; then
   echo >&2 "You have not activated any Blacksmith Forges."
   exit 1
 fi
+
+for opsfile in ${opsfiles[@]}
+do merge+=( "$opsfile" )
+done
 
 echo "${merge[@]}"
