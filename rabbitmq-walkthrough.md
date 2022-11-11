@@ -911,7 +911,7 @@ The process is now embeded to the [Binding the service](#binding) and [Service k
 
 ## Testing dynamic credentials
 
-For generalized tests of the service, if you haven't done so already, you can go through the [Rabbitmq Testing](testing) process.
+For generalized tests of the service, if you haven't done so already, you can go through the [Rabbitmq Testing](#testing) process.
 
 ## Confirming the dynamic nature of credentials
 
