@@ -14,13 +14,13 @@ meta:
     blacksmith_port: (( grab params.blacksmith_port || 3000 ))
 
 exodus:
-  broker_url: (( concat meta.default.scheme "://" meta.default.host ":" meta.default.blacksmith_port ))
+  broker_url:      (( concat meta.default.scheme "://" meta.default.host ":" meta.default.blacksmith_port ))
   broker_username: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.broker.username ))
   broker_password: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.broker.password ))
-  bosh_username: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.username ))
-  bosh_password: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.password ))
-  bosh_address: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.address ))
-  bosh_cacert: (( vault meta.vault "/tls/ca:certificate" ))
+  bosh_username:   (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.username ))
+  bosh_password:   (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.password ))
+  bosh_address:    (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.address ))
+  bosh_cacert:     (( vault meta.vault "/tls/ca:certificate" ))
 
 variables:
 - name: blacksmith_services_ca
