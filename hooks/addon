@@ -6,7 +6,6 @@ set -eu
 ################################################################################
 fail() {
   echo -e "\e[31m$*\e[0m" >&2
-  list
   exit 1
 }
 
@@ -47,27 +46,27 @@ login() {
 blacksmith::list() {
   echo "The following addons are defined:"
   echo
-  echo "  visit         Open the Blacksmith Web Management Console"
-  echo "                in your browser (requires macOS)"
+  echo "  visit     Open the Blacksmith Web Management Console"
+  echo "            in your browser (requires macOS)"
   echo
-  echo "  register      Register this Blacksmith Broker with one of"
-  echo "                your Genesis-deployed Cloud Foundry instances"
+  echo "  register  Register this Blacksmith Broker with one of"
+  echo "            your Genesis-deployed Cloud Foundry instances"
+  echo "            Also runs ca_sync first (below)"
   echo
-  echo "                Interprets its first argument as the name of"
-  echo "                the Cloud Foundry environment.  If no argument"
-  echo "                is given, the current environment name is used"
+  echo "            Interprets its first argument as the name of"
+  echo "            the Cloud Foundry environment.  If no argument"
+  echo "            is given, the current environment name is used"
   echo
-  echo "  bosh          Set up a local alias for the Blacksmith"
-  echo "                BOSH director and log into it"
+  echo "  bosh      Set up a local alias for the Blacksmith"
+  echo "            BOSH director and log into it"
   echo
-  echo "  boss          Interact with the broker via 'boss'"
-  echo "                (must be installed separately)"
+  echo "  boss      Interact with the broker via 'boss'"
+  echo "            (must be installed separately)"
   echo
-  echo "  curl          Issue raw HTTP requests (via curl) against"
-  echo "                the Blacksmith Broker, with authentication"
+  echo "  curl      Issue raw HTTP requests (via curl) against"
+  echo "            the Blacksmith Broker, with authentication"
   echo
-  echo "  blacksmith_ca Prepare blacksmith_ca for use by forges"
-  echo "                Must run add-secrets first to generate ca"
+  echo "  ca_sync   Syncs blacksmith_ca from vault to credhub for use by forges"
   echo
 }
 
@@ -77,6 +76,8 @@ blacksmith::bosh() {
 }
 
 blacksmith::register() {
+  blacksmith::ca::sync # Ensure that vault ca cert syncs to credhub
+
   env=${1:-$GENESIS_ENVIRONMENT}
   cf_version=$(exodus "$env/cf" kit_version)
 
@@ -125,7 +126,7 @@ blacksmith::register() {
 }
 
 
-blacksmith::ca() {
+blacksmith::ca::sync() {
   describe "Fetching Blacksmith CA certificate details..."
 
   _path="${GENESIS_SECRETS_MOUNT}/${GENESIS_VAULT_PREFIX}/broker/ca"
@@ -136,6 +137,8 @@ blacksmith::ca() {
 
   describe "Setting values in credhub (you did login to credhub first, right?...)"
 
+  unset CREDHUB_SERVER # Genesis will auto login when it sees we are using credhub :) 
+
   credhub set -t certificate \
     -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-blacksmith/blacksmith_services_ca" \
     -c /tmp/blacksmith-ca.crt \
@@ -145,16 +148,15 @@ blacksmith::ca() {
 }
 
 blacksmith::visit() {
-    if ! command -v open >/dev/null 2>&1; then
-      echo "The 'visit' addon script only works on macOS, currently."
-      exit 1
-    fi
-    open "$scheme://$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD@$host:$port"
+  if ! command -v open >/dev/null 2>&1
+  then fail "The 'visit' addon script only works on macOS, currently."
+  fi
+  open "$scheme://$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD@$host:$port"
 }
 
 blacksmith::bosh() {
-    has_alias || setup_alias
-    login
+  has_alias || setup_alias
+  login
 }
 
 blacksmith::boss() {
@@ -227,10 +229,10 @@ case $GENESIS_ADDON_SCRIPT in
   (register)
     blacksmith::register
     ;;
-  (blacksmith_ca)
-    blacksmith::ca
+  (ca_sync)
+    blacksmith::ca::sync
     ;;
   (*) 
-    fail "Unrecognized Blacksmith Genesis Kit addon."
+    fail "Unrecognized Blacksmith Genesis Kit addon - see list."
     ;;
 esac
