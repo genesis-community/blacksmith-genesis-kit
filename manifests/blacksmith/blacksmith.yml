@@ -22,13 +22,6 @@ exodus:
   bosh_address:    (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.address ))
   bosh_cacert:     (( vault meta.vault "/tls/ca:certificate" ))
 
-variables:
-- name: blacksmith_services_ca
-  type: certificate
-  options:
-    is_ca: true
-    common_name: (( concat genesis.env "-blacksmith-ca.bosh" ))
-
 instance_groups:
   - name:      blacksmith
     instances: 1
@@ -61,7 +54,7 @@ instance_groups:
             cloud-config: (( grab params.cloud_config ))
           blacksmith_services_ca:
             tls:
-              ca_cert: ((blacksmith_services_ca.certificate))
+              ca_cert: (( vault meta.vault "/broker/ca:certificate" ))
 
 update:
   serial: false
