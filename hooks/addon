@@ -66,8 +66,6 @@ blacksmith::list() {
   echo "  curl      Issue raw HTTP requests (via curl) against"
   echo "            the Blacksmith Broker, with authentication"
   echo
-  echo "  ca_sync   Syncs blacksmith_ca from vault to credhub for use by forges"
-  echo
 }
 
 blacksmith::bosh() {
@@ -125,26 +123,23 @@ blacksmith::register() {
   )
 }
 
-
 blacksmith::ca::sync() {
+  # TODO: future we can use `credhub:` similar to `exodus:` instead of this
   describe "Fetching Blacksmith CA certificate details..."
 
   _path="${GENESIS_SECRETS_MOUNT}/${GENESIS_VAULT_PREFIX}/broker/ca"
 
-  mkdir -p ~/tmp
-  safe get "${_path}:certificate" > /tmp/blacksmith-ca.crt
-  safe get "${_path}:key"         > /tmp/blacksmith-ca.key
+  safe get "${_path}:certificate" > blacksmith-ca.crt
+  safe get "${_path}:key"         > blacksmith-ca.key
 
   describe "Setting values in credhub (you did login to credhub first, right?...)"
-
-  unset CREDHUB_SERVER # Genesis will auto login when it sees we are using credhub :) 
 
   credhub set -t certificate \
     -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-blacksmith/blacksmith_services_ca" \
     -c /tmp/blacksmith-ca.crt \
     -p /tmp/blacksmith-ca.key
 
-  rm -f /tmp/blacksmith-ca.crt /tmp/blacksmith-ca.key
+  rm -f blacksmith-ca.crt blacksmith-ca.key
 }
 
 blacksmith::visit() {
@@ -228,9 +223,6 @@ case $GENESIS_ADDON_SCRIPT in
     ;;
   (register)
     blacksmith::register
-    ;;
-  (ca_sync)
-    blacksmith::ca::sync
     ;;
   (*) 
     fail "Unrecognized Blacksmith Genesis Kit addon - see list."
