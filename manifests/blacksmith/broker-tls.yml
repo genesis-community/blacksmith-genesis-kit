@@ -1,3 +1,4 @@
+---
 meta:
   blacksmith_tls_certificate: (( vault meta.vault "/broker/server:certificate" ))
   blacksmith_tls_key: (( vault meta.vault "/broker/server:key" ))
@@ -6,7 +7,7 @@ meta:
   blacksmith_port: (( grab params.blacksmith_port || 80 ))
 
 exodus:
-  blacksmith_ca: ((blacksmith_services_ca))
+  blacksmith_ca: (( vault meta.vault "broker/ca:certificate" ))
 
 instance_groups:
   - name: blacksmith

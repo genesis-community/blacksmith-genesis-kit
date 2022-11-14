@@ -53,12 +53,15 @@ certificates:
 
   broker-tls:
     broker:
-      ca: {valid_for: 10y}
+      ca:
+        valid_for: 10y
+        names:
+          - blacksmith.services.ca.bosh-internal
       server:
           valid_for: 1y
           names:
             - ${params.ip}
-
+            - blacksmith.services.bosh-internal
 
 credentials:
   base:
