@@ -47,24 +47,27 @@ login() {
 blacksmith::list() {
   echo "The following addons are defined:"
   echo
-  echo "  visit     Open the Blacksmith Web Management Console"
-  echo "            in your browser (requires macOS)"
+  echo "  visit         Open the Blacksmith Web Management Console"
+  echo "                in your browser (requires macOS)"
   echo
-  echo "  register  Register this Blacksmith Broker with one of"
-  echo "            your Genesis-deployed Cloud Foundry instances"
+  echo "  register      Register this Blacksmith Broker with one of"
+  echo "                your Genesis-deployed Cloud Foundry instances"
   echo
-  echo "            Interprets its first argument as the name of"
-  echo "            the Cloud Foundry environment.  If no argument"
-  echo "            is given, the current environment name is used"
+  echo "                Interprets its first argument as the name of"
+  echo "                the Cloud Foundry environment.  If no argument"
+  echo "                is given, the current environment name is used"
   echo
-  echo "  bosh      Set up a local alias for the Blacksmith"
-  echo "            BOSH director and log into it"
+  echo "  bosh          Set up a local alias for the Blacksmith"
+  echo "                BOSH director and log into it"
   echo
-  echo "  boss      Interact with the broker via 'boss'"
-  echo "            (must be installed separately)"
+  echo "  boss          Interact with the broker via 'boss'"
+  echo "                (must be installed separately)"
   echo
-  echo "  curl      Issue raw HTTP requests (via curl) against"
-  echo "            the Blacksmith Broker, with authentication"
+  echo "  curl          Issue raw HTTP requests (via curl) against"
+  echo "                the Blacksmith Broker, with authentication"
+  echo
+  echo "  blacksmith_ca Prepare blacksmith_ca for use by forges"
+  echo "                Must run add-secrets first to generate ca"
   echo
 }
 
