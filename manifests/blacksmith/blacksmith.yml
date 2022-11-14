@@ -1,7 +1,8 @@
 ---
 params:
-  ip:           (( param "Please specify the static IP address for the Blacksmith Service Broker" ))
-  cloud_config: (( param "Please specify a complete BOSH v2 cloud-config, for the Blacksmith internal BOSH director to use" ))
+  ip:            (( param "Please specify the static IP address for the Blacksmith Service Broker" ))
+  cloud_config:  (( param "Please specify a complete BOSH v2 cloud-config, for the Blacksmith internal BOSH director to use" ))
+  blacksmith_ca: (( vault meta.vault "/broker/ca:certificate" ))
 
   releases: []
   stemcells: []
@@ -52,9 +53,10 @@ instance_groups:
             stemcells:    (( grab params.stemcells ))
             releases:     (( grab params.releases ))
             cloud-config: (( grab params.cloud_config ))
+
           blacksmith_services_ca:
             tls:
-              ca_cert: (( vault meta.vault "/broker/ca:certificate" ))
+              ca_cert: (( grab params.blacksmith_ca ))
 
 update:
   serial: false

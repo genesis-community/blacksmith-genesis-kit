@@ -1,62 +1,13 @@
 #!/bin/bash
-
 set -eu
 
-vault="$GENESIS_SECRETS_MOUNT/$GENESIS_VAULT_PREFIX"
-alias="$GENESIS_ENVIRONMENT-blacksmith"
-
-ip=$(lookup --partial params.ip)
-fqdn=$(lookup --partial params.fqdn)
-
-if [[ -n "${fqdn}" ]]
-then host=${fqdn}
-else host=${ip}
-fi
-
-if want_feature "broker-tls"; then
-  port=$(lookup --partial params.blacksmith_tls_port 443)
-  scheme=https
-else
-  port=$(lookup --partial params.blacksmith_port 3000)
-  scheme=http
-fi
-
-export BLACKSMITH_URL="${scheme}://${host}:${port}"
-export BLACKSMITH_USERNAME=blacksmith
-export BLACKSMITH_PASSWORD=$(safe read ${vault}/broker:password)
-
-export BOSH_ENVIRONMENT=$(exodus bosh_address)
-export BOSH_CA_CERT=$(exodus bosh_cacert)
-export BOSH_CLIENT=$(exodus bosh_username)
-export BOSH_CLIENT_SECRET="$(exodus bosh_password)"
-
-list() {
-  echo "The following addons are defined:"
-  echo
-  echo "  visit     Open the Blacksmith Web Management Console"
-  echo "            in your browser (requires macOS)"
-  echo
-  echo "  register  Register this Blacksmith Broker with one of"
-  echo "            your Genesis-deployed Cloud Foundry instances"
-  echo
-  echo "            Interprets its first argument as the name of"
-  echo "            the Cloud Foundry environment.  If no argument"
-  echo "            is given, the current environment name is used"
-  echo
-  echo "  bosh      Set up a local alias for the Blacksmith"
-  echo "            BOSH director and log into it"
-  echo
-  echo "  boss      Interact with the broker via 'boss'"
-  echo "            (must be installed separately)"
-  echo
-  echo "  curl      Issue raw HTTP requests (via curl) against"
-  echo "            the Blacksmith Broker, with authentication"
-  echo
-}
-
-bosh() {
-  command $GENESIS_BOSH_COMMAND "$@"
-  return $?
+################################################################################
+# Utility Functions
+################################################################################
+fail() {
+  echo -e "\e[31m$*\e[0m" >&2
+  list
+  exit 1
 }
 
 has_alias() {
@@ -90,91 +41,193 @@ login() {
     BOSH_CLIENT="" BOSH_CLIENT_SECRET="" bosh login
 }
 
-case $GENESIS_ADDON_SCRIPT in
-  (list)
-    list
-    exit 0
-    ;;
+################################################################################
+# Blacksmith Addon Namespace Functions
+################################################################################
+blacksmith::list() {
+  echo "The following addons are defined:"
+  echo
+  echo "  visit     Open the Blacksmith Web Management Console"
+  echo "            in your browser (requires macOS)"
+  echo
+  echo "  register  Register this Blacksmith Broker with one of"
+  echo "            your Genesis-deployed Cloud Foundry instances"
+  echo
+  echo "            Interprets its first argument as the name of"
+  echo "            the Cloud Foundry environment.  If no argument"
+  echo "            is given, the current environment name is used"
+  echo
+  echo "  bosh      Set up a local alias for the Blacksmith"
+  echo "            BOSH director and log into it"
+  echo
+  echo "  boss      Interact with the broker via 'boss'"
+  echo "            (must be installed separately)"
+  echo
+  echo "  curl      Issue raw HTTP requests (via curl) against"
+  echo "            the Blacksmith Broker, with authentication"
+  echo
+}
+
+blacksmith::bosh() {
+  command $GENESIS_BOSH_COMMAND "$@"
+  return $?
+}
+
+blacksmith::register() {
+  env=${1:-$GENESIS_ENVIRONMENT}
+  cf_version=$(exodus "$env/cf" kit_version)
+
+  if new_enough "${cf_version}" "2.0.0-rc1" 
+  then cf_api="https://$(exodus "$env/cf" api_domain)"
+  else cf_api=$(exodus "$env/cf" api_url)
+  fi
+
+  cf_user=$(exodus "$env/cf" admin_username)
+  cf_pass=$(exodus "$env/cf" admin_password)
   
-  (visit)
+  (
+   export HOME="$(mktemp -d blacksmith.regXXXXXXX)"
+   describe "authenticating to #C{$cf_api} as #G{$cf_user}..."
+   cf api "${cf_api}" --skip-ssl-validation
+   cf auth "${cf_user}" "${cf_pass}"
+
+   env_is_registered=$(cf curl /v2/service_brokers|jq --arg env_name "${env}-blacksmith" -r '.resources[].entity | select(.name==$env_name) | .name' )
+
+   if [[ -n $env_is_registered ]] ; then
+
+       describe "Found and updating service broker #M{$env-blacksmith}..."
+       cf update-service-broker \
+          "${env}-blacksmith"       \
+          "$BLACKSMITH_USERNAME"   \
+          "$BLACKSMITH_PASSWORD"   \
+          "$BLACKSMITH_URL"
+
+   else
+
+       describe "creating service broker #M{$env-blacksmith}..."
+       cf create-service-broker \
+          "${env}-blacksmith"       \
+          "$BLACKSMITH_USERNAME"   \
+          "$BLACKSMITH_PASSWORD"   \
+          "$BLACKSMITH_URL"
+
+   fi
+   describe "enabling service access..."
+   for x in $(curl -Lsk -u "$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD" "$BLACKSMITH_URL/v2/catalog" \
+                   -H Accept:application/json | jq -r '.services[].id'); do
+     describe "  - #C{$x}"
+     cf enable-service-access "$x"
+  done
+  )
+}
+
+
+blacksmith::ca() {
+  describe "Fetching Blacksmith CA certificate details..."
+
+  _path="${GENESIS_SECRETS_MOUNT}/${GENESIS_VAULT_PREFIX}/broker/ca"
+
+  mkdir -p ~/tmp
+  safe get "${_path}:certificate" > /tmp/blacksmith-ca.crt
+  safe get "${_path}:key"         > /tmp/blacksmith-ca.key
+
+  describe "Setting values in credhub (you did login to credhub first, right?...)"
+
+  credhub set -t certificate \
+    -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-blacksmith/blacksmith_services_ca" \
+    -c /tmp/blacksmith-ca.crt \
+    -p /tmp/blacksmith-ca.key
+
+  rm -f /tmp/blacksmith-ca.crt /tmp/blacksmith-ca.key
+}
+
+blacksmith::visit() {
     if ! command -v open >/dev/null 2>&1; then
       echo "The 'visit' addon script only works on macOS, currently."
       exit 1
     fi
     open "$scheme://$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD@$host:$port"
-    ;;
-  
-  (bosh)
+}
+
+blacksmith::bosh() {
     has_alias || setup_alias
     login
+}
+
+blacksmith::boss() {
+  if ! command -v boss>/dev/null 2>&1
+  then
+    echo "  !!! install the 'boss' cli first!"
+    echo "      (https://github.com/blacksmith-community/boss)"
+  else
+    exec boss "$@"
+  fi
+}
+
+blacksmith::curl() {
+  if ! command -v curl >/dev/null 2>&1
+  then echo "  !!! install curl first!"
+  else
+    path=$1; shift
+    exec curl -u "$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD" "$BLACKSMITH_URL$path" "$@" #| jq -r .
+  fi
+}
+
+################################################################################
+# Main Script
+################################################################################
+vault="$GENESIS_SECRETS_MOUNT/$GENESIS_VAULT_PREFIX"
+alias="$GENESIS_ENVIRONMENT-blacksmith"
+
+ip=$(lookup --partial params.ip)
+fqdn=$(lookup --partial params.fqdn)
+
+if [[ -n "${fqdn}" ]]
+then host=${fqdn}
+else host=${ip}
+fi
+
+if want_feature "broker-tls"; then
+  port=$(lookup --partial params.blacksmith_tls_port 443)
+  scheme=https
+else
+  port=$(lookup --partial params.blacksmith_port 3000)
+  scheme=http
+fi
+
+export BLACKSMITH_URL="${scheme}://${host}:${port}"
+export BLACKSMITH_USERNAME=blacksmith
+export BLACKSMITH_PASSWORD=$(safe read ${vault}/broker:password)
+
+export BOSH_ENVIRONMENT=$(exodus bosh_address)
+export BOSH_CA_CERT=$(exodus bosh_cacert)
+export BOSH_CLIENT=$(exodus bosh_username)
+export BOSH_CLIENT_SECRET="$(exodus bosh_password)"
+
+case $GENESIS_ADDON_SCRIPT in
+  (list) 
+    blacksmith::list 
+    exit 0
     ;;
-  
+  (visit)
+    blacksmith::visit
+    ;;
+  (bosh)
+    blacksmith::bosh
+    ;;
   (boss)
-    if ! command -v boss>/dev/null 2>&1; then
-      echo "  !!! install the 'boss' cli first!"
-      echo "      (https://github.com/blacksmith-community/boss)"
-    else
-      exec boss "$@"
-    fi
+    blacksmith::boss
     ;;
-  
   (curl)
-    if ! command -v curl >/dev/null 2>&1; then
-      echo "  !!! install curl first!"
-    else
-      path=$1; shift
-      exec curl -u "$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD" "$BLACKSMITH_URL$path" "$@" #| jq -r .
-    fi
+    blacksmith::curl
     ;;
-  
   (register)
-    env=${1:-$GENESIS_ENVIRONMENT}
-    cf_version=$(exodus "$env/cf" kit_version)
-    if new_enough "${cf_version}" "2.0.0-rc1" ; then
-      cf_api="https://$(exodus "$env/cf" api_domain)"
-    else
-      cf_api=$(exodus "$env/cf" api_url)
-    fi
-    cf_user=$(exodus "$env/cf" admin_username)
-    cf_pass=$(exodus "$env/cf" admin_password)
-  
-    (export HOME="$(mktemp -d blacksmith.regXXXXXXX)"
-     describe "authenticating to #C{$cf_api} as #G{$cf_user}..."
-     cf api "${cf_api}" --skip-ssl-validation
-     cf auth "${cf_user}" "${cf_pass}"
-  
-     env_is_registered=$(cf curl /v2/service_brokers|jq --arg env_name "${env}-blacksmith" -r '.resources[].entity | select(.name==$env_name) | .name' )
-  
-     if [[ -n $env_is_registered ]] ; then
-  
-         describe "Found and updating service broker #M{$env-blacksmith}..."
-         cf update-service-broker \
-            "${env}-blacksmith"       \
-            "$BLACKSMITH_USERNAME"   \
-            "$BLACKSMITH_PASSWORD"   \
-            "$BLACKSMITH_URL"
-  
-     else
-  
-         describe "creating service broker #M{$env-blacksmith}..."
-         cf create-service-broker \
-            "${env}-blacksmith"       \
-            "$BLACKSMITH_USERNAME"   \
-            "$BLACKSMITH_PASSWORD"   \
-            "$BLACKSMITH_URL"
-  
-     fi
-     describe "enabling service access..."
-     for x in $(curl -Lsk -u "$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD" "$BLACKSMITH_URL/v2/catalog" \
-                     -H Accept:application/json | jq -r '.services[].id'); do
-       describe "  - #C{$x}"
-       cf enable-service-access "$x"
-    done)
+    blacksmith::register
     ;;
-  
-  (*)
-    echo "Unrecognized Blacksmith Genesis Kit addon."
-    list
-    exit 1
+  (blacksmith_ca)
+    blacksmith::ca
+    ;;
+  (*) 
+    fail "Unrecognized Blacksmith Genesis Kit addon."
     ;;
 esac
