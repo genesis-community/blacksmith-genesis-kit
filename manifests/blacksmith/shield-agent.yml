@@ -15,9 +15,9 @@ instance_groups:
             shield-url: (( vault params.exodus_path "/shield:api_url" )) 
             require-shield-core: false
             core:
-              ca: (( vault params.exodus_path "/shield:ca" ))
+              ca: (( vault params.exodus_path "/shield:ca_cert" ))
             agent:
-              key: (( vault params.exodus_path "/shield:agent_pubkey" ))
+              key: (( vault params.exodus_path "/shield:pubkey" ))
             env:
               http_proxy: ""
               https_proxy: ""
