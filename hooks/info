@@ -31,18 +31,15 @@ export BOSH_CLIENT=$(exodus bosh_username)
 export BOSH_CLIENT_SECRET="$(exodus bosh_password)"
 
 describe "ca certificate"
-  echo
-  echo "bosh env"
+  echo -e "\nbosh env"
   bosh env --tty | sed -e 's/^/  /';
-  echo
-  echo
-  echo "blacksmith (internal) bosh director"
+
+  echo -e "\n\nblacksmith (internal) bosh director"
 describe "  bosh url: #C{$BOSH_ENVIRONMENT}"
 describe "  username: #M{$BOSH_CLIENT}"
 describe "  password: #G{$BOSH_CLIENT_SECRET}"
-  echo
-  echo
-  echo "blacksmith web management UI"
+
+  echo -e "\n\nblacksmith web management UI"
 describe "  web url:   #C{$BLACKSMITH_URL}"
 describe "  username:  #M{$BLACKSMITH_USERNAME}"
 describe "  password:  #G{$BLACKSMITH_PASSWORD}"
@@ -54,16 +51,15 @@ then
   SHIELD_URL=$(exodus shield_url)
   SHIELD_USERNAME=$(exodus shield_username)
   SHIELD_PASSWORD=$(exodus shield_password)
-  echo
-  echo "shield"
-  echo "  url:       #C{$SHIELD_URL}"
-  echo "  username:  #M{$SHIELD_USERNAME}"
-  echo "  password:  #G{$SHIELD_PASSWORD}"
+
+  echo -e "\nshield"
+describe "  url:       #C{$SHIELD_URL}"
+describe "  username:  #M{$SHIELD_USERNAME}"
+describe "  password:  #G{$SHIELD_PASSWORD}"
   echo
 fi
 
-  echo
-  echo "blacksmith catalog"
+  echo -e "\nblacksmith catalog"
 
 if ! command -v boss >/dev/null 2>&1
 then
