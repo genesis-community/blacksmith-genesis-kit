@@ -129,15 +129,16 @@ blacksmith::ca::sync() {
 
   _path="${GENESIS_SECRETS_MOUNT}/${GENESIS_VAULT_PREFIX}/broker/ca"
 
-  safe get "${_path}:certificate" > blacksmith-ca.crt
-  safe get "${_path}:key"         > blacksmith-ca.key
+  safe get "${_path}:certificate" > ${PWD}/blacksmith-ca.crt
+  safe get "${_path}:key"         > ${PWD}/blacksmith-ca.key
 
   describe "Setting values in credhub (you did login to credhub first, right?...)"
 
-  credhub set -t certificate \
+  credhub set \
+    -t certificate \
     -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-blacksmith/blacksmith_services_ca" \
-    -c /tmp/blacksmith-ca.crt \
-    -p /tmp/blacksmith-ca.key
+    -c ${PWD}/blacksmith-ca.crt \
+    -p ${PWD}/blacksmith-ca.key
 
   rm -f blacksmith-ca.crt blacksmith-ca.key
 }
