@@ -18,6 +18,11 @@ params:
   shield_tenant:   blacksmith
   shield_store:    (( vault meta.vault "/shield:store" ))
 
+exodus:
+  shield_username: (( grab params.shield_username ))
+  shield_password: (( grab params.shield_password ))
+  shield_url:      (( grab meta.shield.address ))
+
 instance_groups:
   - name: blacksmith
     jobs:
