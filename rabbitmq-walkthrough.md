@@ -458,7 +458,7 @@ name         last operation     message
 rmqappuser   create succeeded   
 ```
 
-## Successful messaging
+## <a name="messaging"></a>Successful messaging
 
 We've confirmed the binding and the creation of the service key, but we have yet to see queues being created and messages beings posted and consumed. Let's go ahead and use the same application for a confirmation:
 
@@ -572,6 +572,49 @@ vhost   configure       write   read
 ```
 
 This user is only available through blacksmiths UI, minimizing in that way the permissions available to the applications interacting with rabbitmq service. We will circle back on that on the monitoring section of this document.
+
+## TLS connectivity and Certificate verification
+
+The [forked](https://github.com/itsouvalas/cf-rabbitmq-example-app) version of the testing application has updated the way the `bunny` call is made against the rabbitmq service and updated the environment variables available to that call. In most testing scenarios, the **default** setting of non tls connectivity, or absense of the CA certificate verification would suffice given that those tests are run against a development environment usually lucking proper certificate placement. For TLS connectivity and CA verification read along:
+
+### TLS Connectivity
+
+* enable tls communication on the application through the corresponding environment variable
+
+`cf set-env rabbitmq RABBITMQ_USE_TLS true`
+
+```
+Setting env variable RABBITMQ_USE_TLS for app rabbitmq in org system / space dev as admin...
+OK
+
+TIP: Use 'cf restage rabbitmq' to ensure your env variable changes take effect.
+```
+
+* restage application for the new environment variables to be picked up
+
+`cf restage rabbitmq`
+
+* repeat the [messaging](#messaging) steps above
+
+### CA Certificate Verification
+
+* enable CA verification on the application through the corresponding environment variable
+
+`cf set-env rabbitmq RABBITMQ_CHECK_SSL true`
+
+```
+Setting env variable RABBITMQ_CHECK_SSL for app rabbitmq in org system / space dev as admin...
+OK
+
+TIP: Use 'cf restage rabbitmq' to ensure your env variable changes take effect.
+```
+
+* restage application for the new environment variables to be picked up
+
+`cf restage rabbitmq`
+
+* run the [messaging](#messaging) steps above one last time.
+
 
 # Autoscaling based on queue depth
 
@@ -1143,7 +1186,7 @@ Each of those , `bind` and `service-key` commands has created the corresponding 
 
 `rabbitmqctl list_users`
 
-```json
+```
 Listing users ...
 user    tags
 UAmJaQMHpT3NEgF0hHRu3ztIhSq9BhrG1ffcNg86aruy54qBy5hNm799aKqalWqm        [management policymaker]
@@ -1193,6 +1236,107 @@ lDWzf3ickkteAKMoKE6yzYcv9AvNeUfSGW2GPTfuPV99EvDXjhxAUPeGkSQlZGEz        [monitor
 
 and confirm that the uuid based users are no longer present.
 
+### Confirm uniqueness of dynamic credentials created
+
+Both `cf bind` and `cf create-service-key` processes use the same "bind" function. This means to say that, the steps above have already demonstrated the fact that each binding, may that be done through binding the application to the service or creating a service key for the same service, will create a unique set of credentials each time. To reiterate on that, lets repeat the [Binding the service](#binding) steps above against two applications, and create two service bindings against the same service:
+
+`cf bind-service rabbitmq rmqsmall`
+
+```
+Binding service instance rmqsmall to app rabbitmq in org system / space dev as admin...
+OK
+
+TIP: Use 'cf restage rabbitmq' to ensure your env variable changes take effect
+```
+
+`cf bind-service rabbitmq2 rmqsmall`
+
+```
+Binding service instance rmqsmall to app rabbitmq2 in org system / space dev as admin...
+OK
+
+TIP: Use 'cf restage rabbitmq2' to ensure your env variable changes take effect
+```
+
+`cf create-service-key rmqsmall rmqappuser`
+
+```
+Creating service key rmqappuser for service instance rmqsmall as admin...
+OK
+```
+
+`cf create-service-key rmqsmall rmqappuser2`
+
+```
+Creating service key rmqappuser2 for service instance rmqsmall as admin...
+OK
+```
+
+We have now created 4 bindings, two bindings against `rabbitmq` and `rabbitmq2` applications and two service key creations named `rmqappuser` and `rmqappuser2` respectively. Lets see what `cf` has to say about that:
+
+`cf services`
+
+```
+Getting service instances in org system / space dev as admin...
+
+name         offering     plan                   bound apps            last operation     broker           upgrade available
+autoscaler   autoscaler   autoscaler-free-plan                         create succeeded   autoscaler       no
+rmqsmall     rabbitmq     single-node            rabbitmq, rabbitmq2   create succeeded   dev-blacksmith   no
+```
+
+`cf service-keys rmqsmall`
+
+```
+Getting keys for service instance rmqsmall as admin...
+
+name          last operation     message
+rmqappuser    create succeeded   
+rmqappuser2   create succeeded   
+```
+
+Now, lets have a look at the users listed under the rabbitmq instance:
+
+`rabbitmqctl list_users`
+
+```
+Listing users ...
+user    tags
+JtImqAsBOsfqjJB7lfd5avlafOrdnjARW8HHIY2TtGpGlv6M7okxXFy8HG7agaqg        [management policymaker]
+7078785d-723e-4441-88b4-41e03817cadc    [management, policymaker]
+93c654fb-5041-4e59-a0c2-cec620add265    [management, policymaker]
+b916a74f-44cc-480f-b4a2-64f098c72631    [management, policymaker]
+07bbbed0-b846-47e6-8798-599c5abebe38    [management, policymaker]
+kFEO4XjDeF5i6QWXD0wlGiHB6MjazRKXf1FfQVn2w0u5M5TlMSKsZjphmbt8znqe        [monitoring]
+KFACZ4BbYbrUt4xfbch5YtDjovNIzbLprNHHH9erIOeuVKnD9sxzOJG6XU9rJj66        [administrator]
+```
+
+Finally lets compare that output from the environmnent variables for the bound applications and the service keys to see the users in place:
+
+`cf env rabbitmq | grep username | tail -1`
+
+```
+"username": "7078785d-723e-4441-88b4-41e03817cadc",
+```
+
+`cf env rabbitmq2 | grep username | tail -1`
+
+```
+"username": "b916a74f-44cc-480f-b4a2-64f098c72631",
+```
+
+`cf service-key rmqsmall rmqappuser | grep username | tail -1`
+
+```
+"username": "07bbbed0-b846-47e6-8798-599c5abebe38",
+```
+
+`cf service-key rmqsmall rmqappuser2 | grep username | tail -1`
+
+```
+"username": "93c654fb-5041-4e59-a0c2-cec620add265",
+```
+
+
 ## Conclusion
 
 If everything went as planned and assuming that you followed along, by the time your reach these lines you have managed to 
@@ -1201,6 +1345,7 @@ If everything went as planned and assuming that you followed along, by the time 
 * test connectivity, queue creation as well as message creation and consumption
 * create and bind an autoscaling policy to the test application
 * test autoscaling based on rabbitm's quees depth.
+* test the presence and uniqueness of the dynamic credentials created
 * had fun during the process!
 
 Finally, you also saw a bit under the hood which will give you a head start in the (hopefully unlikely) event of having to troubleshoot your deployment. Happy messaging!
