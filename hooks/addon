@@ -10,25 +10,25 @@ fail() {
 }
 
 has_alias() {
-  bosh envs | grep -q "^$BOSH_ENVIRONMENT\\t$alias\\t"
+  bosh envs | grep -q "^${BOSH_ENVIRONMENT}\\t${alias}\\t"
   return $?
 }
 
 setup_alias() {
-  bosh alias-env --tty $alias | grep -v '^User'
+  bosh alias-env --tty ${alias} | grep -v '^User'
 }
 
 is_logged_in() {
   local user
   user="$(bosh env --json | jq -Mr ".Tables[0].Rows[0].user")"
-  if [[ "$user" == "null" || "$user" == "(not logged in)" ]] ; then
+  if [[ "${user}" == "null" || "${user}" == "(not logged in)" ]] ; then
     return 1
   fi
-  if [[ "$user" != "admin" ]] ; then
-    describe >&2 "Logged in as #C{$user}, expected to be #C{admin}"
+  if [[ "${user}" != "admin" ]] ; then
+    describe >&2 "Logged in as #C{${user}}, expected to be #C{admin}"
     return 2
   fi
-  describe "Logged in as #C{$user}..."
+  describe "Logged in as #C{${user}}..."
   return 0
 }
 
@@ -66,65 +66,68 @@ blacksmith::list() {
   echo "  curl      Issue raw HTTP requests (via curl) against"
   echo "            the Blacksmith Broker, with authentication"
   echo
+
+  exit 0
 }
 
 blacksmith::bosh() {
-  command $GENESIS_BOSH_COMMAND "$@"
+  command ${GENESIS_BOSH_COMMAND} "$@"
   return $?
 }
 
 blacksmith::register() {
   blacksmith::ca::sync # Ensure that vault ca cert syncs to credhub
 
-  env=${1:-$GENESIS_ENVIRONMENT}
-  cf_version=$(exodus "$env/cf" kit_version)
+  env=${1:-${GENESIS_ENVIRONMENT}}
+  cf_version=$(exodus "${env}/cf" kit_version)
 
   if new_enough "${cf_version}" "2.0.0-rc1" 
-  then cf_api="https://$(exodus "$env/cf" api_domain)"
+  then cf_api="https://$(exodus "${env}/cf" api_domain)"
   else cf_api=$(exodus "$env/cf" api_url)
   fi
 
-  cf_user=$(exodus "$env/cf" admin_username)
-  cf_pass=$(exodus "$env/cf" admin_password)
+  cf_user=$(exodus "${env}/cf" admin_username)
+  cf_pass=$(exodus "${env}/cf" admin_password)
   
   (
    export HOME="$(mktemp -d blacksmith.regXXXXXXX)"
-   describe "authenticating to #C{$cf_api} as #G{$cf_user}..."
+   describe "authenticating to #C{${cf_api}} as #G{${cf_user}}..."
    cf api "${cf_api}" --skip-ssl-validation
    cf auth "${cf_user}" "${cf_pass}"
 
    env_is_registered=$(cf curl /v2/service_brokers|jq --arg env_name "${env}-blacksmith" -r '.resources[].entity | select(.name==$env_name) | .name' )
 
-   if [[ -n $env_is_registered ]] ; then
+   if [[ -n ${env_is_registered} ]]
+   then
+     describe "Found and updating service broker #M{${env}-blacksmith}..."
 
-       describe "Found and updating service broker #M{$env-blacksmith}..."
-       cf update-service-broker \
-          "${env}-blacksmith"       \
-          "$BLACKSMITH_USERNAME"   \
-          "$BLACKSMITH_PASSWORD"   \
-          "$BLACKSMITH_URL"
-
+     cf update-service-broker "${env}-blacksmith" \
+       "${BLACKSMITH_USERNAME}" "${BLACKSMITH_PASSWORD}" "${BLACKSMITH_URL}"
    else
+     describe "creating service broker #M{$env-blacksmith}..."
 
-       describe "creating service broker #M{$env-blacksmith}..."
-       cf create-service-broker \
-          "${env}-blacksmith"       \
-          "$BLACKSMITH_USERNAME"   \
-          "$BLACKSMITH_PASSWORD"   \
-          "$BLACKSMITH_URL"
-
+     cf create-service-broker "${env}-blacksmith" \
+       "${BLACKSMITH_USERNAME}" "${BLACKSMITH_PASSWORD}" "${BLACKSMITH_URL}"
    fi
+
    describe "enabling service access..."
-   for x in $(curl -Lsk -u "$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD" "$BLACKSMITH_URL/v2/catalog" \
-                   -H Accept:application/json | jq -r '.services[].id'); do
-     describe "  - #C{$x}"
+   service_ids=($(
+     curl -Lsk \
+       -u "${BLACKSMITH_USERNAME}:${BLACKSMITH_PASSWORD}" \
+       "${BLACKSMITH_URL}/v2/catalog" \
+       -H Accept:application/json |
+       jq -r '.services[].id'
+   ))
+   for x in ${service_ids[@]}
+   do
+     describe "Enabling service access for #C{$x}"
      cf enable-service-access "$x"
-  done
+   done
   )
 }
 
 blacksmith::ca::sync() {
-  # TODO: future we can use `credhub:` similar to `exodus:` instead of this
+  # TODO: future we can use `credhub:` similar to `exodus:` in manifest instead of this
   describe "Fetching Blacksmith CA certificate details..."
 
   _path="${GENESIS_SECRETS_MOUNT}/${GENESIS_VAULT_PREFIX}/broker/ca"
@@ -144,10 +147,10 @@ blacksmith::ca::sync() {
 }
 
 blacksmith::visit() {
-  if ! command -v open >/dev/null 2>&1
+  if ! command -v open &>/dev/null
   then fail "The 'visit' addon script only works on macOS, currently."
   fi
-  open "$scheme://$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD@$host:$port"
+  open "${scheme}://${BLACKSMITH_USERNAME}:${BLACKSMITH_PASSWORD}@${host}:${port}"
 }
 
 blacksmith::bosh() {
@@ -156,7 +159,7 @@ blacksmith::bosh() {
 }
 
 blacksmith::boss() {
-  if ! command -v boss>/dev/null 2>&1
+  if ! command -v boss &>/dev/null
   then
     echo "  !!! install the 'boss' cli first!"
     echo "      (https://github.com/blacksmith-community/boss)"
@@ -166,19 +169,20 @@ blacksmith::boss() {
 }
 
 blacksmith::curl() {
-  if ! command -v curl >/dev/null 2>&1
-  then echo "  !!! install curl first!"
+  if ! command -v curl &>/dev/null
+  then
+    echo "  !!! install curl cli first!"
   else
     path=$1; shift
-    exec curl -u "$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD" "$BLACKSMITH_URL$path" "$@" #| jq -r .
+    exec curl -u "${BLACKSMITH_USERNAME}:${BLACKSMITH_PASSWORD}" "${BLACKSMITH_URL}${path}" "$@" # | jq -r .
   fi
 }
 
 ################################################################################
 # Main Script
 ################################################################################
-vault="$GENESIS_SECRETS_MOUNT/$GENESIS_VAULT_PREFIX"
-alias="$GENESIS_ENVIRONMENT-blacksmith"
+vault="${GENESIS_SECRETS_MOUNT}/${GENESIS_VAULT_PREFIX}"
+alias="${GENESIS_ENVIRONMENT}-blacksmith"
 
 ip=$(lookup --partial params.ip)
 fqdn=$(lookup --partial params.fqdn)
@@ -188,7 +192,8 @@ then host=${fqdn}
 else host=${ip}
 fi
 
-if want_feature "broker-tls"; then
+if want_feature "broker-tls"
+then
   port=$(lookup --partial params.blacksmith_tls_port 443)
   scheme=https
 else
@@ -205,27 +210,13 @@ export BOSH_CA_CERT=$(exodus bosh_cacert)
 export BOSH_CLIENT=$(exodus bosh_username)
 export BOSH_CLIENT_SECRET="$(exodus bosh_password)"
 
-case $GENESIS_ADDON_SCRIPT in
-  (list) 
-    blacksmith::list 
-    exit 0
-    ;;
-  (visit)
-    blacksmith::visit
-    ;;
-  (bosh)
-    blacksmith::bosh
-    ;;
-  (boss)
-    blacksmith::boss
-    ;;
-  (curl)
-    blacksmith::curl
-    ;;
-  (register)
-    blacksmith::register
+case ${GENESIS_ADDON_SCRIPT} in
+  (list|visit|bosh|boss|curl|register)
+    blacksmith::${GENESIS_ADDON_SCRIPT} "$@"
     ;;
   (*) 
-    fail "Unrecognized Blacksmith Genesis Kit addon - see list."
+    fail "Unrecognized Blacksmith Genesis Kit addon '${GENESIS_ADDON_SCRIPT}' - see \`list\`."
     ;;
 esac
+
+exit 0

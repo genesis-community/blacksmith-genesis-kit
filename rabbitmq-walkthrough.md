@@ -1,18 +1,22 @@
 # Rabbitmq Forge - Features and Validation Tests
 
 ## Introduction
+
 So you've turned to Blacksmith once again to deploy your precious managed service. This time around messaging is the need and rabbitmq is the tool of choice. The following lines will walk you through the changes you need to introduce on blacksmith's deployment manifest to deploy rabbitmq, the features available of the deployed rabbitmq service, and different ways to test them, providing you at the same time, a clear path in troubleshooting your deployment in the future.
 
 ## Prerequisites
 
 ### External Bosh
+
 Blacksmith used to exist all by itself, firing up its own bosh director to deploy and manage the service instances. This was introducing another resource to be managed and maintained, while adding little if anything to the service broker's usability. Given the detached status between blacksmith's director, and the director hosting most if not all of the resources using its services, it was hindering interconnectivity between the blacksmith's deployed services and the ones available to bosh director hosting our cloudfoundry deployment. That said, a decision has been made to use `- external-bosh` as the default feature in deploying blacksmith. This is expecting `blacksmith_user` and `blacksmith_password` under `secret/exodus/dev/bosh` (where dev is the environment name) with credentials to the bosh director.
 
 ### Cloudfoundry
+
 Rabbitmq forge has gone a long way since its first introduction. A lot of changes and features where added with the most prominent one being autoscaling based on rabbitmq's queue depth. Given its dependencies, when `rabbitmq-autoscale` feature and plans are added to blacksmith, it is expecting a cloudfoundry deployment with the `- app-autoscaler-integration` feature enabled.
 
 
 ## Deploying rabbitmq
+
 As in all genesis kits, all you need to do is to provide the corresponding configuration lines on the deployment manifest. Bellow is an example of said manifest
 
 ```yaml
@@ -366,7 +370,7 @@ Creating service key rmqappuser for service instance rmqsmall as admin...
 OK
 ```
 
-we may then confirm the same VCAP_SERVICES contents under the service key:
+we may then confirm the same `VCAP_SERVICES` contents under the service key:
 
 `cf service-key rmqsmall rmqappuser`
 
