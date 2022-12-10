@@ -53,6 +53,7 @@ instance_groups:
             stemcells:    (( grab params.stemcells ))
             releases:     (( grab params.releases ))
             cloud-config: (( grab params.cloud_config ))
+            network: (( grab params.network || "blacksmith" ))
 
           blacksmith_services_ca:
             tls:
