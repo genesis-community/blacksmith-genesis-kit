@@ -1,0 +1,273 @@
+exodus:
+  bosh_address: https://10.99.0.16:25555
+  bosh_cacert: <!{meta.vault}/tls/ca:certificate!>
+  bosh_password: <!{meta.vault}/users/blacksmith:password!>
+  bosh_username: blacksmith
+  broker_password: <!{meta.vault}/broker:password!>
+  broker_url: http://10.99.0.16:3000
+  broker_username: blacksmith
+instance_groups:
+- azs:
+  - z1
+  instances: 1
+  jobs:
+  - name: blacksmith
+    properties:
+      bosh:
+        address: https://10.99.0.16:25555
+        cloud-config:
+          azs:
+          - cloud_properties:
+              datacenters:
+              - clusters:
+                - cluster1: {}
+                name: test-datacenter
+            name: z1
+          compilation:
+            az: z1
+            network: services
+            reuse_compilation_vms: true
+            vm_type: sm-2c-4g
+            workers: 3
+          networks:
+          - name: services
+            subnets:
+            - az: z1
+              cloud_properties:
+                name: VMNetwork
+              dns:
+              - 8.8.8.8
+              - 8.8.4.4
+              gateway: 10.200.128.1
+              range: 10.200.128.0/17
+              reserved:
+              - 10.200.128.2   - 10.200.201.3
+              - 10.200.201.255 - 10.200.255.254
+              static:
+              - 10.200.201.4 - 10.200.201.7
+            type: manual
+          vm_types:
+          - cloud_properties:
+              cpu: 2
+              disk: 4096
+              ram: 4096
+            name: sm-2c-4g
+          - cloud_properties:
+              cpu: 4
+              disk: 10240
+              ram: 16384
+            name: md-4c-16g
+        password: <!{meta.vault}/users/blacksmith:password!>
+        releases:
+        - name: redis-forge
+          sha1: 7d0e9b01f6cd76b2755743ad7d69e88ef249e500
+          url: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v0.4.7/redis-forge-0.4.7.tgz
+          version: 0.4.7
+        stemcells:
+        - name: bosh-google-kvm-ubuntu-xenial-go_agent
+          sha1: eadbbd43d09bef7e2877cde032d68321444d10df
+          url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-xenial-go_agent?v=621.55
+          version: "621.55"
+        username: blacksmith
+      broker:
+        password: <!{meta.vault}/broker:password!>
+        port: 3000
+        username: blacksmith
+      debug: false
+      env: base-google
+      shareable: false
+    release: blacksmith
+  - name: bpm
+    release: bpm
+  - name: nats
+    release: bosh
+  - name: postgres-9.4
+    release: bosh
+  - name: blobstore
+    release: bosh
+  - name: director
+    release: bosh
+  - name: health_monitor
+    release: bosh
+  - name: google_cpi
+    release: bosh-google-cpi
+  - name: registry
+    release: bosh
+  - name: redis-blacksmith-plans
+    properties:
+      plans:
+        dedicated-cache:
+          limit: 10
+          network: services
+          persist: false
+          type: standalone
+          vm_type: md-4c-16g
+        dedicated-persistent:
+          disk: 8192
+          limit: 10
+          network: services
+          persist: true
+          type: standalone
+          vm_type: sm-2c-4g
+      service:
+        description: A dedicated Redis instance, deployed on-demand
+        id: redis
+        limit: 0
+        name: redis
+        tags:
+        - blacksmith
+        - dedicated
+        - redis
+    release: redis-forge
+  name: blacksmith
+  networks:
+  - name: blacksmith
+    static_ips:
+    - 10.99.0.16
+  persistent_disk: 20480
+  properties:
+    agent:
+      env:
+        bosh:
+          blobstores:
+          - options:
+              endpoint: http://10.99.0.16:25250
+              password: <!{meta.vault}/blobstore/agent:password!>
+              user: agent
+            provider: dav
+      mbus: nats://nats:<!{meta.vault}/nats:password!>@10.99.0.16:4222
+    blobstore:
+      address: 10.99.0.16
+      agent:
+        password: <!{meta.vault}/blobstore/agent:password!>
+        user: agent
+      director:
+        password: <!{meta.vault}/blobstore/director:password!>
+        user: director
+      port: 25250
+      provider: dav
+      tls:
+        cert:
+          ca: <!{meta.vault}/tls/ca:certificate!>
+          certificate: <!{meta.vault}/tls/blobstore:certificate!>
+          private_key: <!{meta.vault}/tls/blobstore:key!>
+    director:
+      address: 10.99.0.16
+      cpi_job: google_cpi
+      db:
+        adapter: postgres
+        database: bosh
+        host: 127.0.0.1
+        listen_address: 127.0.0.1
+        password: <!{meta.vault}/db:password!>
+        user: postgres
+      enable_dedicated_status_worker: true
+      enable_nats_delivered_templates: true
+      enable_post_deploy: true
+      events:
+        record_events: true
+      flush_arp: true
+      generate_vm_passwords: true
+      local_dns:
+        enabled: true
+      name: base-google-blacksmith
+      ssl:
+        cert: <!{meta.vault}/tls/director:certificate!>
+        key: <!{meta.vault}/tls/director:key!>
+      user_management:
+        local:
+          users:
+          - name: admin
+            password: <!{meta.vault}/users/admin:password!>
+          - name: hm
+            password: <!{meta.vault}/users/hm:password!>
+          - name: blacksmith
+            password: <!{meta.vault}/users/blacksmith:password!>
+        provider: local
+      workers: 4
+    env:
+      http_proxy: ""
+      https_proxy: ""
+      no_proxy: ""
+    google:
+      json_key: <!{meta.vault}/google:json_key!>
+      project: test-project
+    hm:
+      director_account:
+        ca_cert: <!{meta.vault}/tls/ca:certificate!>
+        password: <!{meta.vault}/users/hm:password!>
+        user: hm
+      resurrector_enabled: true
+    nats:
+      address: 10.99.0.16
+      password: <!{meta.vault}/nats:password!>
+      tls:
+        ca: <!{meta.vault}/tls/nats/ca:certificate!>
+        client_ca:
+          certificate: <!{meta.vault}/tls/nats/ca:certificate!>
+          private_key: <!{meta.vault}/tls/nats/ca:key!>
+        director:
+          certificate: <!{meta.vault}/tls/nats/director:certificate!>
+          private_key: <!{meta.vault}/tls/nats/director:key!>
+        health_monitor:
+          certificate: <!{meta.vault}/tls/nats/hm:certificate!>
+          private_key: <!{meta.vault}/tls/nats/hm:key!>
+        server:
+          certificate: <!{meta.vault}/tls/nats/server:certificate!>
+          private_key: <!{meta.vault}/tls/nats/server:key!>
+      user: nats
+    postgres:
+      adapter: postgres
+      database: bosh
+      host: 127.0.0.1
+      listen_address: 127.0.0.1
+      password: <!{meta.vault}/db:password!>
+      user: postgres
+    registry:
+      address: 10.99.0.16
+      db:
+        adapter: postgres
+        database: bosh
+        host: 127.0.0.1
+        listen_address: 127.0.0.1
+        password: <!{meta.vault}/db:password!>
+        user: postgres
+      host: 10.99.0.16
+      password: <!{meta.vault}/registry:password!>
+      port: 25777
+      username: registry-user
+  stemcell: default
+  vm_type: blacksmith
+name: base-google-blacksmith
+releases:
+- name: blacksmith
+  sha1: 1fe5913ba4ce1bde0b90bbe56017f411d60b4325
+  url: https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v1.4.2/blacksmith-1.4.2.tgz
+  version: 1.4.2
+- name: bosh
+  sha1: beef0351db26d173834dbc889e42772cf6d15cae
+  url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=270.2.0
+  version: 270.2.0
+- name: bpm
+  sha1: 82e83a5e8ebd6e07f6ca0765e94eb69e03324a19
+  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.1.0
+  version: 1.1.0
+- name: bosh-google-cpi
+  sha1: fe4643b66f56dfd8a58df70b647bdc7d7e0c1273
+  url: https://bosh.io/d/github.com/cloudfoundry/bosh-google-cpi-release?v=30.0.0
+  version: 30.0.0
+- name: redis-forge
+  sha1: 7d0e9b01f6cd76b2755743ad7d69e88ef249e500
+  url: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v0.4.7/redis-forge-0.4.7.tgz
+  version: 0.4.7
+stemcells:
+- alias: default
+  os: ubuntu-xenial
+  version: latest
+update:
+  canaries: 1
+  canary_watch_time: 30000-600000
+  max_errors: 1
+  max_in_flight: 1
+  serial: false
+  update_watch_time: 5000-600000

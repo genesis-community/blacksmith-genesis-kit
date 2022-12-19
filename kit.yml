@@ -74,3 +74,67 @@ credentials:
     users/blacksmith:   {password: random 64}
 
     registry:           {password: random 64}
+
+provided:
+  aws:
+    aws:
+      keys:
+        secret_key:
+          prompt:    AWS Secret Key
+        access_key:
+          sensitive: false
+          prompt:    AWS Access Key
+
+  azure:
+    azure:
+      keys:
+        client_id:
+          sensitive: false
+          prompt:    Azure Client ID
+        client_secret:
+          prompt:    Azure Client Secret
+        tenant_id:
+          sensitive: false
+          prompt:    Azure Tenant ID
+        subscription_id:
+          sensitive: false
+          prompt:    Azure Resource Group to be used by BOSH to deploying VMs
+    azure/ssh:
+      keys:
+        public:
+          prompt:  Azure SSH Public Key
+
+  google:
+    google:
+      keys:
+        json_key:
+          sensitive: false
+          multiline: true
+          prompt:    GCP credentials (generally supplied as a JSON block)
+
+  openstack:
+    openstack/creds:
+      keys:
+        username:
+          sensitive: false
+          prompt:    OpenStack username
+        password:
+          prompt:    OpenStack password
+        domain:
+          sensitive: false
+          prompt:    OpenStack domain
+        project:
+          sensitive: false
+          prompt:    OpenStack project
+
+  vsphere:
+    vsphere:
+      keys:
+        user:
+          sensitive: false
+          prompt:    Username for BOSH to authenticate with vCenter
+        address:
+          sensitive: false
+          prompt:    IP address of VMWare vCenter Server Appliance
+        password:
+          prompt:    Password for vCenter user
