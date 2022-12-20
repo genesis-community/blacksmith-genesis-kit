@@ -1,0 +1,46 @@
+---
+meta:
+  ocfp:
+    env:
+      scale: (( grab params.ocfp_env_scale || "dev" ))
+
+    vault:
+      tf: (( concat genesis.secrets_mount "tf/" genesis.vault_env ))
+
+    certs:
+      trusted:
+        - (( vault genesis.secrets_mount "certs/org:ca" )) # Organization CA, if exists
+        - (( vault genesis.secrets_mount "certs/dbs:ca" )) # External Databases CA
+
+  stemcell:
+    name:    (( grab params.stemcell_name    || "default" ))
+    os:      (( grab params.stemcell_os      || "ubuntu-bionic" ))
+    version: (( grab params.stemcell_version || "latest" ))
+
+  cf: 
+    exodus_path: (( concat genesis.exodus_mount genesis.env "/cf" ))
+
+  bosh:
+    exodus_path: (( concat genesis.exodus_mount genesis.env "/bosh" ))
+    env_name:    (( grab genesis.env ))
+
+  blacksmith:
+    cloud_config: {} # TODO: OCFP Reference Arch based Cloud Config
+
+    fqdn:   (( vault meta.ocfp.vault.tf "/ocf/fqdns:blacksmith" ))
+    az:     (( concat genesis.env "-z1" ))
+
+    disk_type: (( concat "blacksmith-" meta.ocfp.env.scale ))
+    vm_type:   (( concat "blacksmith-" meta.ocfp.env.scale ))
+    network:   (( concat genesis.env "-ocf" ))
+
+    debug:      (( grab params.blacksmith_debug || false ))
+    shareable:  (( grab params.blacksmith_sharable || false ))
+
+    broker:
+      # NOTE: TLS is always enabled as broker-tls is included by default.
+      url: (( concat "https://" meta.blacksmith.fqdn ))
+
+      username: blacksmith
+      password: (( vault meta.vault "/broker:password" ))
+

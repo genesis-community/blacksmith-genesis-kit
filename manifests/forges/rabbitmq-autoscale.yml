@@ -1,12 +1,12 @@
 ---
 meta:
   cf:
-    exodus_path: (( concat "secret/exodus/" meta.environment "/cf" ))
-    deployment_name: (( concat meta.environment "-cf" ))
-    system_domain: (( vault meta.cf.exodus_path ":system_domain" ))
-    api_url:    (( concat "https://api." meta.cf.system_domain ))
-    username:   (( vault meta.cf.exodus_path ":admin_username" ))
-    password:   (( vault meta.cf.exodus_path ":admin_password" ))
+    exodus_path:     (( concat genesis.secrets_mount genesis.env "/cf" ))
+    deployment_name: (( concat genesis.env "-cf" ))
+    system_domain:   (( vault meta.cf.exodus_path ":system_domain" ))
+    api_url:         (( concat "https://api." meta.cf.system_domain ))
+    username:        (( vault meta.cf.exodus_path ":admin_username" ))
+    password:        (( vault meta.cf.exodus_path ":admin_password" ))
 
 params:
   cf_skip_ssl_validation: false

@@ -7,7 +7,7 @@ code:     https://github.com/genesis-community/blacksmith-genesis-kit
 
 description: Blacksmith
 
-genesis_version_min: 2.6.0
+genesis_version_min: 2.8.5
 
 certificates:
   base:
@@ -53,12 +53,15 @@ certificates:
 
   broker-tls:
     broker:
-      ca: {valid_for: 10y}
+      ca:
+        valid_for: 10y
+        names:
+          - blacksmith.services.ca.bosh-internal
       server:
           valid_for: 1y
           names:
+            - blacksmith.services.bosh-internal
             - ${params.ip}
-
 
 credentials:
   base:
@@ -82,7 +85,5 @@ provided:
   shield-backups:
     shield:
       keys:
-        agent:
-          prompt: "External S.H.I.E.L.D agent IP:PORT"
         store:
           prompt: "External S.H.I.E.L.D store UUID or exact name"

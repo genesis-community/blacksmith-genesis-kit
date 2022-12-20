@@ -2,6 +2,11 @@
 set -eu
 
 declare -a merge
+declare -a opsfiles
+
+iaas=0
+forges=0
+external_bosh=0
 
 # TODO: Refactor instead of using validate_features to use loops enabling ops/ dir.
 
@@ -12,85 +17,115 @@ declare -a merge
 
 # We always start out with the skeleton of a BOSH deployment,
 # and add-in a local UAA and a Credhub
-merge=( manifests/blacksmith/blacksmith.yml )
-
-iaas=0
-if want_feature "external-bosh"; then
-  merge+=( manifests/blacksmith/external-bosh.yml )
-  # No IaaS Specification needed with external bosh
-  iaas=$(( iaas + 1 ))
-else
-  merge+=( manifests/blacksmith/bosh.yml )
-fi
-
-if want_feature "broker-tls"; then
-  merge+=( manifests/blacksmith/broker-tls.yml )
-fi
-
-if want_feature "shield-backups"; then
-  merge+=( manifests/blacksmith/shield-backups.yml )
-fi
+merge=( 
+  "manifests/blacksmith/blacksmith.yml" 
+  "manifests/releases/blacksmith.yml"
+)
 
 for want in ${GENESIS_REQUESTED_FEATURES}
 do
   case "$want" in
-    # IaaS selector feature flags
-    (aws|azure|google|openstack|vsphere)
+    (ocfp)
+      external_bosh=$(( external_bosh + 1 )) # OCFP Ref Arch requires external bosh
+      true
+      ;;
+
+    (external-bosh)
+      merge+=( "manifests/blacksmith/external-bosh.yml" )
+      external_bosh=$(( external_bosh + 1 ))
+      ;;
+
+    (aws|azure|google|openstack|vsphere) # IaaS selector feature flags
+      OCFP_IAAS="$want"
       iaas=$(( iaas + 1 ))
-      merge+=( manifests/iaas/$want.yml )
-      case $want in
-        (vsphere) ;; # vSphere doesn't need a registry
-        (*)          # but everyone else does...
-          merge+=( manifests/addons/registry.yml )
-          ;;
-      esac
+      ;;
+
+    (broker-tls)
+      merge+=( "manifests/blacksmith/broker-tls.yml" )
+      ;;
+
+    (shield-backups)
+      merge+=( "manifests/blacksmith/shield-backups.yml" )
+      ;;
+
+    (shield-agent)
+      merge+=( "manifests/blacksmith/shield-agent.yml" )
+      merge+=( "manifests/releases/shield-agent.yml" )
+      ;;
+
+    (rabbitmq|redis|postgresql|mariadb|kubernetes) # Forges
+      forges=$(( forges + 1 ))
+      merge+=( "manifests/forges/$want.yml" )
+      ;;
+
+    (redis-tls)
+      merge+=( "manifests/forges/redis-tls.yml" )
+      ;;
+
+    (redis-dual-mode)
+      merge+=( "manifests/forges/redis-dual-mode.yml" )
+      ;;
+
+    (rabbitmq-tls)
+      merge+=( "manifests/forges/rabbitmq-tls.yml" )
+      ;;
+
+    (rabbitmq-dual-mode)
+      merge+=( "manifests/forges/rabbitmq-dual-mode.yml" )
+      ;;
+
+    (rabbitmq-dashboard-registration)
+      merge+=( "manifests/forges/rabbitmq-dashboard-registration.yml" )
+      ;;
+
+    (cf-route-registrar)
+      merge+=( "manifests/blacksmith/cf-route-registrar.yml" )
+      ;;
+
+    (*)
+      if [[ -f "$GENESIS_ROOT/ops/$want.yml" ]] ; then
+        opsfiles+=( "$GENESIS_ROOT/ops/$want.yml" )
+      fi
       ;;
   esac
 done
 
-forges=0
-for want in ${GENESIS_REQUESTED_FEATURES}; do
-  case "$want" in
-  # Forges
-  (rabbitmq|redis|postgresql|mariadb|kubernetes)
-    forges=$(( forges + 1 ))
-    merge+=( manifests/forges/$want.yml )
-    ;;
-  (*)
-    if [[ -f "$GENESIS_ROOT/ops/$want.yml" ]] ; then
-      merge+=( "$GENESIS_ROOT/ops/$want.yml" )
-    fi
-    ;;
-  esac
-done
-
-if want_feature "redis-tls"; then
-  merge+=( manifests/forges/redis-tls.yml )
+if [[ $external_bosh == 0 ]] ; then
+  merge+=( "manifests/blacksmith/bosh.yml" )
 fi
 
-if want_feature "redis-dual-mode"; then
-  merge+=( manifests/forges/redis-dual-mode.yml )
-fi
+# Add the IaaS manifest only if we are not using the OCFP feature.
+if ! want_feature "ocfp" && [[ $iaas != 0 ]] ; then
+  merge+=( "manifests/iaas/${OCFP_IAAS}.yml" )
 
-if want_feature "rabbitmq-tls"; then
-  merge+=( manifests/forges/rabbitmq-tls.yml )
-fi
-
-if want_feature "rabbitmq-dual-mode"; then
-  merge+=( manifests/forges/rabbitmq-dual-mode.yml )
-fi
-
-if want_feature "rabbitmq-dashboard-registration"; then
-  merge+=( manifests/forges/rabbitmq-dashboard-registration.yml )
+  if ! want_feature "vsphere" ; then
+    # vSphere doesn't need a registry, but everyone else does...
+    merge+=( "manifests/addons/registry.yml" )
+  fi
 fi
 
 if want_feature "rabbitmq-autoscale"; then
-  merge+=( manifests/forges/rabbitmq-autoscale.yml )
+  merge+=( "manifests/forges/rabbitmq-autoscale.yml" )
 fi
 
+if want_feature "ocfp"; then
+  merge+=( 
+    "ocfp/meta.yml"
+    "ocfp/ocfp.yml"
+    "ocfp/${OCFP_IAAS}/ocf.yml"
+  )
+  if want_feature shield-backups ; then
+    merge+=( "ocfp/shield-backups.yml" )
+  fi
+  if want_feature shield-agent ; then
+    merge+=( "ocfp/shield-agent.yml" )
+  fi
+fi
+
+# TODO: Move the below checks to hooks/check.
 # Sanity Check Time!
 # If we haven't chosen an IaaS, that's a problem.
-if [[ $iaas == 0 ]]; then
+if [[ $iaas == 0 && $external_bosh == 0 ]]; then
   echo >&2 "You have not enabled an IaaS feature flag."
   exit 1
 fi
@@ -104,5 +139,9 @@ if [[ $forges == 0 ]]; then
   echo >&2 "You have not activated any Blacksmith Forges."
   exit 1
 fi
+
+for opsfile in ${opsfiles[@]}
+do merge+=( "$opsfile" )
+done
 
 echo "${merge[@]}"

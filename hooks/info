@@ -1,52 +1,72 @@
 #!/bin/bash
 set -eu
-vault="secret/$GENESIS_VAULT_PREFIX"
 
-ip=$(lookup params.ip)
-ip=$(lookup params.ip)
-if want_feature "broker-tls"; then
-  port=$(lookup params.blacksmith_tls_port 443)
+vault="$GENESIS_SECRETS_MOUNT/$GENESIS_VAULT_PREFIX"
+
+ip=$(lookup --partial params.ip)
+fqdn=$(lookup --partial params.fqdn)
+
+if [[ -n "${fqdn}" ]]
+then host=${fqdn}
+else host=${ip}
+fi
+
+if want_feature "broker-tls"
+then
+  port=$(lookup --partial params.blacksmith_tls_port 443)
   scheme=https
-  export BLACKSMITH_URL=https://$ip:$port
+  export BLACKSMITH_URL=https://$host:$port
   export BLACKSMITH_SKIP_VERIFY=true
 else
-  port=$(lookup params.blacksmith_port 3000)
+  port=$(lookup --partial params.blacksmith_port 3000)
   scheme=http
-  export BLACKSMITH_URL=http://$ip:$port
+  export BLACKSMITH_URL=http://$host:$port
 fi
+
 export BLACKSMITH_USERNAME=blacksmith
 export BLACKSMITH_PASSWORD=$(safe read $vault/broker:password)
-
 export BOSH_ENVIRONMENT=$(exodus bosh_address)
 export BOSH_CA_CERT=$(exodus bosh_cacert)
 export BOSH_CLIENT=$(exodus bosh_username)
 export BOSH_CLIENT_SECRET="$(exodus bosh_password)"
 
-
 describe "ca certificate"
-         safe read $vault/tls/ca:certificate
-    echo
-    echo "bosh env"
-         bosh env --tty | sed -e 's/^/  /';
-    echo
-    echo
-    echo "blacksmith (internal) bosh director"
+  echo -e "\nbosh env"
+  bosh env --tty | sed -e 's/^/  /';
+
+  echo -e "\n\nblacksmith (internal) bosh director"
 describe "  bosh url: #C{$BOSH_ENVIRONMENT}"
 describe "  username: #M{$BOSH_CLIENT}"
 describe "  password: #G{$BOSH_CLIENT_SECRET}"
-    echo
-    echo
-    echo "blacksmith web management UI"
+
+  echo -e "\n\nblacksmith web management UI"
 describe "  web url:   #C{$BLACKSMITH_URL}"
 describe "  username:  #M{$BLACKSMITH_USERNAME}"
 describe "  password:  #G{$BLACKSMITH_PASSWORD}"
-describe "  clickable: #B{$scheme://$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD@$ip:$port}"
-    echo
-    echo
-    echo "blacksmith catalog"
-if ! command -v boss >/dev/null 2>&1; then
-    echo "  !!! install the 'boss' cli to query the blacksmith catalog"
-    echo "      (https://github.com/jhunt/boss)"
-else
-         boss catalog | sed -e 's/^/  /';
+describe "  clickable: #B{$scheme://$BLACKSMITH_USERNAME:$BLACKSMITH_PASSWORD@$host:$port}"
+  echo
+
+if want_feature "shield-backups"
+then
+  SHIELD_URL=$(exodus shield_url)
+  SHIELD_USERNAME=$(exodus shield_username)
+  SHIELD_PASSWORD=$(exodus shield_password)
+
+  echo -e "\nshield"
+describe "  url:       #C{$SHIELD_URL}"
+describe "  username:  #M{$SHIELD_USERNAME}"
+describe "  password:  #G{$SHIELD_PASSWORD}"
+  echo
 fi
+
+  echo -e "\nblacksmith catalog"
+
+if ! command -v boss >/dev/null 2>&1
+then
+  echo "  !!! install the 'boss' cli to query the blacksmith catalog"
+  echo "      (https://github.com/jhunt/boss)"
+else
+  boss catalog | sed -e 's/^/  /';
+fi
+
+exit 0

@@ -6,8 +6,9 @@ meta:
     admin_username:  (( vault params.shield_exodus_path "admin_username" ))
     admin_password:  (( vault params.shield_exodus_path "admin_password" ))
 
-    address:  (( vault params.shield_exodus_path "url" ))
-    agent:    (( vault meta.vault "/shield:agent" )) # TODO: this value is not set by the SHIELD kit.
+    address:   (( vault params.shield_exodus_path "api_url" ))
+    agent_ip:  (( vault params.shield_exodus_path "agent_ip" ))
+    agent:     (( concat meta.shield.agent_ip ":5444" ))
 
 params:
   shield_exodus_path: (( grab meta.shield.default_exodus ))
@@ -16,6 +17,11 @@ params:
   shield_password: (( vault meta.vault "/shield:password" ))
   shield_tenant:   blacksmith
   shield_store:    (( vault meta.vault "/shield:store" ))
+
+exodus:
+  shield_username: (( grab params.shield_username ))
+  shield_password: (( grab params.shield_password ))
+  shield_url:      (( grab meta.shield.address ))
 
 instance_groups:
   - name: blacksmith

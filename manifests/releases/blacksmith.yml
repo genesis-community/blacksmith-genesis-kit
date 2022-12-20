@@ -1,0 +1,26 @@
+---
+releases:
+  - name:    blacksmith
+    version: 1.6.10
+    url:     https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v1.6.10/blacksmith-1.6.10.tgz
+    sha1:    1791f977ac19a06f2550a87dea930418b340313a
+
+  - name:    bosh
+    version: "270.12.0"
+    sha1:    ecb69fdc834e962cc66747f2a9f57470a57401f9
+    url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/bosh?v=" releases.bosh.version ))
+
+  - name:    bpm
+    version: "1.1.12"
+    sha1:    502e9446fa34accaf122ad2b28b6ffa543d5bbca
+    url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=" releases.bpm.version ))
+
+  - name:    routing
+    version: "0.225.0"
+    sha1:    a5b7f3b746cfa169f466c2b682db296ab8dcd0ad
+    url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/routing-release?v=" releases.routing.version ))
+
+  - name:    bosh-dns-aliases
+    version: "0.0.4"
+    sha1:    55b3dced813ff9ed92a05cda02156e4b5604b273
+    url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/bosh-dns-aliases-release?v=" releases.bosh-dns-aliases.version ))

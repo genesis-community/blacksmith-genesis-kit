@@ -1,0 +1,24 @@
+---
+meta:
+  shield:
+    exodus_path: (( concat $GENESIS_EXODUS_MOUNT params.shield.deployment_env ))
+
+params:
+  exodus_path: (( grab meta.shield.exodus_path ))
+
+instance_groups:
+  - name: blacksmith
+    jobs:
+      - name:    shield-agent
+        release: shield
+        properties:
+            shield-url: (( vault params.exodus_path "/shield:api_url" )) 
+            require-shield-core: false
+            core:
+              ca: (( vault params.exodus_path "/shield:ca_cert" ))
+            agent:
+              key: (( vault params.exodus_path "/shield:pubkey" ))
+            env:
+              http_proxy: ""
+              https_proxy: ""
+              no_proxy: ""

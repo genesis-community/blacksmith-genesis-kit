@@ -1,0 +1,70 @@
+---
+meta:
+  cf:
+    exodus_path:     (( concat $GENESIS_EXODUS_MOUNT genesis.env "/cf" ))
+    deployment_name: (( concat genesis.env "-cf" ))
+    core_network:    (( vault meta.cf.exodus_path ":core_network" ))
+    system:
+      domain:        (( vault meta.cf.exodus_path ":system_domain" ))
+    nats:
+      client:
+        cert: (( vault meta.cf.exodus_path ":nats_client_cert" ))
+        key:  (( vault meta.cf.exodus_path ":nats_client_key" ))
+
+addons:
+- name: bosh-dns-aliases
+  include:
+    jobs:
+    - name: route_registrar
+      release: routing
+  jobs:
+  - name: bosh-dns-aliases
+    release: bosh-dns-aliases
+    properties:
+      aliases:
+      - domain: nats.service.cf.internal
+        targets:
+        - deployment: (( grab meta.cf.deployment_name ))
+          domain: bosh
+          instance_group: nats
+          network: (( grab meta.cf.core_network ))
+          query: '*'
+      - domain: _.nats.service.cf.internal
+        targets:
+        - deployment: (( grab meta.cf.deployment_name ))
+          domain: bosh
+          instance_group: nats
+          network: (( grab meta.cf.core_network ))
+          query: _
+---
+- type: replace
+  path: /instance_groups/0/jobs/name=route_registrar?
+  value:
+    name: route_registrar
+    release: routing
+    consumes:
+      nats-tls:
+        from:       nats-tls
+        deployment: (( grab meta.cf.deployment_name ))
+    properties:
+      nats:
+        tls:
+          enabled: true
+          client_cert: (( grab meta.cf.nats.client.cert ))
+          client_key:  (( grab meta.cf.nats.client.key ))
+      route_registrar:
+        routes:
+        - name: blacksmith
+          port: (( grab meta.blacksmith_port || params.blacksmith_port ))
+          tls_port: (( grab meta.blacksmith_tls_port || "" ))
+          server_cert_domain_san: (( grab params.fqdn ))
+          registration_interval: 10s
+          uris:
+            - (( grab params.fqdn ))
+        host: (( grab meta.cf.system.domain ))
+
+- type: replace
+  path: /instance_groups/0/jobs/name=bpm?
+  value:
+    name: bpm
+    release: bpm

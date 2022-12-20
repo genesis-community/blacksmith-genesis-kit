@@ -1,7 +1,8 @@
 ---
 params:
-  ip:           (( param "Please specify the static IP address for the Blacksmith Service Broker" ))
-  cloud_config: (( param "Please specify a complete BOSH v2 cloud-config, for the Blacksmith internal BOSH director to use" ))
+  ip:            (( param "Please specify the static IP address for the Blacksmith Service Broker" ))
+  cloud_config:  (( param "Please specify a complete BOSH v2 cloud-config, for the Blacksmith internal BOSH director to use" ))
+  blacksmith_ca: (( vault meta.vault "/broker/ca:certificate" ))
 
   releases: []
   stemcells: []
@@ -14,28 +15,21 @@ meta:
     blacksmith_port: (( grab params.blacksmith_port || 3000 ))
 
 exodus:
-  broker_url: (( concat meta.default.scheme "://" meta.default.host ":" meta.default.blacksmith_port ))
+  broker_url:      (( concat meta.default.scheme "://" meta.default.host ":" meta.default.blacksmith_port ))
   broker_username: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.broker.username ))
   broker_password: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.broker.password ))
-  bosh_username: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.username ))
-  bosh_password: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.password ))
-  bosh_address: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.address ))
-  bosh_cacert: (( vault meta.vault "/tls/ca:certificate" ))
-
-variables:
-- name: blacksmith_services_ca
-  type: certificate
-  options:
-    is_ca: true
-    common_name: (( concat params.env "-blacksmith-services-ca.bosh" ))
+  bosh_username:   (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.username ))
+  bosh_password:   (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.password ))
+  bosh_address:    (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.address ))
+  bosh_cacert:     (( vault meta.vault "/tls/ca:certificate" ))
 
 instance_groups:
   - name:      blacksmith
     instances: 1
-    stemcell:  default
+    stemcell:  bionic
     azs:             (( grab params.availability_zones || meta.default.azs ))
     vm_type:         (( grab params.vm_type   || "blacksmith" ))
-    persistent_disk: (( grab params.disk_size || 20480 ))
+    disk_type:       (( grab params.disk_type || "blacksmith" ))
     networks:
       - name:       (( grab params.network || "blacksmith" ))
         static_ips: [(( grab params.ip ))]
@@ -60,20 +54,10 @@ instance_groups:
             releases:     (( grab params.releases ))
             cloud-config: (( grab params.cloud_config ))
             network: (( grab params.network || "blacksmith" ))
+
           blacksmith_services_ca:
             tls:
-              ca_cert: ((blacksmith_services_ca.certificate))
-
-releases:
-- name:    blacksmith
-  version: 1.6.8
-  url:     https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v1.6.8/blacksmith-1.6.8.tgz
-  sha1:    c31a8a854823806d2a50083eddced543eb392284
-
-stemcells:
-  - alias: default
-    os:      (( grab params.stemcell_os      || "ubuntu-bionic"))
-    version: (( grab params.stemcell_version || "latest" ))
+              ca_cert: (( grab params.blacksmith_ca ))
 
 update:
   serial: false
@@ -83,3 +67,7 @@ update:
   max_in_flight: 1
   max_errors: 1
 
+stemcells:
+  - alias: bionic
+    os:      (( grab params.stemcell_os      || "ubuntu-bionic"))
+    version: (( grab params.stemcell_version || "latest" ))

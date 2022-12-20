@@ -25,9 +25,9 @@ meta:
 
 releases:
 - name:    redis-forge
-  version: 0.8.11
-  url:     https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v0.8.11/redis-forge-0.8.11.tgz
-  sha1:    3cec4d60947dc4b915b6d5cd0b4495709c51fd0a
+  version: 0.8.16
+  url:     https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v0.8.16/redis-forge-0.8.16.tgz
+  sha1:    feede84c0f37b7eda4421debd2304cb48da83ff7
 
 params:
   releases:
@@ -50,3 +50,4 @@ instance_groups:
             description: (( grab params.redis_service_description || "A dedicated Redis instance, deployed on-demand" ))
             tags:        (( grab params.redis_service_tags        || meta.default.redis_tags ))
             limit:       (( grab params.redis_service_limit       || 0 ))
+

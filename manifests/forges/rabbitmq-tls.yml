@@ -8,6 +8,6 @@ instance_groups:
           rabbitmq:
             tls: 
               enabled: true
-              ca: (( vault meta.vault "/tls/rabbitmq/ca:certificate" ))
+              ca:  (( vault meta.vault "/tls/rabbitmq/ca:certificate" ))
               crt: (( vault meta.vault "/tls/rabbitmq/server:certificate" ))
               key: (( vault meta.vault "/tls/rabbitmq/server:key" ))

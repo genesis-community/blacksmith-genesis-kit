@@ -1,0 +1,82 @@
+---
+meta:
+  azs:
+    - (( concat genesis.env "-z1" ))
+    - (( concat genesis.env "-z2" ))
+    - (( concat genesis.env "-z3" ))
+
+params:
+  ip:           (( grab meta.blacksmith.fqdn ))
+  fqdn:         (( grab meta.blacksmith.fqdn ))
+  cloud_config: (( grab meta.blacksmith.cloud_config ))
+
+  disk_type:    (( grab meta.blacksmith.disk_type ))
+  vm_type:      (( grab meta.blacksmith.vm_type ))
+  network:      (( grab meta.blacksmith.network ))
+
+  releases: []
+  stemcells: []
+  azs: (( grab meta.azs ))
+
+exodus:
+  broker_url:      (( grab meta.blacksmith.broker.url ))
+  broker_username: (( grab meta.blacksmith.broker.username ))
+  broker_password: (( grab meta.blacksmith.broker.password ))
+
+  bosh_username: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.username ))
+  bosh_password: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.password ))
+  bosh_address: (( grab instance_groups.blacksmith.jobs.blacksmith.properties.bosh.address ))
+
+variables:
+  - name: blacksmith_services_ca
+    type: certificate
+    options:
+      is_ca: true
+      common_name: (( concat genesis.env "-blacksmith-ca.bosh" ))
+
+instance_groups:
+  - name: blacksmith
+    persistent_disk_type: (( concat "blacksmith-" meta.ocfp.env.scale ))
+    vm_type:              (( grab params.vm_type ))
+    stemcell:  default
+    instances: 1
+    azs:
+      - (( grab meta.blacksmith.az ))
+
+    networks:
+      - (( replace )) 
+      - name: (( grab params.network ))
+
+    jobs:
+      - release: blacksmith
+        name:    blacksmith
+        properties:
+          env:       (( grab genesis.env ))
+          debug:     (( grab meta.blacksmith.debug ))
+          shareable: (( grab meta.blacksmith.shareable ))
+
+          broker: # NOTE: port, tls.port, tls.key and tls.certificate are set by the broker-tls feature.
+            username: (( grab meta.blacksmith.broker.username ))
+            password: (( grab meta.blacksmith.broker.password ))
+
+          bosh: # NOTE: username, password, and address are set by the external-bosh feature.
+            stemcells:    (( grab params.stemcells ))
+            releases:     (( grab params.releases ))
+            cloud-config: (( grab params.cloud_config ))
+
+          blacksmith_services_ca:
+            tls:
+              ca_cert: (( vault meta.vault "/broker/ca:certificate" ))
+
+update:
+  serial: false
+  canaries: 1
+  canary_watch_time: 30000-600000
+  update_watch_time: 5000-600000
+  max_in_flight: 1
+  max_errors: 1
+
+stemcells:
+  - alias:   (( grab meta.stemcell.name    ))
+    os:      (( grab meta.stemcell.os      ))
+    version: (( grab meta.stemcell.version ))
