@@ -181,7 +181,7 @@ rmqlarge          rabbitmq   large-single-node                create succeeded  
 rmqsmall          rabbitmq   single-node                      create succeeded   dev-blacksmith   no
 ```
 
-## Binding the service
+## <a name="binding"></a>Binding the service
 
 As much as everyone would like to have (all the) services available to them at all times, its when using them that makes a difference. To use rabbitmq you need to bind it to an application. For the requirements of this document, lets go ahead and clone a forked version of [cf-rabbitmq-example-app](https://github.com/itsouvalas/cf-rabbitmq-example-app):
 
@@ -238,7 +238,7 @@ memory usage:   256M
 
 We are now ready to run our tests and verify that the service and its features are available to the application.
 
-# Rabbitmq Testing
+# <a name="testing"></a>Rabbitmq Testing
 
 We saw that everything went fine so far, but unless we take that in good faith we can't really confirm that the application and the service is working as expected. Given that `good faith` is rarely something we rely on, lets go ahead and see for ourselves:
 
@@ -359,7 +359,7 @@ VCAP_SERVICES={"rabbitmq":[{
 }]}
 ```
 
-## Service key creation
+## <a name="service-key"></a>Service key creation
 
 Blacksmith uses the same `bind` function to bind the credentials seen earlier to a service key to be used outside that specific application:
 
@@ -462,7 +462,7 @@ name         last operation     message
 rmqappuser   create succeeded   
 ```
 
-## Successful messaging
+## <a name="messaging"></a>Successful messaging
 
 We've confirmed the binding and the creation of the service key, but we have yet to see queues being created and messages beings posted and consumed. Let's go ahead and use the same application for a confirmation:
 
@@ -501,7 +501,7 @@ SUCCESS
 Hello
 ```
 
-## Permissions
+## <a name="permissions"></a>Permissions
 
 With everything working we know that we have enough privileges to reach out to the deployed service, but since seeing is believing lets go ahead and take a look:
 
@@ -576,6 +576,49 @@ vhost   configure       write   read
 ```
 
 This user is only available through blacksmiths UI, minimizing in that way the permissions available to the applications interacting with rabbitmq service. We will circle back on that on the monitoring section of this document.
+
+## TLS connectivity and Certificate verification
+
+The [forked](https://github.com/itsouvalas/cf-rabbitmq-example-app) version of the testing application has updated the way the `bunny` call is made against the rabbitmq service and updated the environment variables available to that call. In most testing scenarios, the **default** setting of non tls connectivity, or absense of the CA certificate verification would suffice given that those tests are run against a development environment usually lucking proper certificate placement. For TLS connectivity and CA verification read along:
+
+### TLS Connectivity
+
+* enable tls communication on the application through the corresponding environment variable
+
+`cf set-env rabbitmq RABBITMQ_USE_TLS true`
+
+```
+Setting env variable RABBITMQ_USE_TLS for app rabbitmq in org system / space dev as admin...
+OK
+
+TIP: Use 'cf restage rabbitmq' to ensure your env variable changes take effect.
+```
+
+* restage application for the new environment variables to be picked up
+
+`cf restage rabbitmq`
+
+* repeat the [messaging](#messaging) steps above
+
+### CA Certificate Verification
+
+* enable CA verification on the application through the corresponding environment variable
+
+`cf set-env rabbitmq RABBITMQ_CHECK_SSL true`
+
+```
+Setting env variable RABBITMQ_CHECK_SSL for app rabbitmq in org system / space dev as admin...
+OK
+
+TIP: Use 'cf restage rabbitmq' to ensure your env variable changes take effect.
+```
+
+* restage application for the new environment variables to be picked up
+
+`cf restage rabbitmq`
+
+* run the [messaging](#messaging) steps above one last time.
+
 
 # Autoscaling based on queue depth
 
@@ -903,6 +946,401 @@ Connection to 10.7.18.17 5671 port [tcp/amqps] succeeded!
 Connection to 10.7.18.17 5672 port [tcp/amqp] succeeded!
 ```
 
+# Dynamic Credentials
+
+Our past implementation of credentials handling relied on the creation of three types of users, admin, monitoring, and application, all of which were created during the creation of the service instance itself. The monitoring and application users were available to each application bound to the service instance or to each service key created against that service. Even though an application could be unbound from the Rabbitmq service or have the service key deleted, given the static nature of the credentials, those would still be able to communicate with RabbitMQ untill that service instance was deleted.
+
+The dynamic credentials feature extends the predefined static credentials with new, unique credentials created each time an applicaiton is bound to the RabbitMQ service or a service key is created against that same service. As a result, operators can rely on the static credentials for monitoring, application testing and administering the RabbitMQ service while relying on dynamic credentials for each of the application bindings or service keys created.
+
+## Creating dynamic credentials
+
+The process is now embeded to the [Binding the service](#binding) and [Service key creation](#service-key) process defined earlier.
+
+## Testing dynamic credentials
+
+For generalized tests of the service, if you haven't done so already, you can go through the [Rabbitmq Testing](#testing) process.
+
+## Confirming the dynamic nature of credentials
+
+### Environment Variables
+
+`cf env rabbitmq` # replace with the application name bound to rabbitm's service
+
+```yaml
+Getting env variables for app rabbitmq in org system / space dev as admin...
+System-Provided:
+VCAP_SERVICES: {
+  "rabbitmq": [
+    {
+      "binding_guid": "2e5552dd-94da-4768-aeca-ffb664ebce86",
+      "binding_name": null,
+      "credentials": {
+        "api_url": "https://rabbitmq-single-node-070318e0-bed8-4263-993e-1c3f5e8f1ec4.system.codex2.starkandwayne.com/api",
+        "credential_type": "dynamic",
+        "dashboard_url": "https://rabbitmq-single-node-070318e0-bed8-4263-993e-1c3f5e8f1ec4.system.codex2.starkandwayne.com/#/login/3EfZvJt0QOxtDZCQfcwsVvQqxv58w3S3T7tRIh408e96gCHHBrn7bviYjxzzHUO3/67vg3KdmZ7x79VjVod6yRtXpeQnn19ztGlP6uCNplXLSxGRzpy3mTo4pO9dFnC9g",
+        "host": "10.7.16.22",
+        "hostname": "10.7.16.22",
+        "hostnames": [
+          "10.7.16.22"
+        ],
+        "mgmt_port": 15672,
+        "monitoring_password": "lDZNOqrHI4JSxPM70ARfiIpg0rDsgyHF4To05atzZhpUmmfCzWq5RSJDIIlLkHrO",
+        "monitoring_username": "lDWzf3ickkteAKMoKE6yzYcv9AvNeUfSGW2GPTfuPV99EvDXjhxAUPeGkSQlZGEz",
+        "password": "ca05e71d-f9d6-4743-9f56-9edb3dbdbff7",
+        "protocols": {
+          "amqp": {
+            "host": "10.7.16.22",
+            "password": "ca05e71d-f9d6-4743-9f56-9edb3dbdbff7",
+            "port": 5672,
+            "ssl": false,
+            "uri": "amqp://2e5552dd-94da-4768-aeca-ffb664ebce86:ca05e71d-f9d6-4743-9f56-9edb3dbdbff7@10.7.16.22:5672",
+            "uris": [
+              "amqp://2e5552dd-94da-4768-aeca-ffb664ebce86:ca05e71d-f9d6-4743-9f56-9edb3dbdbff7@10.7.16.22:5672"
+            ],
+            "username": "2e5552dd-94da-4768-aeca-ffb664ebce86",
+            "vhost": "070318e0-bed8-4263-993e-1c3f5e8f1ec4"
+          },
+          "amqps": {
+            "host": "10.7.16.22",
+            "password": "ca05e71d-f9d6-4743-9f56-9edb3dbdbff7",
+            "port": 5671,
+            "ssl": true,
+            "uri": "amqps://2e5552dd-94da-4768-aeca-ffb664ebce86:ca05e71d-f9d6-4743-9f56-9edb3dbdbff7@10.7.16.22:5671",
+            "uris": [
+              "amqps://2e5552dd-94da-4768-aeca-ffb664ebce86:ca05e71d-f9d6-4743-9f56-9edb3dbdbff7@10.7.16.22:5671"
+            ],
+            "username": "2e5552dd-94da-4768-aeca-ffb664ebce86",
+            "vhost": "070318e0-bed8-4263-993e-1c3f5e8f1ec4"
+          },
+          "management": {
+            "host": "10.7.16.22",
+            "password": "ca05e71d-f9d6-4743-9f56-9edb3dbdbff7",
+            "path": "/api",
+            "port": 15672,
+            "ssl": false,
+            "uri": "http://2e5552dd-94da-4768-aeca-ffb664ebce86:ca05e71d-f9d6-4743-9f56-9edb3dbdbff7@10.7.16.22:15672/api",
+            "uris": [
+              "http://2e5552dd-94da-4768-aeca-ffb664ebce86:ca05e71d-f9d6-4743-9f56-9edb3dbdbff7@10.7.16.22:15672/api"
+            ],
+            "username": "2e5552dd-94da-4768-aeca-ffb664ebce86"
+          },
+          "management_tls": {
+            "host": "10.7.16.22",
+            "password": "ca05e71d-f9d6-4743-9f56-9edb3dbdbff7",
+            "path": "/api",
+            "port": 15671,
+            "ssl": true,
+            "uri": "https://2e5552dd-94da-4768-aeca-ffb664ebce86:ca05e71d-f9d6-4743-9f56-9edb3dbdbff7@10.7.16.22:15671/api",
+            "uris": [
+              "https://2e5552dd-94da-4768-aeca-ffb664ebce86:ca05e71d-f9d6-4743-9f56-9edb3dbdbff7@10.7.16.22:15671/api"
+            ],
+            "username": "2e5552dd-94da-4768-aeca-ffb664ebce86"
+          }
+        },
+        "rmq_port": 5672,
+        "tls_mgmt_port": 15671,
+        "tls_port": 5671,
+        "uri": "amqps://2e5552dd-94da-4768-aeca-ffb664ebce86:ca05e71d-f9d6-4743-9f56-9edb3dbdbff7@10.7.16.22:5671",
+        "uris": [
+          "amqps://2e5552dd-94da-4768-aeca-ffb664ebce86:ca05e71d-f9d6-4743-9f56-9edb3dbdbff7@10.7.16.22:5671"
+        ],
+        "username": "2e5552dd-94da-4768-aeca-ffb664ebce86",
+        "vhost": "070318e0-bed8-4263-993e-1c3f5e8f1ec4"
+      },
+      "instance_guid": "070318e0-bed8-4263-993e-1c3f5e8f1ec4",
+      "instance_name": "rmqsmall",
+      "label": "rabbitmq",
+      "name": "rmqsmall",
+      "plan": "single-node",
+      "provider": null,
+      "syslog_drain_url": null,
+      "tags": [
+        "blacksmith",
+        "dedicated",
+        "rabbitmq"
+      ],
+      "volume_mounts": []
+    }
+  ]
+}
+
+
+VCAP_APPLICATION: {
+  "application_id": "00719e0c-dc66-40af-bf8f-90755bf374b0",
+  "application_name": "rabbitmq",
+  "application_uris": [
+    "rabbitmq.run.codex2.starkandwayne.com"
+  ],
+  "cf_api": "https://api.system.codex2.starkandwayne.com",
+  "limits": {
+    "fds": 16384
+  },
+  "name": "rabbitmq",
+  "organization_id": "0b383e89-cae5-4f98-bbd8-7a8a6e1296a0",
+  "organization_name": "system",
+  "space_id": "bacd79a6-9a65-4ffc-8349-b314883efd84",
+  "space_name": "dev",
+  "uris": [
+    "rabbitmq.run.codex2.starkandwayne.com"
+  ],
+  "users": null
+}
+
+
+
+User-Provided:
+RABBITMQ_USE_TLS: true
+
+No running env variables have been set
+
+No staging env variables have been set
+```
+
+Note the `"credential_type": "dynamic"` as well as the uuid based format for both `username` and `password` used for interacting with rabbitmq's service instance
+
+### Service key
+
+`cf service-key rmqsmall rmqappuser` # replace with the service and service key name used
+
+```yaml
+Getting key rmqappuser for service instance rmqsmall as admin...
+
+{
+  "credentials": {
+    "api_url": "https://rabbitmq-single-node-070318e0-bed8-4263-993e-1c3f5e8f1ec4.system.codex2.starkandwayne.com/api",
+    "credential_type": "dynamic",
+    "dashboard_url": "https://rabbitmq-single-node-070318e0-bed8-4263-993e-1c3f5e8f1ec4.system.codex2.starkandwayne.com/#/login/3EfZvJt0QOxtDZCQfcwsVvQqxv58w3S3T7tRIh408e96gCHHBrn7bviYjxzzHUO3/67vg3KdmZ7x79VjVod6yRtXpeQnn19ztGlP6uCNplXLSxGRzpy3mTo4pO9dFnC9g",
+    "host": "10.7.16.22",
+    "hostname": "10.7.16.22",
+    "hostnames": [
+      "10.7.16.22"
+    ],
+    "mgmt_port": 15672,
+    "monitoring_password": "lDZNOqrHI4JSxPM70ARfiIpg0rDsgyHF4To05atzZhpUmmfCzWq5RSJDIIlLkHrO",
+    "monitoring_username": "lDWzf3ickkteAKMoKE6yzYcv9AvNeUfSGW2GPTfuPV99EvDXjhxAUPeGkSQlZGEz",
+    "password": "4335fed9-299f-4c3a-b8dd-ee00dbab9f7a",
+    "protocols": {
+      "amqp": {
+        "host": "10.7.16.22",
+        "password": "4335fed9-299f-4c3a-b8dd-ee00dbab9f7a",
+        "port": 5672,
+        "ssl": false,
+        "uri": "amqp://43eb6b37-dfa7-446d-9317-b4c2030cf777:4335fed9-299f-4c3a-b8dd-ee00dbab9f7a@10.7.16.22:5672",
+        "uris": [
+          "amqp://43eb6b37-dfa7-446d-9317-b4c2030cf777:4335fed9-299f-4c3a-b8dd-ee00dbab9f7a@10.7.16.22:5672"
+        ],
+        "username": "43eb6b37-dfa7-446d-9317-b4c2030cf777",
+        "vhost": "070318e0-bed8-4263-993e-1c3f5e8f1ec4"
+      },
+      "amqps": {
+        "host": "10.7.16.22",
+        "password": "4335fed9-299f-4c3a-b8dd-ee00dbab9f7a",
+        "port": 5671,
+        "ssl": true,
+        "uri": "amqps://43eb6b37-dfa7-446d-9317-b4c2030cf777:4335fed9-299f-4c3a-b8dd-ee00dbab9f7a@10.7.16.22:5671",
+        "uris": [
+          "amqps://43eb6b37-dfa7-446d-9317-b4c2030cf777:4335fed9-299f-4c3a-b8dd-ee00dbab9f7a@10.7.16.22:5671"
+        ],
+        "username": "43eb6b37-dfa7-446d-9317-b4c2030cf777",
+        "vhost": "070318e0-bed8-4263-993e-1c3f5e8f1ec4"
+      },
+      "management": {
+        "host": "10.7.16.22",
+        "password": "4335fed9-299f-4c3a-b8dd-ee00dbab9f7a",
+        "path": "/api",
+        "port": 15672,
+        "ssl": false,
+        "uri": "http://43eb6b37-dfa7-446d-9317-b4c2030cf777:4335fed9-299f-4c3a-b8dd-ee00dbab9f7a@10.7.16.22:15672/api",
+        "uris": [
+          "http://43eb6b37-dfa7-446d-9317-b4c2030cf777:4335fed9-299f-4c3a-b8dd-ee00dbab9f7a@10.7.16.22:15672/api"
+        ],
+        "username": "43eb6b37-dfa7-446d-9317-b4c2030cf777"
+      },
+      "management_tls": {
+        "host": "10.7.16.22",
+        "password": "4335fed9-299f-4c3a-b8dd-ee00dbab9f7a",
+        "path": "/api",
+        "port": 15671,
+        "ssl": true,
+        "uri": "https://43eb6b37-dfa7-446d-9317-b4c2030cf777:4335fed9-299f-4c3a-b8dd-ee00dbab9f7a@10.7.16.22:15671/api",
+        "uris": [
+          "https://43eb6b37-dfa7-446d-9317-b4c2030cf777:4335fed9-299f-4c3a-b8dd-ee00dbab9f7a@10.7.16.22:15671/api"
+        ],
+        "username": "43eb6b37-dfa7-446d-9317-b4c2030cf777"
+      }
+    },
+    "rmq_port": 5672,
+    "tls_mgmt_port": 15671,
+    "tls_port": 5671,
+    "uri": "amqps://43eb6b37-dfa7-446d-9317-b4c2030cf777:4335fed9-299f-4c3a-b8dd-ee00dbab9f7a@10.7.16.22:5671",
+    "uris": [
+      "amqps://43eb6b37-dfa7-446d-9317-b4c2030cf777:4335fed9-299f-4c3a-b8dd-ee00dbab9f7a@10.7.16.22:5671"
+    ],
+    "username": "43eb6b37-dfa7-446d-9317-b4c2030cf777",
+    "vhost": "070318e0-bed8-4263-993e-1c3f5e8f1ec4"
+  }
+}
+```
+
+Again, note the `"credential_type": "dynamic"` as well as the uuid based format for both `username` and `password` used for interacting with rabbitmq's service instance.
+
+### Rabbitmq instance
+
+Each of those , `bind` and `service-key` commands has created the corresponding key to rabbitmq's instance. ssh to the rabbitmq instance ( discussed on [permissions](#permissions) earlier ) and list the users:
+
+`rabbitmqctl list_users`
+
+```
+Listing users ...
+user    tags
+UAmJaQMHpT3NEgF0hHRu3ztIhSq9BhrG1ffcNg86aruy54qBy5hNm799aKqalWqm        [management policymaker]
+43eb6b37-dfa7-446d-9317-b4c2030cf777    [management, policymaker]
+2e5552dd-94da-4768-aeca-ffb664ebce86    [management, policymaker]
+lDWzf3ickkteAKMoKE6yzYcv9AvNeUfSGW2GPTfuPV99EvDXjhxAUPeGkSQlZGEz        [monitoring]
+3EfZvJt0QOxtDZCQfcwsVvQqxv58w3S3T7tRIh408e96gCHHBrn7bviYjxzzHUO3        [administrator]
+```
+
+Note the uuid based format for each of the users created earlier, `2e5552dd-94da-4768-aeca-ffb664ebce86` for the binding and `43eb6b37-dfa7-446d-9317-b4c2030cf777` for the service key
+
+### Deleting the dynamic credentials
+
+* unbind the application
+
+`cf unbind-service rabbitmq rmqsmall`
+
+```
+Unbinding app rabbitmq from service rmqsmall in org system / space dev as admin...
+OK
+```
+
+* delete the service key
+
+`cf delete-service-key rmqsmall rmqappuser`
+
+```
+cf delete-service-key rmqsmall rmqappuser
+Really delete the service key rmqappuser? [yN]: y
+Deleting key rmqappuser for service instance rmqsmall as admin...
+OK
+```
+
+### Confirming cleanup
+
+Repeat the `list_users` command issued earlier on the rabbitmq instance
+
+`rabbitmqctl list_users`
+
+```
+Listing users ...
+user    tags
+UAmJaQMHpT3NEgF0hHRu3ztIhSq9BhrG1ffcNg86aruy54qBy5hNm799aKqalWqm        [management policymaker]
+lDWzf3ickkteAKMoKE6yzYcv9AvNeUfSGW2GPTfuPV99EvDXjhxAUPeGkSQlZGEz        [monitoring]
+3EfZvJt0QOxtDZCQfcwsVvQqxv58w3S3T7tRIh408e96gCHHBrn7bviYjxzzHUO3        [administrator]
+```
+
+and confirm that the uuid based users are no longer present.
+
+### Confirm uniqueness of dynamic credentials created
+
+Both `cf bind` and `cf create-service-key` processes use the same "bind" function. This means to say that, the steps above have already demonstrated the fact that each binding, may that be done through binding the application to the service or creating a service key for the same service, will create a unique set of credentials each time. To reiterate on that, lets repeat the [Binding the service](#binding) steps above against two applications, and create two service bindings against the same service:
+
+`cf bind-service rabbitmq rmqsmall`
+
+```
+Binding service instance rmqsmall to app rabbitmq in org system / space dev as admin...
+OK
+
+TIP: Use 'cf restage rabbitmq' to ensure your env variable changes take effect
+```
+
+`cf bind-service rabbitmq2 rmqsmall`
+
+```
+Binding service instance rmqsmall to app rabbitmq2 in org system / space dev as admin...
+OK
+
+TIP: Use 'cf restage rabbitmq2' to ensure your env variable changes take effect
+```
+
+`cf create-service-key rmqsmall rmqappuser`
+
+```
+Creating service key rmqappuser for service instance rmqsmall as admin...
+OK
+```
+
+`cf create-service-key rmqsmall rmqappuser2`
+
+```
+Creating service key rmqappuser2 for service instance rmqsmall as admin...
+OK
+```
+
+We have now created 4 bindings, two bindings against `rabbitmq` and `rabbitmq2` applications and two service key creations named `rmqappuser` and `rmqappuser2` respectively. Lets see what `cf` has to say about that:
+
+`cf services`
+
+```
+Getting service instances in org system / space dev as admin...
+
+name         offering     plan                   bound apps            last operation     broker           upgrade available
+autoscaler   autoscaler   autoscaler-free-plan                         create succeeded   autoscaler       no
+rmqsmall     rabbitmq     single-node            rabbitmq, rabbitmq2   create succeeded   dev-blacksmith   no
+```
+
+`cf service-keys rmqsmall`
+
+```
+Getting keys for service instance rmqsmall as admin...
+
+name          last operation     message
+rmqappuser    create succeeded   
+rmqappuser2   create succeeded   
+```
+
+Now, lets have a look at the users listed under the rabbitmq instance:
+
+`rabbitmqctl list_users`
+
+```
+Listing users ...
+user    tags
+JtImqAsBOsfqjJB7lfd5avlafOrdnjARW8HHIY2TtGpGlv6M7okxXFy8HG7agaqg        [management policymaker]
+7078785d-723e-4441-88b4-41e03817cadc    [management, policymaker]
+93c654fb-5041-4e59-a0c2-cec620add265    [management, policymaker]
+b916a74f-44cc-480f-b4a2-64f098c72631    [management, policymaker]
+07bbbed0-b846-47e6-8798-599c5abebe38    [management, policymaker]
+kFEO4XjDeF5i6QWXD0wlGiHB6MjazRKXf1FfQVn2w0u5M5TlMSKsZjphmbt8znqe        [monitoring]
+KFACZ4BbYbrUt4xfbch5YtDjovNIzbLprNHHH9erIOeuVKnD9sxzOJG6XU9rJj66        [administrator]
+```
+
+Finally lets compare that output from the environmnent variables for the bound applications and the service keys to see the users in place:
+
+`cf env rabbitmq | grep username | tail -1`
+
+```
+"username": "7078785d-723e-4441-88b4-41e03817cadc",
+```
+
+`cf env rabbitmq2 | grep username | tail -1`
+
+```
+"username": "b916a74f-44cc-480f-b4a2-64f098c72631",
+```
+
+`cf service-key rmqsmall rmqappuser | grep username | tail -1`
+
+```
+"username": "07bbbed0-b846-47e6-8798-599c5abebe38",
+```
+
+`cf service-key rmqsmall rmqappuser2 | grep username | tail -1`
+
+```
+"username": "93c654fb-5041-4e59-a0c2-cec620add265",
+```
+
+
 ## Conclusion
 
 If everything went as planned and assuming that you followed along, by the time your reach these lines you have managed to 
@@ -911,6 +1349,7 @@ If everything went as planned and assuming that you followed along, by the time 
 * test connectivity, queue creation as well as message creation and consumption
 * create and bind an autoscaling policy to the test application
 * test autoscaling based on rabbitm's quees depth.
+* test the presence and uniqueness of the dynamic credentials created
 * had fun during the process!
 
 Finally, you also saw a bit under the hood which will give you a head start in the (hopefully unlikely) event of having to troubleshoot your deployment. Happy messaging!
