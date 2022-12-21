@@ -56,7 +56,7 @@ instance_groups:
 
           blacksmith_services_ca:
             tls:
-              ca_cert: (( vault meta.vault "/tls/ca:certificate" ))
+              ca_cert: (( vault meta.vault "/broker/ca:certificate" ))
 
 update:
   serial: false
