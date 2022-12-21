@@ -22,16 +22,16 @@ certificates:
         names:
           - ${params.ip}
     tls/redis:
-      ca: {valid_for: 10y}
       server:
         valid_for: 1y
+        signed_by: tls/ca
         names:
           - ${params.ip}
 
     tls/rabbitmq:
-      ca: {valid_for: 10y}
       server:
           valid_for: 5y
+          signed_by: tls/ca
           names:
             - server.rabbitmq.bosh-internal
 
@@ -53,12 +53,9 @@ certificates:
 
   broker-tls:
     broker:
-      ca:
-        valid_for: 10y
-        names:
-          - blacksmith.services.ca.bosh-internal
       server:
           valid_for: 1y
+          signed_by: tls/ca
           names:
             - blacksmith.services.bosh-internal
             - ${params.ip}
