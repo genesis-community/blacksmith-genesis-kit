@@ -12,6 +12,7 @@ genesis_version_min: 2.8.5
 certificates:
   base:
     tls:
+      ca: {valid_for: 10y}
       director:
         valid_for: 1y
         names:
