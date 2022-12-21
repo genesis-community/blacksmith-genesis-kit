@@ -7,7 +7,7 @@ meta:
   blacksmith_port: (( grab params.blacksmith_port || 80 ))
 
 exodus:
-  blacksmith_ca: (( vault meta.vault "/tls/ca:certificate" ))
+  blacksmith_ca: (( vault meta.vault "/broker/ca:certificate" ))
 
 instance_groups:
   - name: blacksmith
