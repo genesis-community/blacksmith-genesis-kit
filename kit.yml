@@ -12,7 +12,6 @@ genesis_version_min: 2.8.5
 certificates:
   base:
     tls:
-      ca: {valid_for: 10y}
       director:
         valid_for: 1y
         names:
@@ -24,14 +23,14 @@ certificates:
     tls/redis:
       server:
         valid_for: 1y
-        signed_by: tls/ca
+        signed_by: broker/ca
         names:
           - ${params.ip}
 
     tls/rabbitmq:
       server:
           valid_for: 5y
-          signed_by: tls/ca
+          signed_by: broker/ca
           names:
             - server.rabbitmq.bosh-internal
 
@@ -53,9 +52,14 @@ certificates:
 
   broker-tls:
     broker:
+      ca:
+        valid_for: 10y
+        names:
+          - blacksmith.services.ca.bosh-internal
+
       server:
           valid_for: 1y
-          signed_by: tls/ca
+          signed_by: broker/ca
           names:
             - blacksmith.services.bosh-internal
             - ${params.ip}
