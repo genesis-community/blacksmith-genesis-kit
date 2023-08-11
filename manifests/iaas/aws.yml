@@ -11,16 +11,16 @@ params:
   aws_default_sgs: (( param "What security groups should VMs be placed in, if none are specified via Cloud Config?" ))
 
   stemcells:
-    - name:    bosh-aws-xen-hvm-ubuntu-bionic-go_agent
-      version: '1.36'
-      url:     https://storage.googleapis.com/bosh-aws-light-stemcells/1.36/light-bosh-stemcell-1.36-aws-xen-hvm-ubuntu-bionic-go_agent.tgz
-      sha1:    4278c71c23a2f0345e445825baa9f631f15ad520
+    - name:    bosh-aws-xen-hvm-ubuntu-jammy-go_agent
+      version: '1.181'
+      url:     https://storage.googleapis.com/bosh-aws-light-stemcells/1.181/light-bosh-stemcell-1.181-aws-xen-hvm-ubuntu-jammy-go_agent.tgz
+      sha1:    2e113e50c47df57bfe9fe31a0d2bee3fab20af37
 
 releases:
   - name:    bosh-aws-cpi
-    version: 87
-    url:     https://bosh.io/d/github.com/cloudfoundry/bosh-aws-cpi-release?v=87
-    sha1:    a920cd1bdead3d6167273e763912becca2225ba6
+    version: 99
+    url:     https://bosh.io/d/github.com/cloudfoundry/bosh-aws-cpi-release?v=99
+    sha1:    ffc4a06d6728d88eb108418f886f46428c2a1bf2
 
 instance_groups:
 - name: blacksmith

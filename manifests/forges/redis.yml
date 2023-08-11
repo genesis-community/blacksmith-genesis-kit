@@ -5,9 +5,9 @@ meta:
 
   default:
     redis_tags:
-      - blacksmith
-      - dedicated
-      - redis
+    - blacksmith
+    - dedicated
+    - redis
 
     redis_plans:
       standalone:
@@ -25,29 +25,28 @@ meta:
 
 releases:
 - name:    redis-forge
-  version: 0.8.16
-  url:     https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v0.8.16/redis-forge-0.8.16.tgz
-  sha1:    feede84c0f37b7eda4421debd2304cb48da83ff7
+  version: 1.0.0
+  url:     https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v1.0.0/redis-forge-1.0.0.tgz
+  sha1:    7d9352c038cfaf279987410c87607c5413083aa0
 
 params:
   releases:
-    - (( append ))
-    - (( grab releases.redis-forge ))
+  - (( append ))
+  - (( grab releases.redis-forge ))
 
 instance_groups:
-  - name: blacksmith
-    jobs:
-      - release: redis-forge
-        name:    redis-blacksmith-plans
-        properties:
-          environment: (( grab meta.environment ))
-          bosh_env: (( grab meta.bosh_env ))
+- name: blacksmith
+  jobs:
+  - release: redis-forge
+    name:    redis-blacksmith-plans
+    properties:
+      environment: (( grab meta.environment ))
+      bosh_env: (( grab meta.bosh_env ))
 
-          plans: (( grab params.redis_plans || meta.default.redis_plans ))
-          service:
-            id:          (( grab params.redis_service_id          || "redis" ))
-            name:        (( grab params.redis_service_name        || params.redis_service_id || "redis" ))
-            description: (( grab params.redis_service_description || "A dedicated Redis instance, deployed on-demand" ))
-            tags:        (( grab params.redis_service_tags        || meta.default.redis_tags ))
-            limit:       (( grab params.redis_service_limit       || 0 ))
-
+      plans: (( grab params.redis_plans || meta.default.redis_plans ))
+      service:
+        id:          (( grab params.redis_service_id          || "redis" ))
+        name:        (( grab params.redis_service_name        || params.redis_service_id || "redis" ))
+        description: (( grab params.redis_service_description || "A dedicated Redis instance, deployed on-demand" ))
+        tags:        (( grab params.redis_service_tags        || meta.default.redis_tags ))
+        limit:       (( grab params.redis_service_limit       || 0 ))

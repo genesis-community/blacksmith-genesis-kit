@@ -5,7 +5,7 @@ meta:
   bosh:
     exodus_path: (( grab params.bosh_exodus_path || genesis.bosh || params.bosh || genesis.env || params.env ))
     env_name: (( grab genesis.bosh_env || genesis.bosh || params.bosh || genesis.env || params.env ))
-    
+
 params:
   cf: &cf
     deployment_env:  (( grab genesis.env )) # assume the same env name as cf env
@@ -15,17 +15,16 @@ params:
     system_domain:   (( vault meta.cf.exodus ":system_domain" ))
 
 instance_groups:
-  - name: blacksmith
-    jobs:
-    - name: rabbitmq-blacksmith-plans
-      properties:
-        cf:
-          <<: *cf
-        bosh:
-          deployment_name: ((grab meta.bosh.env_name))
-        rabbitmq:
-          route_registrar:
-            enabled: true
-            tls:
-              enabled: (( grab params.route_registrar_tls_enabled || false ))
-
+- name: blacksmith
+  jobs:
+  - name: rabbitmq-blacksmith-plans
+    properties:
+      cf:
+        <<: *cf
+      bosh:
+        deployment_name: ((grab meta.bosh.env_name))
+      rabbitmq:
+        route_registrar:
+          enabled: true
+          tls:
+            enabled: (( grab params.route_registrar_tls_enabled || false ))

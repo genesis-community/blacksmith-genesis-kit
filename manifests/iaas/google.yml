@@ -1,7 +1,7 @@
 ---
 params:
   google_project: (( param "Enter the project name that your BOSH will be deployed into" ))
-  
+
   ntp: # use GCP ntp
     - (( replace ))
     - time.google.com
@@ -10,16 +10,16 @@ params:
     - time4.google.com
 
   stemcells:
-    - name:    bosh-google-kvm-ubuntu-bionic-go_agent
-      version: '1.36'
-      url:     https://storage.googleapis.com/bosh-gce-light-stemcells/1.36/light-bosh-stemcell-1.36-google-kvm-ubuntu-bionic-go_agent.tgz
-      sha1:    962c958e17012bd8bd003568f7978c465d83d12b
+    - name:    bosh-google-kvm-ubuntu-jammy-go_agent
+      version: '1.181'
+      url:     https://storage.googleapis.com/bosh-gce-light-stemcells/1.181/light-bosh-stemcell-1.181-google-kvm-ubuntu-jammy-go_agent.tgz
+      sha1:    aeeb0c3b54a0e1494835c71acd94d0f6cf8f6130
 
 releases:
   - name:    bosh-google-cpi
-    version: 40.0.4
-    url:     https://bosh.io/d/github.com/cloudfoundry/bosh-google-cpi-release?v=40.0.4
-    sha1:    723cbba1e027bf9b628fe413ba16d90415057edc
+    version: "49.0.1"
+    url:     https://bosh.io/d/github.com/cloudfoundry/bosh-google-cpi-release?v=49.0.1
+    sha1:    0be6fd82fb5d6121105733a3e9ae33e62e4b0a8b
 
 instance_groups:
 - name: blacksmith

@@ -1,9 +1,9 @@
 instance_groups:
-  - name: blacksmith
-    jobs:
-      - release: redis-forge
-        name:    redis-blacksmith-plans
-        properties:
-          redis:
-            tls: 
-              dual-mode: true
+- name: blacksmith
+  jobs:
+  - release: redis-forge
+    name:    redis-blacksmith-plans
+    properties:
+      redis:
+        tls:
+          dual-mode: true

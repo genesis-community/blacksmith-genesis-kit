@@ -1,10 +1,10 @@
 ---
 instance_groups:
-  - name: blacksmith
-    jobs:
-      - release: rabbitmq-forge
-        name: rabbitmq-blacksmith-plans
-        properties:
-          rabbitmq:
-            tls: 
-              dual-mode: true
+- name: blacksmith
+  jobs:
+  - release: rabbitmq-forge
+    name: rabbitmq-blacksmith-plans
+    properties:
+      rabbitmq:
+        tls:
+          dual-mode: true

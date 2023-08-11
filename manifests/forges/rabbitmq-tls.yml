@@ -1,13 +1,13 @@
 ---
 instance_groups:
-  - name: blacksmith
-    jobs:
-      - release: rabbitmq-forge
-        name: rabbitmq-blacksmith-plans
-        properties:
-          rabbitmq:
-            tls: 
-              enabled: true
-              ca:  (( vault meta.vault "/tls/ca:certificate" ))
-              crt: (( vault meta.vault "/tls/rabbitmq/server:certificate" ))
-              key: (( vault meta.vault "/tls/rabbitmq/server:key" ))
+- name: blacksmith
+  jobs:
+  - release: rabbitmq-forge
+    name: rabbitmq-blacksmith-plans
+    properties:
+      rabbitmq:
+        tls:
+          enabled: true
+          ca:  (( vault meta.vault "/tls/ca:certificate" ))
+          crt: (( vault meta.vault "/tls/rabbitmq/server:certificate" ))
+          key: (( vault meta.vault "/tls/rabbitmq/server:key" ))

@@ -5,9 +5,9 @@ meta:
 
   default:
     rabbitmq_tags:
-      - blacksmith
-      - dedicated
-      - rabbitmq
+    - blacksmith
+    - dedicated
+    - rabbitmq
 
     rabbitmq_plans:
       standalone:
@@ -19,28 +19,27 @@ meta:
 
 releases:
 - name:    rabbitmq-forge
-  version: 1.0.2
-  url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v1.0.2/rabbitmq-forge-1.0.2.tgz
-  sha1:    5338da47c6b431bc079dc60ca6e83e85b0c557fe
+  version: 1.1.4
+  url:     https://github.com//rabbitmq-forge-boshrelease/releases/download/v1.1.4/rabbitmq-forge-1.1.4.tgz
+  sha1:    4bbd46e69bda463a02ebbfad32f3998aaedfdacf
 
 params:
   releases:
-    - (( append ))
-    - (( grab releases.rabbitmq-forge ))
+  - (( append ))
+  - (( grab releases.rabbitmq-forge ))
 
 instance_groups:
-  - name: blacksmith
-    jobs:
-      - release: rabbitmq-forge
-        name:    rabbitmq-blacksmith-plans
-        properties:
-          environment: (( grab meta.environment ))
-          bosh_env: (( grab meta.bosh_env ))
-          plans: (( grab params.rabbitmq_plans || meta.default.rabbitmq_plans ))
-          service:
-            id:          (( grab params.rabbitmq_service_id          || "rabbitmq" ))
-            name:        (( grab params.rabbitmq_service_name        || params.rabbitmq_service_id || "rabbitmq" ))
-            description: (( grab params.rabbitmq_service_description || "A dedicated RabbitMQ instance, deployed on-demand" ))
-            tags:        (( grab params.rabbitmq_service_tags        || meta.default.rabbitmq_tags ))
-            limit:       (( grab params.rabbitmq_service_limit       || 0 ))
-
+- name: blacksmith
+  jobs:
+  - release: rabbitmq-forge
+    name:    rabbitmq-blacksmith-plans
+    properties:
+      environment: (( grab meta.environment ))
+      bosh_env: (( grab meta.bosh_env ))
+      plans: (( grab params.rabbitmq_plans || meta.default.rabbitmq_plans ))
+      service:
+        id:          (( grab params.rabbitmq_service_id          || "rabbitmq" ))
+        name:        (( grab params.rabbitmq_service_name        || params.rabbitmq_service_id || "rabbitmq" ))
+        description: (( grab params.rabbitmq_service_description || "A dedicated RabbitMQ instance, deployed on-demand" ))
+        tags:        (( grab params.rabbitmq_service_tags        || meta.default.rabbitmq_tags ))
+        limit:       (( grab params.rabbitmq_service_limit       || 0 ))

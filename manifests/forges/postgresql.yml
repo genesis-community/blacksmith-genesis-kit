@@ -2,9 +2,9 @@
 meta:
   default:
     postgresql_tags:
-      - blacksmith
-      - dedicated
-      - postgresql
+    - blacksmith
+    - dedicated
+    - postgresql
 
     postgresql_plans:
       standalone:
@@ -21,33 +21,33 @@ meta:
         vm_type: default
 
 releases:
-  - name:    postgresql-forge
-    version: 0.4.0
-    url:     https://github.com/blacksmith-community/postgresql-forge-boshrelease/releases/download/v0.4.0/postgresql-forge-0.4.0.tgz
-    sha1:    81d5b2d0b864a02cf4f519d6029ad74503391bf5
+- name:    postgresql-forge
+  version: 0.4.0
+  url:     https://github.com/blacksmith-community/postgresql-forge-boshrelease/releases/download/v0.4.0/postgresql-forge-0.4.0.tgz
+  sha1:    81d5b2d0b864a02cf4f519d6029ad74503391bf5
 
 params:
   releases:
-    - (( append ))
-    - name:    postgres
-      version: 2.0.0
-      url:     https://github.com/cloudfoundry-community/postgres-boshrelease/releases/download/v2.0.0/postgres-2.0.0.tgz
-      sha1:    dea5cad517c62afaf97a1b31df41ad691928d960
-    - name:    postgres
-      version: 3.2.2
-      url:     https://github.com/cloudfoundry-community/postgres-boshrelease/releases/download/v3.2.2/postgres-3.2.2.tgz
-      sha1:    7699715ed0b7ec129f60958e2864958030333cea
+  - (( append ))
+  - name:    postgres
+    version: 2.0.0
+    url:     https://github.com/cloudfoundry-community/postgres-boshrelease/releases/download/v2.0.0/postgres-2.0.0.tgz
+    sha1:    dea5cad517c62afaf97a1b31df41ad691928d960
+  - name:    postgres
+    version: 3.2.2
+    url:     https://github.com/cloudfoundry-community/postgres-boshrelease/releases/download/v3.2.2/postgres-3.2.2.tgz
+    sha1:    7699715ed0b7ec129f60958e2864958030333cea
 
 instance_groups:
-  - name: blacksmith
-    jobs:
-      - release: postgresql-forge
-        name:    postgresql-blacksmith-plans
-        properties:
-          plans: (( grab params.postgresql_plans || meta.default.postgresql_plans ))
-          service:
-            id:          (( grab params.postgresql_service_id          || "postgresql" ))
-            name:        (( grab params.postgresql_service_name        || params.postgresql_service_id || "postgresql" ))
-            description: (( grab params.postgresql_service_description || "A dedicated PostgreSQL instance, deployed on-demand" ))
-            tags:        (( grab params.postgresql_service_tags        || meta.default.postgresql_tags ))
-            limit:       (( grab params.postgresql_service_limit       || 0 ))
+- name: blacksmith
+  jobs:
+  - release: postgresql-forge
+    name:    postgresql-blacksmith-plans
+    properties:
+      plans: (( grab params.postgresql_plans || meta.default.postgresql_plans ))
+      service:
+        id:          (( grab params.postgresql_service_id          || "postgresql" ))
+        name:        (( grab params.postgresql_service_name        || params.postgresql_service_id || "postgresql" ))
+        description: (( grab params.postgresql_service_description || "A dedicated PostgreSQL instance, deployed on-demand" ))
+        tags:        (( grab params.postgresql_service_tags        || meta.default.postgresql_tags ))
+        limit:       (( grab params.postgresql_service_limit       || 0 ))

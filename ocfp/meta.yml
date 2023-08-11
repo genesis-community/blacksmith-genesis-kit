@@ -14,10 +14,10 @@ meta:
 
   stemcell:
     name:    (( grab params.stemcell_name    || "default" ))
-    os:      (( grab params.stemcell_os      || "ubuntu-bionic" ))
+    os:      (( grab params.stemcell_os      || "ubuntu-jammy" ))
     version: (( grab params.stemcell_version || "latest" ))
 
-  cf: 
+  cf:
     exodus_path: (( concat genesis.exodus_mount genesis.env "/cf" ))
 
   bosh:

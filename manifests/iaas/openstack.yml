@@ -9,20 +9,20 @@ params:
   openstack_ssh_key:  (( param "What is the OpenStack SSH Key Name?" ))
   openstack_default_security_groups: (( param "What OpenStack SGs are applied to VMs by default?" ))
 
-stemcells:
-  - name:    bosh-openstack-kvm-ubuntu-bionic-go_agent
-    version: '1.36'
-    url:     https://storage.googleapis.com/bosh-core-stemcells/1.36/bosh-stemcell-1.36-openstack-kvm-ubuntu-bionic-go_agent.tgz
-    sha1:    a444fe21177db5b0dfcb116d58fb566707c2e36c
+  stemcells:
+  - name:    bosh-openstack-kvm-ubuntu-jammy-go_agent
+    version: '1.181'
+    url:     https://storage.googleapis.com/bosh-core-stemcells/1.181/bosh-stemcell-1.181-openstack-kvm-ubuntu-jammy-go_agent.tgz
+    sha1:    dcf3f905c617c38ba3c6a2d661ec41d8651e75f4
 
 releases:
-  - name:    bosh-openstack-cpi
-    version: 44
-    url:     https://bosh.io/d/github.com/cloudfoundry/bosh-openstack-cpi-release?v=44
-    sha1:    7c9be83eb11214db85ef5320f26ec9db8fab353f
+- name:    bosh-openstack-cpi
+  version: 53
+  url:     https://bosh.io/d/github.com/cloudfoundry/bosh-openstack-cpi-release?v=53
+  sha1:    c9402008495b6c13c22eed9b45a8ce21ac2e274a
 
 instance_groups:
-- name: blacksmith 
+- name: blacksmith
   jobs:
   - name: openstack_cpi
     release: bosh-openstack-cpi

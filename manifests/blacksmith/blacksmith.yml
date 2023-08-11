@@ -25,7 +25,7 @@ exodus:
 instance_groups:
   - name:      blacksmith
     instances: 1
-    stemcell:  bionic
+    stemcell:  default
     azs:             (( grab params.availability_zones || meta.default.azs ))
     vm_type:         (( grab params.vm_type   || "blacksmith" ))
     disk_type:       (( grab params.disk_type || "blacksmith" ))
@@ -67,6 +67,6 @@ update:
   max_errors: 1
 
 stemcells:
-  - alias: bionic
-    os:      (( grab params.stemcell_os      || "ubuntu-bionic"))
+  - alias: default
+    os:      (( grab params.stemcell_os      || "ubuntu-jammy"))
     version: (( grab params.stemcell_version || "latest" ))
