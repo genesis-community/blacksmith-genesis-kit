@@ -37,6 +37,8 @@ instance_groups:
       environment: (( grab meta.environment ))
       bosh_env: (( grab meta.bosh_env ))
       plans: (( grab params.rabbitmq_plans || meta.default.rabbitmq_plans ))
+      cf:
+        nats_tls_only: (( grab params.cf.nats_tls_only || false ))
       service:
         id:          (( grab params.rabbitmq_service_id          || "rabbitmq" ))
         name:        (( grab params.rabbitmq_service_name        || params.rabbitmq_service_id || "rabbitmq" ))
