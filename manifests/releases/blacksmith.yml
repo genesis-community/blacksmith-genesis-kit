@@ -7,12 +7,12 @@ releases:
 
   - name:    bosh
     version: "277.3.1"
-    sha1:    355e8881d836b5886599a6b5c74c28ead4002acd
+    sha1:    73029034704f1d2e48bf0c312c0576b5fb14387e
     url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/bosh?v=" releases.bosh.version ))
 
   - name:    bpm
     version: "1.2.2"
-    sha1:    81525ee3ca9c3b2c1a1bab52326e70a60d9b9b4e
+    sha1:    8000e1875637e82b96f3e497c45238dfcb3dec45
     url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=" releases.bpm.version ))
 
   - name:    routing
