@@ -36,7 +36,8 @@ variables:
 
 instance_groups:
   - name: blacksmith
-    persistent_disk_type: (( concat "blacksmith-" meta.ocfp.env.scale ))
+    persistent_disk_type: (( grab meta.blacksmith.disk_type ))
+    persistent_disk:      (( prune ))   # Set in Classic mode
     vm_type:              (( grab params.vm_type ))
     stemcell:  default
     instances: 1
