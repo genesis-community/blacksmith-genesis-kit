@@ -1,9 +1,9 @@
 ---
 releases:
   - name:    blacksmith
-    version: "1.7.0"
+    version: "1.8.0-rc1"
     url:     (( concat "https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v" releases.blacksmith.version "/blacksmith-" releases.blacksmith.version ".tgz" ))
-    sha1:    47bbb69553836a84ab9397ce4620fd1490ded9f7
+    sha1:    b9e2957d6f11349ff12061b8b1d53603293aa655
 
   - name:    bosh
     version: "277.3.1"
