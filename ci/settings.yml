@@ -2,40 +2,12 @@
 meta:
   kit:     blacksmith
   release: Blacksmith Genesis Kit
-  target:  cloudpipes/genesis
-  url:     https://cloudpipes.starkandwayne.com
-  iaas:    gcp
+  target:  pipes/genesis
+  url:     https://pipes.scalecf.net
+  iaas:    vcenter
+  exposed:         false
   version_file:    version
-  initial_version: 0.12.0
-  exposed: false
-
-  upstream:
-    TODO_bosh_releases: # TODO!!!
-      - name:  bosh
-        notes: https://github.com/cloudfoundry/bosh/releases/tag/v${version}
-      - name:  bpm
-        label: bpm (new)
-        notes: https://github.com/cloudfoundry-incubator/bpm-release/releases/tag/v${version}
-      - name:  bosh-azure-cpi
-        notes: https://github.com/cloudfoundry/bosh-azure-cpi-release/releases/tag/v${version}
-      - name:  bosh-google-cpi
-        notes: https://github.com/cloudfoundry/bosh-google-cpi-release/releases/tag/v${version}
-      - name:  bosh-aws-cpi
-        notes: https://github.com/cloudfoundry/bosh-aws-cpi-release/releases/tag/v${version}
-      - name:  bosh-vsphere-cpi
-        notes: https://github.com/cloudfoundry/bosh-vsphere-cpi-release/releases/tag/v${version}
-      - name:  bosh-openstack-cpi
-        notes: https://github.com/cloudfoundry/bosh-openstack-cpi-release/releases/tag/v${version}
-      - name:  blacksmith
-        notes: https://github.com/blacksmith-community/blacksmith-boshrelease/releases/tag/v${version}
-      - name:  mariadb-forge
-        notes: https://github.com/blacksmith-community/mariadb-forge-boshrelease/releases/tag/v${version}
-      - name:  postgresql-forge
-        notes: https://github.com/blacksmith-community/postgresql-forge-boshrelease/releases/tag/v${version}
-      - name:  rabbitmq-forge
-        notes: https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/tag/v${version}
-      - name:  redis-forge
-        notes: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/tag/v${version}
+  initial_version: 0.17.0
 
   bosh:
     uri:      ((bosh.uri))
@@ -53,8 +25,8 @@ meta:
     token:     ((vault.token))
 
   aws:
-    access_key: ((aws.access_key_id))
-    secret_key: ((aws.secret_access_key))
+    access_key:  ((cloudfoundry-community-aws.access_key_id))
+    secret_key:  ((cloudfoundry-community-aws.secret_access_key))
 
   github:
     owner:        genesis-community
@@ -65,7 +37,13 @@ meta:
     access_token: ((github.access_token))
 
   shout:
-    url:      ((shout.url)
+    url:      ((shout.url))
     username: ((shout.username))
     password: ((shout.password))
 
+  upstream:
+    bosh_releases:
+    - name:       blacksmith
+      type:       bosh-io-release
+      repository: blacksmith-community/blacksmith-boshrelease
+      path:       manifests/releases/blacksmith.yml

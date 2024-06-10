@@ -19,23 +19,16 @@ meta:
   url:      (( param "Please specify the full url of the target Concourse CI" ))
   pipeline: (( grab meta.name ))
 
-  upstream:
-    package:  example # dummy value for things that don't use upstream
-    path:     (( grab meta.upstream.package ))
-    org:      cloudfoundry
-    repo:     (( concat meta.upstream.org "/" meta.upstream.package ))
-    url:      (( concat "https://github.com/" meta.upstream.repo ".git" ))
-
   vault:
     url:   (( param "Please provide the address of your Vault" ))
     token: (( param "Please provide a Vault Token" ))
 
   git:
-    email: ci@starkandwayne.com
-    name:  Stark & Wayne CI Bot
+    email: genesis-ci@rubidiumstudios.com
+    name:  Genesis CI Bot
 
   image:
-    name: starkandwayne/genesis
+    repository: registry.ops.scalecf.net/genesis-community/genesis
     tag: latest
 
   aws:
@@ -80,15 +73,25 @@ meta:
     VAULT_TOKEN:          (( grab meta.vault.token ))
     INFRASTRUCTURE:       (( grab meta.iaas ))
 
+  cats_params:
+    .: (( inject meta.task_connectivity_params ))
+    DEPLOY_ENV:           (( concat "ci-" meta.iaas "-cats" ))
+    KIT_SHORTNAME:        (( grab meta.kit ))
+    SKIP_CATS:            false
+    FAILFAST:             true
+    VERBOSE:              false
+    CATS_NODES:           6
+
 groups:
   - name: (( grab meta.pipeline ))
     jobs:
     - build-kit
-    #- spec-tests
+    - spec-tests
     - spec-check
     - ship-prerelease
     - deploy
-    #- upgrade
+      #- upgrade
+      #- acceptance-tests
     - prepare
     - ship-release
 

@@ -1,53 +1,5 @@
 sections:
-  - name:  core
-    label: Cloud Foundry Components
-  - name:  buildpacks
-    label: Buildpacks 
+  - name:  releases
+    label: Releases
+    default: true
 
-core:
-  app-autoscaler: {}
-  bpm: {}
-  bosh-dns-aliases: {}
-  capi: {}
-  cf-cli: {}
-  cf-networking: {}
-  cf-smoke-tests: {}
-  cf-syslog-drain: {}
-  cflinuxfs2: {}
-  cflinuxfs3: {}
-  credhub: {}
-  diego: {}
-  garden-runc: {}
-  haproxy: {}
-  loggregator: {}
-  loggregator-agent: {}
-  log-cache: {}
-  mapfs: {}
-  metrics-discovery: {}
-  nats: {}
-  nfs-volume: {}
-  postgres: {}
-  pxc: {}
-  routing: {}
-  statsd-injector: {}
-  uaa: {}
-  silk: {}
-  smb-volume: {}
-  winc: {}
-  windows-resize-root-disk: {}
-  windows-utilities: {}
-  windowsfs: {}
-
-buildpacks:
-  binary-buildpack: {}
-  dotnet-core-buildpack: {}
-  go-buildpack: {}
-  hwc-buildpack: {}
-  java-buildpack: {}
-  nginx-buildpack: {}
-  nodejs-buildpack: {}
-  php-buildpack: {}
-  python-buildpack: {}
-  r-buildpack: {}
-  ruby-buildpack: {}
-  staticfile-buildpack: {}
