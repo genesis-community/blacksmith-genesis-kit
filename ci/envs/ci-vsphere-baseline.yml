@@ -15,6 +15,6 @@ genesis:
 
 params:
   env: (( grab genesis.env ))
-  bosh_exodus_path:   rsat-bc-genesis-ci
+  bosh_exodus_path:   rsat-bc-genesis-ci/bosh
 
   ip: 172.20.8.144
