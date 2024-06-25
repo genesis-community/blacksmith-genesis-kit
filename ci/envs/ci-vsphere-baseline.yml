@@ -1,6 +1,18 @@
 ---
+kit:
+  features:
+    - external-bosh
+    - redis
+    - postgresql
+    - rabbitmq
+    - mariadb
+    - broker-tls
+    - redis-tls
+
 genesis:
   env:   ci-vsphere-baseline
 
 params:
-  auxiliary_vault: true
+  env: (( grab genesis.env ))
+
+  ip: 172.20.8.144
