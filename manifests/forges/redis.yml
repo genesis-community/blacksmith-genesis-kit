@@ -22,12 +22,19 @@ meta:
         limit: 7
         type: standalone-6
         vm_type: default
+      standalone-7:
+        name: standalone-7
+        description: A dedicated Redis 7 server, with no redundancy or replication
+        limit: 7
+        type: standalone-7
+        vm_type: default
+
 
 releases:
 - name:    redis-forge
-  version: 1.0.0
-  url:     https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v1.0.0/redis-forge-1.0.0.tgz
-  sha1:    7d9352c038cfaf279987410c87607c5413083aa0
+  version: 1.2.0
+  url:     https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v1.2.0/redis-forge-1.2.0.tgz
+  sha1:    6c5bed86ba757aff8e7d8c3fc6b982e69b6932fb
 
 params:
   releases:
