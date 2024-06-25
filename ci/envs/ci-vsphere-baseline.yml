@@ -10,9 +10,11 @@ kit:
     - redis-tls
 
 genesis:
-  env:   rsat-bc-genesis-ci
+  env:        ci-vsphere-baseline
+  bosh_env:   rsat-bc-genesis-ci
 
 params:
   env: (( grab genesis.env ))
+  bosh_exodus_path:   rsat-bc-genesis-ci
 
   ip: 172.20.8.144
