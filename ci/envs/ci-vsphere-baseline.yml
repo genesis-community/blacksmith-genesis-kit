@@ -10,7 +10,7 @@ kit:
     - redis-tls
 
 genesis:
-  env:   ci-vsphere-baseline
+  env:   rsat-bc-genesis-ci
 
 params:
   env: (( grab genesis.env ))
