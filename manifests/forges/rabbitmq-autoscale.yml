@@ -33,6 +33,11 @@ instance_groups:
           agent:
             cert: (( vault meta.cf.exodus_path ":loggregator_tls_agent_cert" ))
             key: (( vault meta.cf.exodus_path ":loggregator_tls_agent_key" ))
+      cloud-controller:
+        tls:
+          ca_cert: (( vault meta.cf.exodus_path ":cloud_controller_tls_ca" ))
+          cert: (( vault meta.cf.exodus_path ":cloud_controller_tls_certificate" ))
+          key: (( vault meta.cf.exodus_path ":cloud_controller_tls_private_key" ))
       rabbitmq_metrics_emitter:
         cloud_foundry:
           api:    (( grab meta.cf.api_url ))
