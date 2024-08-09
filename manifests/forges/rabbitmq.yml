@@ -2,7 +2,6 @@
 meta:
   environment: (( grab genesis.env || params.env ))
   bosh_env: (( grab genesis.bosh_env || params.bosh_env || params.env ))
-
   default:
     rabbitmq_tags:
     - blacksmith
@@ -19,9 +18,9 @@ meta:
 
 releases:
 - name:    rabbitmq-forge
-  version: 1.2.4
-  url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v1.2.4/rabbitmq-forge-1.2.4.tgz
-  sha1:    539bf9fce41657f6d0bd549e4b5bed9d3232c96f
+  version: 1.2.5
+  url:     https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v1.2.5/rabbitmq-forge-1.2.5.tgz
+  sha1:    03fa361a9f63fdf92f1e3cf0fcbac7b8c2770dcf
 
 params:
   releases:
@@ -37,6 +36,7 @@ instance_groups:
       environment: (( grab meta.environment ))
       bosh_env: (( grab meta.bosh_env ))
       plans: (( grab params.rabbitmq_plans || meta.default.rabbitmq_plans ))
+      plugins: (( grab params.rabbitmq_plugins || ~ ))
       cf:
         nats_tls_only: (( grab params.cf.nats_tls_only || true ))
       service:
