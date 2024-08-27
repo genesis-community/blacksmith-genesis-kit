@@ -77,20 +77,14 @@ To update plugin configurations for existing RabbitMQ instance deployments:
 
 2. Update your RabbitMQ deployment manifest:
    - Download and save the manifest `bosh -d rabbitmq-single-node-fcab211b-dffd-478d-8537-5ba2b7c4d5bb manifest > single-plugins-manifest.yml`
-   - Modify the `releases` section to use the latest version of the rabbitmq-forge release
-   - Add or modify the `plugins` property under the `properties` section of the `rabbitmq-blacksmith-plans` job specification
+   - Add or modify the `plugins` property under the `properties` section of the `rabbitmq` job specification
 
    For example:
 
    ```yaml
-   releases:
-   - name: rabbitmq-forge
-     version: 1.2.4+dev.12  # Use the actual version number of the latest release
-
-   # ...
 
    jobs:
-   - name: rabbitmq-blacksmith-plans
+   - name: rabbitmq
      # ...
      properties:
        plugins:
@@ -107,7 +101,7 @@ To update plugin configurations for existing RabbitMQ instance deployments:
 4. During the deployment process, confirm that:
    - The latest release version is being used. You should see something like:
      ```
-     Using release 'rabbitmq-forge/1.2.4+dev.12'
+     Using release 'rabbitmq-forge/1.2.6'
      ```
    - The new plugins property is being applied. Look for log lines similar to:
      ```
