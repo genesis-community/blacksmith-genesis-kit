@@ -2,12 +2,12 @@
 
 ## Table of Contents
 1. [Introduction](#1-introduction)
-2. Understanding RabbitMQ Plugins
-3. New Plugin Configuration Feature
-4. Configuring Plugins for New Deployments
-5. Updating Existing Deployments
-6. Available Plugins
-7. Best Practices
+2. [Understanding RabbitMQ Plugins](#2-understanding-rabbitmq-plugins])
+3. [New Plugin Configuration Feature](#3-new-plugin-configuration-feature)
+4. [Configuring Plugins for New Deployments](#4-configuring-plugins-for-new-deployments)
+5. [Updating Existing Deployments](#5-Updating-Existing-Deployments)
+6. [Available Plugins](#6-Available-Plugins)
+7. [Best Practices](#7-best-practices)
 8. [Troubleshooting](#8-troubleshooting)
 9. [FAQ](9-faq)
 
