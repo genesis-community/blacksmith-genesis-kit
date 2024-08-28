@@ -60,7 +60,7 @@ To enable new RabbitMQ Instance deployments with configured plugins, you can eas
 7. After the the Blacksmith deployment is complete, verify that the plugins are enabled:
    - Create a new RabbitMQ service instance
    - SSH into the newely created RabbitMQ instance
-   - Run `rabbitmq-plugins list` to see the enabled plugins or
+   - Run `source /var/vcap/jobs/rabbitmq/env` then `rabbitmq-plugins list` to see the enabled plugins or
    - `cat /var/vcap/sys/log/rabbitmq/rabbitmq.log` which will show the enablement of the plugins
 
 Note: The `rabbitmq_management` plugin is typically enabled by default. If you need it, you don't have to explicitly include it in your list unless you're overriding a default set of plugins.
