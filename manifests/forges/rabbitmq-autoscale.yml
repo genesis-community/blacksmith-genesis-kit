@@ -33,11 +33,21 @@ instance_groups:
           agent:
             cert: (( vault meta.cf.exodus_path ":loggregator_tls_agent_cert" ))
             key: (( vault meta.cf.exodus_path ":loggregator_tls_agent_key" ))
-      cloud-controller:
+      syslog_agent_api:
         tls:
-          ca_cert: (( vault meta.cf.exodus_path ":cloud_controller_tls_ca" ))
-          cert: (( vault meta.cf.exodus_path ":cloud_controller_tls_certificate" ))
-          key: (( vault meta.cf.exodus_path ":cloud_controller_tls_private_key" ))
+          ca_cert: (( vault meta.cf.exodus_path ":syslog_agent_api_tls_ca" ))
+          cert: (( vault meta.cf.exodus_path ":syslog_agent_api_tls_certificate" ))
+          key: (( vault meta.cf.exodus_path ":syslog_agent_api_tls_private_key" ))
+      syslog_agent_metrics:
+        tls:
+          ca_cert: (( vault meta.cf.exodus_path ":syslog_agent_metrics_tls_ca" ))
+          cert: (( vault meta.cf.exodus_path ":syslog_agent_metrics_tls_certificate" ))
+          key: (( vault meta.cf.exodus_path ":syslog_agent_metrics_tls_private_key" ))
+      forwarder_agent_metrics:
+        tls:
+          ca_cert: (( vault meta.cf.exodus_path ":forwarder_agent_metrics_tls_ca" ))
+          cert: (( vault meta.cf.exodus_path ":forwarder_agent_metrics_tls_certificate" ))
+          key: (( vault meta.cf.exodus_path ":forwarder_agent_metrics_tls_private_key" ))
       rabbitmq_metrics_emitter:
         cloud_foundry:
           api:    (( grab meta.cf.api_url ))
