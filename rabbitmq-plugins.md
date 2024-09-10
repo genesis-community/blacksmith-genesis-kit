@@ -1,15 +1,15 @@
 # RabbitMQ Plugin Configuration Guide
 
 ## Table of Contents
-1. Introduction
-2. Understanding RabbitMQ Plugins
-3. New Plugin Configuration Feature
-4. Configuring Plugins for New Deployments
-5. Updating Existing Deployments
-6. Available Plugins
-7. Best Practices
-8. Troubleshooting
-9. FAQ
+1. [Introduction](#1-introduction)
+2. [Understanding RabbitMQ Plugins](#2-understanding-rabbitmq-plugins])
+3. [New Plugin Configuration Feature](#3-new-plugin-configuration-feature)
+4. [Configuring Plugins for New Deployments](#4-configuring-plugins-for-new-deployments)
+5. [Updating Existing Deployments](#5-Updating-Existing-Deployments)
+6. [Available Plugins](#6-Available-Plugins)
+7. [Best Practices](#7-best-practices)
+8. [Troubleshooting](#8-troubleshooting)
+9. [FAQ](9-faq)
 
 ## 1. Introduction
 
@@ -21,18 +21,18 @@ RabbitMQ plugins extend the functionality of RabbitMQ, providing additional feat
 
 ## 3. New Plugin Configuration Feature
 
-Our new plugin configuration feature allows for dynamic selection and management of RabbitMQ plugins through BOSH deployment manifests. This feature provides greater flexibility and easier management of RabbitMQ instances.
+Our new plugin configuration feature allows for dynamic selection and management of RabbitMQ plugins through Blacksmith BOSH deployment manifests. This feature provides greater flexibility and easier management of RabbitMQ instances.
 
 Key benefits:
-- Configure plugins during initial deployment
-- Update plugin configurations for existing deployments
+- Configure plugins during service broker Blacksmith deployment 
+- Update plugin configurations for existing RabbitMQ instance deployments
 - Consistent plugin management across all instances
 
 ## 4. Configuring Plugins for New Deployments
 
-For new RabbitMQ deployments, you can easily configure plugins by specifying them in your genesis deployment manifest. Here's how:
+To enable new RabbitMQ Instance deployments with configured plugins, you can easily configure plugins by specifying them in your Blacksmith genesis deployment manifest. After you deploy Blacksmith deployment, all the new RabbitMQ instances created afther Blacksmith deployed is configured with the plugins you enabled by default. Here's how:
 
-1. Open your genesis deployment manifest file for the new deployment.
+1. Open your Blacksmith genesis deployment manifest file for the new deployment.
 
 2. Locate the `params` section in the manifest. If it doesn't exist, create it.
 
@@ -48,7 +48,7 @@ For new RabbitMQ deployments, you can easily configure plugins by specifying the
 
 4. Save the changes to your deployment manifest.
 
-5. Deploy your new environment using this manifest:
+5. Deploy your Blacksmith environment using this manifest:
 
    ```
    genesis deploy <your-new-environment>
@@ -57,16 +57,17 @@ For new RabbitMQ deployments, you can easily configure plugins by specifying the
 6. During the deployment process, confirm that:
    - The plugins property is being applied. Look for log lines indicating the addition of the specified plugins.
 
-7. After the deployment is complete, verify that the plugins are enabled:
-   - SSH into the RabbitMQ instance
-   - Run `rabbitmq-plugins list` to see the enabled plugins or
+7. After the the Blacksmith deployment is complete, verify that the plugins are enabled:
+   - Create a new RabbitMQ service instance
+   - SSH into the newely created RabbitMQ instance
+   - Run `source /var/vcap/jobs/rabbitmq/env` then `rabbitmq-plugins list` to see the enabled plugins or
    - `cat /var/vcap/sys/log/rabbitmq/rabbitmq.log` which will show the enablement of the plugins
 
 Note: The `rabbitmq_management` plugin is typically enabled by default. If you need it, you don't have to explicitly include it in your list unless you're overriding a default set of plugins.
 
-## 5. Updating Existing Deployments
+## 5. Updating Existing RabbitMQ Instance Deployments
 
-To update plugin configurations for existing deployments:
+To update plugin configurations for existing RabbitMQ instance deployments:
 
 1. Ensure that the latest BOSH release, which includes the new plugin configuration feature, has been uploaded to your BOSH director. If not, upload it using:
 
@@ -74,22 +75,16 @@ To update plugin configurations for existing deployments:
    bosh upload-release path/to/latest-rabbitmq-forge-release.tgz
    ```
 
-2. Update your deployment manifest:
+2. Update your RabbitMQ deployment manifest:
    - Download and save the manifest `bosh -d rabbitmq-single-node-fcab211b-dffd-478d-8537-5ba2b7c4d5bb manifest > single-plugins-manifest.yml`
-   - Modify the `releases` section to use the latest version of the rabbitmq-forge release
-   - Add or modify the `plugins` property under the `properties` section of the `rabbitmq-blacksmith-plans` job specification
+   - Add or modify the `plugins` property under the `properties` section of the `rabbitmq` job specification
 
    For example:
 
    ```yaml
-   releases:
-   - name: rabbitmq-forge
-     version: 1.2.4+dev.12  # Use the actual version number of the latest release
-
-   # ...
 
    jobs:
-   - name: rabbitmq-blacksmith-plans
+   - name: rabbitmq
      # ...
      properties:
        plugins:
@@ -106,7 +101,7 @@ To update plugin configurations for existing deployments:
 4. During the deployment process, confirm that:
    - The latest release version is being used. You should see something like:
      ```
-     Using release 'rabbitmq-forge/1.2.4+dev.12'
+     Using release 'rabbitmq-forge/1.2.6'
      ```
    - The new plugins property is being applied. Look for log lines similar to:
      ```
@@ -149,7 +144,7 @@ If you encounter issues with plugin configuration:
    cat /var/vcap/sys/log/rabbitmq/rabbitmq.log
    ```
 
-2. Verify that the plugins are correctly listed in your deployment manifest
+2. Verify that the plugins are correctly listed in your RabbitMQ deployment manifest
 
 3. Ensure that the plugins you're trying to enable are compatible with your RabbitMQ version
 
