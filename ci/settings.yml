@@ -42,6 +42,7 @@ meta:
     password: ((shout.password))
 
   upstream:
+    manifest: (( prune ))
     bosh_releases:
     - name:       blacksmith
       type:       bosh-io-release

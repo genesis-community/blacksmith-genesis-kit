@@ -1,13 +1,17 @@
 ---
 kit:
   features:
-    - external-bosh
-    - redis
-    - postgresql
-    - rabbitmq
-    - mariadb
-    - broker-tls
-    - redis-tls
+  - external-bosh
+  - redis
+  - postgresql
+  - rabbitmq
+  - mariadb
+  - broker-tls
+  - redis-tls
+  ci:
+    job: deploy
+    spec-tests: false
+
 
 genesis:
   env:        ci-vsphere-baseline
