@@ -22,7 +22,7 @@ meta:
 
   upstream:
     manifest:
-      package:  (( param "You must specify an upstream.manifest.package or prune upstream.manifest" ))
+      package:  ~
       path:     (( grab meta.upstream.manifest.package ))
       org:      cloudfoundry
       repo:     (( concat meta.upstream.manifest.org "/" meta.upstream.manifest.package ))
@@ -87,7 +87,7 @@ groups:
 - name: (( grab meta.pipeline ))
   jobs:
   - build-kit
-  - spec-tests
+  - spec-check
   - ship-prerelease
   - prepare
   - ship-release

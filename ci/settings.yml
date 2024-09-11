@@ -4,7 +4,7 @@ meta:
   release: Blacksmith Genesis Kit
   target:  pipes/genesis
   url:     https://pipes.scalecf.net
-  iaas:    vcenter
+  iaas:    vsphere
   exposed:         false
   version_file:    version
   initial_version: 0.17.0
@@ -42,9 +42,8 @@ meta:
     password: ((shout.password))
 
   upstream:
-    manifest: (( prune ))
     bosh_releases:
     - name:       blacksmith
-      type:       bosh-io-release
+      type:       github-release
       repository: blacksmith-community/blacksmith-boshrelease
       path:       manifests/releases/blacksmith.yml

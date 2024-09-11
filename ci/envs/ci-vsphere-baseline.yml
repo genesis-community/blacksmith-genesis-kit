@@ -10,7 +10,7 @@ kit:
   - redis-tls
   ci:
     job: deploy
-    spec-tests: false
+    spec_tests: false
 
 
 genesis:

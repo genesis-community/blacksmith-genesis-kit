@@ -63,7 +63,7 @@ for env in "${envs[@]+"${envs[@]}"}" ; do
   fi
 
   serial_group="$(_lookup "$env_ci" '.serial_groups//"[]"')"
-  spec_tests="$(_lookup "$env_ci" '.spec_tests')')" || true
+  spec_tests="$(_lookup "$env_ci" '.spec_tests')" || true
   pass_spec_tests=""
   if [[ $spec_tests != "false" ]] ; then
 		pass_spec_tests=", spec-tests"
