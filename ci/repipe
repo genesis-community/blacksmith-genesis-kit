@@ -138,7 +138,7 @@ while [[ -n "${1:-""}" ]] ; do
             P) PAUSE="pause" ;;
             X) EXPOSE="expose" ;;
             H) EXPOSE="hide" ;;
-            h) usage; exit 0;;
+            h) usage;;
             o) (( OPEN++ )) ;;
             -) ;; # ignore -- TBD: if we ever need to support --, ...
             *) usage "Unknown option '$opt'";;
