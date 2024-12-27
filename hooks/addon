@@ -160,7 +160,7 @@ blacksmith::ca::sync() {
     -p ${PWD}/nats_client_key.key \
     -r ${PWD}/nats_client_ca.crt
 
-  rm -f nats_client_cert.crt nats_client_key.key
+  rm -f nats_client_cert.crt nats_client_key.key nats_client_ca.crt
 }
 
 blacksmith::visit() {
