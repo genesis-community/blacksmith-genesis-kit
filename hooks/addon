@@ -151,13 +151,15 @@ blacksmith::ca::sync() {
 
   safe get "${_path_1}:nats_client_cert" > ${PWD}/nats_client_cert.crt
   safe get "${_path_1}:nats_client_key" > ${PWD}/nats_client_key.key
+  credhub get -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-cf/nats_client_cert" -k ca > ${PWD}/nats_client_ca.crt
 
   credhub set \
     -t certificate \
     -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-cf/nats_client_cert" \
     -c ${PWD}/nats_client_cert.crt \
-    -p ${PWD}/nats_client_key.key
-  
+    -p ${PWD}/nats_client_key.key \
+    -r ${PWD}/nats_client_ca.crt
+
   rm -f nats_client_cert.crt nats_client_key.key
 }
 
