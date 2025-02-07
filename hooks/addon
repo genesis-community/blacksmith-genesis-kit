@@ -134,33 +134,25 @@ blacksmith::ca::sync() {
 
   _path="${GENESIS_SECRETS_MOUNT}/${GENESIS_VAULT_PREFIX}/broker/ca"
 
-  safe get "${_path}:certificate" > ${PWD}/blacksmith-ca.crt
-  safe get "${_path}:key"         > ${PWD}/blacksmith-ca.key
-
   credhub set \
     -t certificate \
     -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-blacksmith/blacksmith_services_ca" \
-    -c ${PWD}/blacksmith-ca.crt \
-    -p ${PWD}/blacksmith-ca.key
+    -c <(safe get "${_path}:certificate") \
+    -p <(safe get "${_path}:key")
 
-  rm -f blacksmith-ca.crt blacksmith-ca.key
 
   describe "Setting values in credhub for nats_client_cert..."
   
   _path_1="${GENESIS_SECRETS_MOUNT}exodus/${GENESIS_ENVIRONMENT}/cf"
-
-  safe get "${_path_1}:nats_client_cert" > ${PWD}/nats_client_cert.crt
-  safe get "${_path_1}:nats_client_key" > ${PWD}/nats_client_key.key
-  credhub get -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-cf/nats_client_cert" -k ca > ${PWD}/nats_client_ca.crt
+  _cf_path="${GENESIS_SECRETS_MOUNT}/${GENESIS_VAULT_PREFIX/blacksmith/cf}"
 
   credhub set \
     -t certificate \
     -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-cf/nats_client_cert" \
-    -c ${PWD}/nats_client_cert.crt \
-    -p ${PWD}/nats_client_key.key \
-    -r ${PWD}/nats_client_ca.crt
+    -c <(safe get "${_path_1}:nats_client_cert") \
+    -p <(safe get "${_path_1}:nats_client_key") \
+    -r <(safe get "${_cf_path}/nats_ca:certificate")
 
-  rm -f nats_client_cert.crt nats_client_key.key nats_client_ca.crt
 }
 
 blacksmith::visit() {
