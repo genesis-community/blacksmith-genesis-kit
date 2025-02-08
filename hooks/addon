@@ -129,21 +129,30 @@ blacksmith::register() {
 blacksmith::ca::sync() {
   # TODO: future we can use `credhub:` similar to `exodus:` in manifest instead of this
   describe "Fetching Blacksmith CA certificate details..."
+  
+  describe "Setting values in credhub for blacksmith_services_ca..."
 
   _path="${GENESIS_SECRETS_MOUNT}/${GENESIS_VAULT_PREFIX}/broker/ca"
 
-  safe get "${_path}:certificate" > ${PWD}/blacksmith-ca.crt
-  safe get "${_path}:key"         > ${PWD}/blacksmith-ca.key
+  genesis credhub ${GENESIS_ENVIRONMENT} set \
+     -t certificate \
+     -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-blacksmith/blacksmith_services_ca" \
+     -c <(safe get "${_path}:certificate") \
+     -p <(safe get "${_path}:key")
 
-  describe "Setting values in credhub (you did login to credhub first, right?...)"
 
-  credhub set \
+  describe "Setting values in credhub for nats_client_cert..."
+  
+  _path_1="${GENESIS_SECRETS_MOUNT}exodus/${GENESIS_ENVIRONMENT}/cf"
+  _cf_path="${GENESIS_SECRETS_MOUNT}/${GENESIS_VAULT_PREFIX/blacksmith/cf}"
+
+  genesis credhub ${GENESIS_ENVIRONMENT} set \
     -t certificate \
-    -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-blacksmith/blacksmith_services_ca" \
-    -c ${PWD}/blacksmith-ca.crt \
-    -p ${PWD}/blacksmith-ca.key
+    -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-cf/nats_client_cert" \
+    -c <(safe get "${_path_1}:nats_client_cert") \
+    -p <(safe get "${_path_1}:nats_client_key") \
+    -r <(safe get "${_cf_path}/nats_ca:certificate")
 
-  rm -f blacksmith-ca.crt blacksmith-ca.key
 }
 
 blacksmith::visit() {
