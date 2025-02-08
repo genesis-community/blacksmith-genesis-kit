@@ -134,11 +134,11 @@ blacksmith::ca::sync() {
 
   _path="${GENESIS_SECRETS_MOUNT}/${GENESIS_VAULT_PREFIX}/broker/ca"
 
-  credhub set \
-    -t certificate \
-    -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-blacksmith/blacksmith_services_ca" \
-    -c <(safe get "${_path}:certificate") \
-    -p <(safe get "${_path}:key")
+  genesis credhub ${GENESIS_ENVIRONMENT} set \
+     -t certificate \
+     -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-blacksmith/blacksmith_services_ca" \
+     -c <(safe get "${_path}:certificate") \
+     -p <(safe get "${_path}:key")
 
 
   describe "Setting values in credhub for nats_client_cert..."
@@ -146,7 +146,7 @@ blacksmith::ca::sync() {
   _path_1="${GENESIS_SECRETS_MOUNT}exodus/${GENESIS_ENVIRONMENT}/cf"
   _cf_path="${GENESIS_SECRETS_MOUNT}/${GENESIS_VAULT_PREFIX/blacksmith/cf}"
 
-  credhub set \
+  genesis credhub ${GENESIS_ENVIRONMENT} set \
     -t certificate \
     -n "/${GENESIS_ENVIRONMENT}-bosh/${GENESIS_ENVIRONMENT}-cf/nats_client_cert" \
     -c <(safe get "${_path_1}:nats_client_cert") \
