@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+# vim: set ts=2 sw=2 sts=2 foldmethod=marker
+package Genesis::Hook::Features::Blacksmith v4.0.0;
+
+use strict;
+use warnings;
+use v5.20; # Genesis min perl version is 5.20
+
+# Only needed for development
+BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/lib'}
+use parent qw(Genesis::Hook::Features);
+
+use Genesis qw/bail/;
+
+sub init {
+  my $class = shift;
+  my $obj = $class->SUPER::init(@_);
+  $obj->check_minimum_genesis_version('3.1.0-rc.20');
+  return $obj;
+}
+
+sub perform {
+  my ($self) = @_;
+
+  foreach my $feature (@{$self->{features}}) {
+    # Pass through all features
+    $self->add_feature($feature);
+
+    # For OCFP feature, add additional features
+    if ($feature eq 'ocfp') {
+      $self->add_feature('broker-tls');
+      $self->add_feature('external-bosh');
+      $self->add_feature('cf-route-registrar');
+
+      if ($self->has_feature('redis')) {
+        $self->add_feature('redis-tls');
+      }
+
+      if ($self->has_feature('rabbitmq')) {
+        $self->add_feature('rabbitmq-tls');
+        $self->add_feature('rabbitmq-dashboard-registration');
+      }
+    }
+  }
+
+  return $self->done();
+}
+
+1;
+
