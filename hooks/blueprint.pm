@@ -41,7 +41,7 @@ sub perform {
       $blueprint->add_files("manifests/blacksmith/external-bosh.yml");
       $external_bosh += 1;
     }
-    elsif ($feature =~ /^(aws|azure|google|openstack|vsphere)$/) {
+    elsif ($feature =~ /^(aws|azure|google|openstack|vsphere|stackit)$/) {
       $ENV{OCFP_IAAS} = $feature;
       $iaas += 1;
     }

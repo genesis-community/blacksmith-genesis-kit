@@ -123,6 +123,35 @@ new data services instances on behalf of end users.
     where Blacksmith will deploy service VMs.
 
 
+- `stackit` (IaaS) - Deploy the on-demand services to a STACKIT
+  OpenStack-compatible cloud. You will need to provide all of the
+  information Blacksmith needs to contact the STACKIT API for VM
+  orchestration purposes.
+
+  Activating this feature also activates the following parameters:
+
+  - `stackit_auth_url` - The URL of the STACKIT authentication endpoint
+
+  - `stackit_username` - The username to authenticate with STACKIT
+
+  - `stackit_password` - The password to authenticate with STACKIT
+
+  - `stackit_domain` - The STACKIT domain name
+
+  - `stackit_project` - The STACKIT project name
+
+  - `stackit_region` - The STACKIT region to deploy to
+
+  - `stackit_ssh_key` - The SSH key name to use for VM authentication
+
+  - `stackit_default_security_groups` - A YAML list of security group names
+    to apply to all VMs by default
+
+  Note: STACKIT has a 1:1 correspondence of networks to subnets rather than a 
+  single overarching network. This should be considered when designing your 
+  cloud-config for STACKIT deployments.
+
+
 - `external-bosh` (IaaS substitute) - Deploy the on-demand services to an
   existing bosh director.  You will need to provide all of the information
   Blacksmith needs to contact bosh director for deployments orchestration
@@ -400,8 +429,35 @@ params:
     - san3
 ```
 
+Deploying Blacksmith with a STACKIT director:
+
+```
+---
+kit:
+  name:    blacksmith
+  version: 5.6.7
+  features:
+    - stackit
+    - postgresql
+
+params:
+  env: acme-stackit-prod
+
+  ip: 10.0.134.4
+
+  shareable: true
+
+  # STACKIT
+  stackit_auth_url: https://keystone.api.stackit.example.com:5000/v3
+  stackit_region:   region1
+  stackit_ssh_key:  blacksmith-key
+  stackit_default_security_groups:
+    - default
+    - blacksmith-sg
+```
+
 Since Blacksmith has its own internal BOSH director, you need to
-supply a cloud configuration, and stemcells.  Here's an example:
+supply a cloud configuration, and stemcells.  Here's an example for vSphere:
 
 ```
   cloud_config:
@@ -435,6 +491,52 @@ supply a cloud configuration, and stemcells.  Here's an example:
           cpu:   4
           ram:   8_192
           disk: 32_768
+
+    compilation:
+      workers: 3
+      reuse_compilation_vms: true
+      az: z1
+      vm_type: small
+      network: services
+```
+
+And here's a cloud config example for STACKIT, showing the 1:1 correspondence between networks and subnets:
+
+```
+  cloud_config:
+    azs:
+      - name: z1
+        cloud_properties: {}
+
+    networks:
+      - name: services
+        type: manual
+        subnets:
+          - range: 10.10.0.0/24
+            gateway: 10.10.0.1
+            az: z1
+            cloud_properties:
+              net_id: subnet-services-id-123456
+
+      - name: data
+        type: manual
+        subnets:
+          - range: 10.10.1.0/24
+            gateway: 10.10.1.1
+            az: z1
+            cloud_properties:
+              net_id: subnet-data-id-123456
+
+    vm_types:
+      - name: small
+        cloud_properties:
+          instance_type: small
+          root_disk_size_gb: 10
+
+      - name: medium
+        cloud_properties:
+          instance_type: medium
+          root_disk_size_gb: 20
 
     compilation:
       workers: 3
