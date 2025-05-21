@@ -70,11 +70,18 @@ sub perform {
             aws => {
               'instance_type' => $self->for_scale({
                   dev => 't3.medium',
-                  prod => 'm5.large'
+                  prod => 'm6i.large'
                 }, 't3.medium'),
               'ephemeral_disk' => {
-                'size' => 32768, # 32GB
-                'type' => 'gp2'
+                'size' => $self->for_scale({
+                    dev => 4096,
+                    prod => 16384
+                  }, 4096),
+                'type' => 'gp3',
+                'encrypted' => $self->TRUE
+              },
+              'metadata_options' => {
+                'http_tokens' => 'required'
               },
             },
             azure => {
@@ -104,21 +111,214 @@ sub perform {
             },
           },
         ),
+        # Redis VM Types
+        $self->vm_type_definition('redis-small',
+          cloud_properties_for_iaas => {
+            aws => {
+              'instance_type' => $self->for_scale({
+                  dev => 't3.medium',
+                  prod => 'c6i.large'
+                }, 't3.medium'),
+              'ephemeral_disk' => {
+                'size' => $self->for_scale({
+                    dev => 4096,
+                    prod => 8192
+                  }, 4096),
+                'type' => 'gp3',
+                'encrypted' => $self->TRUE
+              },
+              'metadata_options' => {
+                'http_tokens' => 'required'
+              },
+            },
+          },
+        ),
+        $self->vm_type_definition('redis-medium',
+          cloud_properties_for_iaas => {
+            aws => {
+              'instance_type' => $self->for_scale({
+                  dev => 't3.medium',
+                  prod => 'c6i.xlarge'
+                }, 't3.medium'),
+              'ephemeral_disk' => {
+                'size' => $self->for_scale({
+                    dev => 4096,
+                    prod => 16384
+                  }, 4096),
+                'type' => 'gp3',
+                'encrypted' => $self->TRUE
+              },
+              'metadata_options' => {
+                'http_tokens' => 'required'
+              },
+            },
+          },
+        ),
+        $self->vm_type_definition('redis-large',
+          cloud_properties_for_iaas => {
+            aws => {
+              'instance_type' => $self->for_scale({
+                  dev => 't3.large',
+                  prod => 'c6i.2xlarge'
+                }, 't3.large'),
+              'ephemeral_disk' => {
+                'size' => $self->for_scale({
+                    dev => 4096,
+                    prod => 32768
+                  }, 4096),
+                'type' => 'gp3',
+                'encrypted' => $self->TRUE
+              },
+              'metadata_options' => {
+                'http_tokens' => 'required'
+              },
+            },
+          },
+        ),
+        # RabbitMQ VM Types
+        $self->vm_type_definition('rabbitmq-small',
+          cloud_properties_for_iaas => {
+            aws => {
+              'instance_type' => $self->for_scale({
+                  dev => 't3.small',
+                  prod => 'c6i.large'
+                }, 't3.small'),
+              'ephemeral_disk' => {
+                'size' => $self->for_scale({
+                    dev => 4096,
+                    prod => 8192
+                  }, 4096),
+                'type' => 'gp3',
+                'encrypted' => $self->TRUE
+              },
+              'metadata_options' => {
+                'http_tokens' => 'required'
+              },
+            },
+          },
+        ),
+        $self->vm_type_definition('rabbitmq-medium',
+          cloud_properties_for_iaas => {
+            aws => {
+              'instance_type' => $self->for_scale({
+                  dev => 't3.medium',
+                  prod => 'c6i.xlarge'
+                }, 't3.medium'),
+              'ephemeral_disk' => {
+                'size' => $self->for_scale({
+                    dev => 4096,
+                    prod => 8192
+                  }, 4096),
+                'type' => 'gp3',
+                'encrypted' => $self->TRUE
+              },
+              'metadata_options' => {
+                'http_tokens' => 'required'
+              },
+            },
+          },
+        ),
+        $self->vm_type_definition('rabbitmq-large',
+          cloud_properties_for_iaas => {
+            aws => {
+              'instance_type' => $self->for_scale({
+                  dev => 't3.large',
+                  prod => 'c6i.2xlarge'
+                }, 't3.large'),
+              'ephemeral_disk' => {
+                'size' => $self->for_scale({
+                    dev => 4096,
+                    prod => 16384
+                  }, 4096),
+                'type' => 'gp3',
+                'encrypted' => $self->TRUE
+              },
+              'metadata_options' => {
+                'http_tokens' => 'required'
+              },
+            },
+          },
+        ),
+        # PostgreSQL VM Types
+        $self->vm_type_definition('postgres-small',
+          cloud_properties_for_iaas => {
+            aws => {
+              'instance_type' => $self->for_scale({
+                  dev => 't3.small',
+                  prod => 'c6i.large'
+                }, 't3.small'),
+              'ephemeral_disk' => {
+                'size' => $self->for_scale({
+                    dev => 4096,
+                    prod => 8192
+                  }, 4096),
+                'type' => 'gp3',
+                'encrypted' => $self->TRUE
+              },
+              'metadata_options' => {
+                'http_tokens' => 'required'
+              },
+            },
+          },
+        ),
+        $self->vm_type_definition('postgres-medium',
+          cloud_properties_for_iaas => {
+            aws => {
+              'instance_type' => $self->for_scale({
+                  dev => 't3.medium',
+                  prod => 'c6i.xlarge'
+                }, 't3.medium'),
+              'ephemeral_disk' => {
+                'size' => $self->for_scale({
+                    dev => 4096,
+                    prod => 8192
+                  }, 4096),
+                'type' => 'gp3',
+                'encrypted' => $self->TRUE
+              },
+              'metadata_options' => {
+                'http_tokens' => 'required'
+              },
+            },
+          },
+        ),
+        $self->vm_type_definition('postgres-large',
+          cloud_properties_for_iaas => {
+            aws => {
+              'instance_type' => $self->for_scale({
+                  dev => 't3.large',
+                  prod => 'c6i.2xlarge'
+                }, 't3.large'),
+              'ephemeral_disk' => {
+                'size' => $self->for_scale({
+                    dev => 4096,
+                    prod => 8192
+                  }, 4096),
+                'type' => 'gp3',
+                'encrypted' => $self->TRUE
+              },
+              'metadata_options' => {
+                'http_tokens' => 'required'
+              },
+            },
+          },
+        ),
       ],
       'disk_types' => [
         $self->disk_type_definition('blacksmith',
           common => {
             disk_size => $self->for_scale({
-                dev => gigabytes(64),
-                prod => gigabytes(128)
-              }, gigabytes(96)),
+                dev => 16384, # 16 GB in MB
+                prod => 65536, # 64 GB in MB
+              }, 16384),
           },
           cloud_properties_for_iaas => {
             openstack => {
               'type' => 'storage_premium_perf6',
             },
             aws => {
-              'type' => 'gp2',
+              'type' => 'gp3',
+              'encrypted' => $self->TRUE,
             },
             azure => {
               'storage_account_type' => 'Premium_LRS',
@@ -127,6 +327,135 @@ sub perform {
               'type' => 'pd-ssd',
             },
             vsphere => {},
+          },
+        ),
+        # Redis Disk Types
+        $self->disk_type_definition('redis-small',
+          common => {
+            disk_size => $self->for_scale({
+                dev => 8192, # 8 GB in MB
+                prod => 32768, # 32 GB in MB
+              }, 8192),
+          },
+          cloud_properties_for_iaas => {
+            aws => {
+              'type' => 'gp3',
+              'encrypted' => $self->TRUE,
+            },
+          },
+        ),
+        $self->disk_type_definition('redis-medium',
+          common => {
+            disk_size => $self->for_scale({
+                dev => 16384, # 16 GB in MB
+                prod => 65536, # 64 GB in MB
+              }, 16384),
+          },
+          cloud_properties_for_iaas => {
+            aws => {
+              'type' => 'gp3',
+              'encrypted' => $self->TRUE,
+            },
+          },
+        ),
+        $self->disk_type_definition('redis-large',
+          common => {
+            disk_size => $self->for_scale({
+                dev => 32768, # 32 GB in MB
+                prod => 131072, # 128 GB in MB
+              }, 32768),
+          },
+          cloud_properties_for_iaas => {
+            aws => {
+              'type' => 'gp3',
+              'encrypted' => $self->TRUE,
+            },
+          },
+        ),
+        # RabbitMQ Disk Types
+        $self->disk_type_definition('rabbitmq-small',
+          common => {
+            disk_size => $self->for_scale({
+                dev => 8192, # 8 GB in MB
+                prod => 32768, # 32 GB in MB
+              }, 8192),
+          },
+          cloud_properties_for_iaas => {
+            aws => {
+              'type' => 'gp3',
+              'encrypted' => $self->TRUE,
+            },
+          },
+        ),
+        $self->disk_type_definition('rabbitmq-medium',
+          common => {
+            disk_size => $self->for_scale({
+                dev => 16384, # 16 GB in MB
+                prod => 65536, # 64 GB in MB
+              }, 16384),
+          },
+          cloud_properties_for_iaas => {
+            aws => {
+              'type' => 'gp3',
+              'encrypted' => $self->TRUE,
+            },
+          },
+        ),
+        $self->disk_type_definition('rabbitmq-large',
+          common => {
+            disk_size => $self->for_scale({
+                dev => 32768, # 32 GB in MB
+                prod => 131072, # 128 GB in MB
+              }, 32768),
+          },
+          cloud_properties_for_iaas => {
+            aws => {
+              'type' => 'gp3',
+              'encrypted' => $self->TRUE,
+            },
+          },
+        ),
+        # PostgreSQL Disk Types
+        $self->disk_type_definition('postgres-small',
+          common => {
+            disk_size => $self->for_scale({
+                dev => 8192, # 8 GB in MB
+                prod => 32768, # 32 GB in MB
+              }, 8192),
+          },
+          cloud_properties_for_iaas => {
+            aws => {
+              'type' => 'gp3',
+              'encrypted' => $self->TRUE,
+            },
+          },
+        ),
+        $self->disk_type_definition('postgres-medium',
+          common => {
+            disk_size => $self->for_scale({
+                dev => 16384, # 16 GB in MB
+                prod => 65536, # 64 GB in MB
+              }, 16384),
+          },
+          cloud_properties_for_iaas => {
+            aws => {
+              'type' => 'gp3',
+              'encrypted' => $self->TRUE,
+            },
+          },
+        ),
+        $self->disk_type_definition('postgres-large',
+          common => {
+            disk_size => $self->for_scale({
+                dev => 32768, # 32 GB in MB
+                prod => 131072, # 128 GB in MB
+              }, 32768),
+          },
+          cloud_properties_for_iaas => {
+            aws => {
+              'type' => 'gp3',
+              'encrypted' => $self->TRUE,
+            },
           },
         ),
       ],
