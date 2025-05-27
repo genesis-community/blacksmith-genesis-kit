@@ -70,7 +70,7 @@ sub perform {
     $env->notify(error => "environment files [#R{FAILED}]");
   }
 
-  return $self->done($ok);
+  return $self->done();
 }
 
 1;

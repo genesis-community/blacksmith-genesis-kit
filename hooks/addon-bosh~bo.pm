@@ -44,7 +44,7 @@ sub perform {
   );
   bail("Failed to log in to BOSH: %s", $login_out) if $login_rc != 0;
 
-  return $self->done(1);
+  return $self->done();
 }
 
 1;

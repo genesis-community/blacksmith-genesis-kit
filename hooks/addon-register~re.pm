@@ -149,7 +149,7 @@ sub perform {
     bail("Failed to enable service access for %s: %s", $service_id, $enable_out) if $enable_rc != 0;
   }
 
-  return $self->done(1);
+  return $self->done();
 }
 
 1;

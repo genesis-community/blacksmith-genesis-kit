@@ -322,6 +322,7 @@ sub _process_iaas_params {
     $self->{openstack_ssh_key} = $openstack_ssh_key;
     $self->{openstack_default_sgs} = \@openstack_default_sgs;
   }
+  return $self->done();
 }
 
 sub _create_environment_file {

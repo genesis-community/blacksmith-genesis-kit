@@ -70,7 +70,7 @@ sub perform {
   );
   bail("Failed to run curl command: %s", $err) if $rc != 0;
 
-  return $self->done(1);
+  return $self->done();
 }
 
 1;

@@ -54,7 +54,7 @@ sub perform {
   my ($out, $open_rc) = run('open "$1"', "$scheme://$blacksmith_username:$blacksmith_password\@$host:$port");
   bail("Failed to open browser: %s", $out) if $open_rc != 0;
 
-  return $self->done(1);
+  return $self->done();
 }
 
 1;

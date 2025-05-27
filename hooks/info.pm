@@ -89,7 +89,7 @@ sub perform {
     info($catalog);
   }
 
-  return $self->done(1);
+  return $self->done();
 }
 
 1;

@@ -58,8 +58,7 @@ sub perform {
     bail("Failed to import shield configuration: %s", $import_out) if $import_rc != 0;
   }
 
-  # Return successful completion
-  return $self->done(1);
+  return $self->done();
 }
 
 1;

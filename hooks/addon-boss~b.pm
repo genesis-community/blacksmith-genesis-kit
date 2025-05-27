@@ -38,7 +38,7 @@ sub perform {
   my ($out, $rc, $err) = run({interactive => 1}, 'boss "$@"', @{$self->{args}});
   bail("Failed to run boss command: %s", $err) if $rc != 0;
 
-  return $self->done(1);
+  return $self->done();
 }
 
 1;
