@@ -9,6 +9,14 @@ description: Blacksmith
 
 genesis_version_min: 2.8.5
 
+supports:
+- aws
+- azure
+- gcp
+- openstack
+- vsphere
+- stackit
+
 certificates:
   base:
     tls:
