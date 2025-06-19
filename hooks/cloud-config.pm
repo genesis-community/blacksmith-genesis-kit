@@ -1,10 +1,7 @@
-#!/usr/bin/env perl
-# vim: set ts=2 sw=2 sts=2 foldmethod=marker
-package Genesis::Hook::CloudConfig::Blacksmith v4.0.0;
+package Genesis::Hook::CloudConfig::Blacksmith;
 
-use strict;
-use warnings;
-use v5.20; # Genesis min perl version is 5.20
+use v5.20;
+use warnings; # Genesis min perl version is 5.20
 
 # Only needed for development
 BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/lib'}
@@ -462,6 +459,10 @@ sub perform {
     });
 
   $self->done($config);
+
+	return 1;
+
 }
 
 1;
+# vim: set ts=2 sw=2 sts=2 noet fdm=marker foldlevel=1:

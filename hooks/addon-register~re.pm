@@ -1,13 +1,12 @@
-#!/usr/bin/env perl
-# vim: set ts=2 sw=2 sts=2 foldmethod=marker
-package Genesis::Hook::Addon::Blacksmith::Register v4.0.0;
+package Genesis::Hook::Addon::Blacksmith::Register;
 
-use strict;
-use warnings;
-use v5.20; # Genesis min perl version is 5.20
+use v5.20;
+use warnings; # Genesis min perl version is 5.20
 use Genesis qw/bail info run new_enough/;
+# Only needed for development
+BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'./.genesis/lib'}
+
 use parent qw(Genesis::Hook::Addon);
-use lib $ENV{GENESIS_LIB} // "$ENV{HOME}/.genesis/lib";
 use File::Temp qw/tempdir/;
 
 sub init {
@@ -153,3 +152,4 @@ sub perform {
 }
 
 1;
+# vim: set ts=2 sw=2 sts=2 noet fdm=marker foldlevel=1:
