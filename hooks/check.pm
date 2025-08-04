@@ -74,7 +74,7 @@ sub check_cloud_config {
 
 	# Skip cloud config check for external BOSH or OCFP
 	return $self->check_result('cloud-config', 'skipped', "not applicable for external-bosh/OCFP environments")
-		if $self->want_feature('external-bosh') || $self->want_feature('ocfp');
+		if $self->has_feature('external-bosh') || $self->has_feature('ocfp');
 
 	return $self->check_result('cloud-config', 'failed', "no cloud config found")
 		unless $self->env->has_config('cloud');
@@ -111,7 +111,7 @@ sub check_environment_parameters {
 
 	$self->start_check('environment');
 
-	unless(self->want_feature('ocfp')) {
+	unless(self->has_feature('ocfp')) {
 		# Common required parameters
 		# Check for required IP parameter
 		my $has_ip = defined($self->env->lookup('params.ip', undef));
@@ -183,7 +183,7 @@ sub check_environment_parameters {
 	}
 
 	# Check broker TLS parameters if feature is enabled
-	if ($self->want_feature('broker-tls')) {
+	if ($self->has_feature('broker-tls')) {
 		if ($self->env->lookup('params.blacksmith_port', 3000) == 3000) {
 			my $has_tls_port = defined($self->env->lookup('params.blacksmith_tls_port', undef));
 			if (!$has_tls_port) {
@@ -203,11 +203,11 @@ sub _determine_iaas {
 
 	# Check features for IaaS
 	for my $iaas (qw(aws azure google openstack vsphere stackit)) {
-		return $iaas if $self->want_feature($iaas);
+		return $iaas if $self->has_feature($iaas);
 	}
 
 	# If using external-bosh or ocfp, we might not have an IaaS feature
-	return 'unknown' if $self->want_feature('external-bosh') || $self->want_feature('ocfp');
+	return 'unknown' if $self->has_feature('external-bosh') || $self->has_feature('ocfp');
 
 	return 'none';
 }
@@ -281,7 +281,7 @@ sub check_runtime_config {
 
 	# Skip for external BOSH or OCFP
 	return $self->check_result('runtime-config', 'skipped', 'not applicable for external-bosh/OCFP environments')
-		if $self->want_feature('external-bosh') || $self->want_feature('ocfp');
+		if $self->has_feature('external-bosh') || $self->has_feature('ocfp');
 
 	return $self->check_result('runtime-config', 'failed', 'no runtime config found')
 		unless $self->env->has_config('runtime');
@@ -303,16 +303,16 @@ sub check_feature_compatibility {
 	my @errors;
 
 	# Check for conflicting forge TLS features without base forge
-	if ($self->want_feature('redis-tls') && !$self->want_feature('redis')) {
+	if ($self->has_feature('redis-tls') && !$self->has_feature('redis')) {
 		push @errors, "redis-tls feature requires redis forge to be enabled";
 	}
 
-	if ($self->want_feature('rabbitmq-tls') && !$self->want_feature('rabbitmq')) {
+	if ($self->has_feature('rabbitmq-tls') && !$self->has_feature('rabbitmq')) {
 		push @errors, "rabbitmq-tls feature requires rabbitmq forge to be enabled";
 	}
 
 	# Check for shield features consistency
-	if ($self->want_feature('shield-backups') && !$self->env->lookup('params.shield_url', undef)) {
+	if ($self->has_feature('shield-backups') && !$self->env->lookup('params.shield_url', undef)) {
 		push @errors, "shield-backups feature requires shield connection parameters";
 	}
 
