@@ -1,12 +1,16 @@
-package Genesis::Hook::Addon::Blacksmith::Boss;
+package Genesis::Hook::Addon::Blacksmith::Boss v3.0.0;
 
-use v5.20;
-use warnings; # Genesis min perl version is 5.20
-use Genesis qw/bail info run/;
+use v5.20; # Genesis min perl version is 5.20
+use warnings;
+
 # Only needed for development
-BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'./.genesis/lib'}
+BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/lib'}
 
 use parent qw(Genesis::Hook::Addon);
+
+use Genesis qw/bail info warning error run/;
+
+# init - Initialize the addon {{{
 sub init {
   my $class = shift;
   my $obj = $class->SUPER::init(@_);
@@ -14,6 +18,9 @@ sub init {
   return $obj;
 }
 
+# }}}
+
+# cmd_details - Return command details {{{
 sub cmd_details {
   return
     "Interacts with the Blacksmith broker via the 'boss' CLI.\n".
@@ -21,6 +28,9 @@ sub cmd_details {
     "See https://github.com/blacksmith-community/boss for details.";
 }
 
+# }}}
+
+# perform - Execute the addon command {{{
 sub perform {
   my ($self) = @_;
 
@@ -38,6 +48,8 @@ sub perform {
 
   return $self->done();
 }
+
+# }}}
 
 1;
 # vim: set ts=2 sw=2 sts=2 noet fdm=marker foldlevel=1:
