@@ -52,9 +52,8 @@ sub perform {
               stackit => {
                 'net_id' => $self->network_reference('id'),
                 'security_groups' => $self->env->lookup('stackit_default_security_groups', ['default'])
-              },
-            },
-          },
+              }
+            }
         )
       ],
       'vm_types' => [
