@@ -14,7 +14,7 @@ use Genesis qw/bail info warning error run in_array new_enough/;
 use File::Basename qw/dirname/;
 
 # Include common utilities
-do dirname(__FILE__) . '/_util.pm';
+do(dirname(__FILE__) . '/_util.pm');
 
 ##
 ## Blacksmith Check Hook

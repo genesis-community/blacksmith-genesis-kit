@@ -7,7 +7,7 @@
 
 # Include common utilities
 use File::Basename qw/dirname/;
-do dirname(__FILE__) . '/_util.pm';
+do(dirname(__FILE__) . '/_util.pm');
 
 # Override init to add version check
 sub init {

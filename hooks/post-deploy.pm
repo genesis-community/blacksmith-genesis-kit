@@ -12,7 +12,7 @@ use Genesis qw/info warning error/;
 use File::Basename qw/dirname/;
 
 # Include common utilities
-do dirname(__FILE__) . '/_util.pm';
+do(dirname(__FILE__) . '/_util.pm');
 
 # init - Initialize the hook and check minimum Genesis version {{{
 sub init {

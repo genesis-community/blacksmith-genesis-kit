@@ -28,7 +28,7 @@ sub perform {
 
   my $config = $self->build_cloud_config({
       'networks' => [
-        $self->network_definition('blacksmith', 
+        $self->network_definition('blacksmith',
           strategy => 'ocfp',
           dynamic_subnets => {
             allocation => {
@@ -57,9 +57,9 @@ sub perform {
           cloud_properties_for_iaas => {
             openstack => {
               'instance_type' => $self->for_scale({
-                  dev => 'm1.2',
-                  prod => 'm1.3'
-                }, 'm1.2'),
+                  dev => 'g1a.4d',
+                  prod => 'g1a.8d'
+                }, 'g1a.4d'),
               'boot_from_volume' => $self->TRUE,
               'root_disk' => {
                 'size' => 32 # in gigabytes
@@ -107,11 +107,28 @@ sub perform {
                 }, 4096),
               'disk' => 32768,
             },
+            stackit => {
+              'instance_type' => $self->for_scale({
+                  dev => 'g1a.4d',
+                  prod => 'g1a.8d'
+                }, 'g1a.4d'),
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => {
+                'size' => 32
+              },
+            },
           },
         ),
         # Redis VM Types
         $self->vm_type_definition('redis-small',
           cloud_properties_for_iaas => {
+            stackit => {
+              'instance_type' => 'g1a.4d',
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => {
+                'size' => 16
+              },
+            },
             aws => {
               'instance_type' => $self->for_scale({
                   dev => 't3.medium',
@@ -133,6 +150,13 @@ sub perform {
         ),
         $self->vm_type_definition('redis-medium',
           cloud_properties_for_iaas => {
+            stackit => {
+              'instance_type' => 'g1a.4d',
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => {
+                'size' => 32
+              },
+            },
             aws => {
               'instance_type' => $self->for_scale({
                   dev => 't3.medium',
@@ -154,6 +178,13 @@ sub perform {
         ),
         $self->vm_type_definition('redis-large',
           cloud_properties_for_iaas => {
+            stackit => {
+              'instance_type' => 'g1a.8d',
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => {
+                'size' => 64
+              },
+            },
             aws => {
               'instance_type' => $self->for_scale({
                   dev => 't3.large',
@@ -176,6 +207,13 @@ sub perform {
         # RabbitMQ VM Types
         $self->vm_type_definition('rabbitmq-small',
           cloud_properties_for_iaas => {
+            stackit => {
+              'instance_type' => 'g1a.4d',
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => {
+                'size' => 16
+              },
+            },
             aws => {
               'instance_type' => $self->for_scale({
                   dev => 't3.small',
@@ -197,6 +235,13 @@ sub perform {
         ),
         $self->vm_type_definition('rabbitmq-medium',
           cloud_properties_for_iaas => {
+            stackit => {
+              'instance_type' => 'g1a.4d',
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => {
+                'size' => 32
+              },
+            },
             aws => {
               'instance_type' => $self->for_scale({
                   dev => 't3.medium',
@@ -218,6 +263,13 @@ sub perform {
         ),
         $self->vm_type_definition('rabbitmq-large',
           cloud_properties_for_iaas => {
+            stackit => {
+              'instance_type' => 'g1a.8d',
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => {
+                'size' => 64
+              },
+            },
             aws => {
               'instance_type' => $self->for_scale({
                   dev => 't3.large',
@@ -240,6 +292,13 @@ sub perform {
         # PostgreSQL VM Types
         $self->vm_type_definition('postgres-small',
           cloud_properties_for_iaas => {
+            stackit => {
+              'instance_type' => 'g1a.4d',
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => {
+                'size' => 16
+              },
+            },
             aws => {
               'instance_type' => $self->for_scale({
                   dev => 't3.small',
@@ -261,6 +320,13 @@ sub perform {
         ),
         $self->vm_type_definition('postgres-medium',
           cloud_properties_for_iaas => {
+            stackit => {
+              'instance_type' => 'g1a.4d',
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => {
+                'size' => 32
+              },
+            },
             aws => {
               'instance_type' => $self->for_scale({
                   dev => 't3.medium',
@@ -282,6 +348,13 @@ sub perform {
         ),
         $self->vm_type_definition('postgres-large',
           cloud_properties_for_iaas => {
+            stackit => {
+              'instance_type' => 'g1a.8d',
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => {
+                'size' => 64
+              },
+            },
             aws => {
               'instance_type' => $self->for_scale({
                   dev => 't3.large',
@@ -325,6 +398,7 @@ sub perform {
               'type' => 'pd-ssd',
             },
             vsphere => {},
+            stackit => {},
           },
         ),
         # Redis Disk Types
@@ -336,6 +410,9 @@ sub perform {
               }, 8192),
           },
           cloud_properties_for_iaas => {
+            stackit => {
+              'type' => 'storage_premium_perf2',
+            },
             aws => {
               'type' => 'gp3',
               'encrypted' => $self->TRUE,
@@ -350,6 +427,9 @@ sub perform {
               }, 16384),
           },
           cloud_properties_for_iaas => {
+            stackit => {
+              'type' => 'storage_premium_perf4',
+            },
             aws => {
               'type' => 'gp3',
               'encrypted' => $self->TRUE,
@@ -364,6 +444,9 @@ sub perform {
               }, 32768),
           },
           cloud_properties_for_iaas => {
+            stackit => {
+              'type' => 'storage_premium_perf6',
+            },
             aws => {
               'type' => 'gp3',
               'encrypted' => $self->TRUE,
@@ -379,6 +462,9 @@ sub perform {
               }, 8192),
           },
           cloud_properties_for_iaas => {
+            stackit => {
+              'type' => 'storage_premium_perf2',
+            },
             aws => {
               'type' => 'gp3',
               'encrypted' => $self->TRUE,
@@ -393,6 +479,9 @@ sub perform {
               }, 16384),
           },
           cloud_properties_for_iaas => {
+            stackit => {
+              'type' => 'storage_premium_perf4',
+            },
             aws => {
               'type' => 'gp3',
               'encrypted' => $self->TRUE,
@@ -407,6 +496,9 @@ sub perform {
               }, 32768),
           },
           cloud_properties_for_iaas => {
+            stackit => {
+              'type' => 'storage_premium_perf6',
+            },
             aws => {
               'type' => 'gp3',
               'encrypted' => $self->TRUE,
@@ -422,6 +514,9 @@ sub perform {
               }, 8192),
           },
           cloud_properties_for_iaas => {
+            stackit => {
+              'type' => 'storage_premium_perf2',
+            },
             aws => {
               'type' => 'gp3',
               'encrypted' => $self->TRUE,
@@ -436,6 +531,9 @@ sub perform {
               }, 16384),
           },
           cloud_properties_for_iaas => {
+            stackit => {
+              'type' => 'storage_premium_perf4',
+            },
             aws => {
               'type' => 'gp3',
               'encrypted' => $self->TRUE,
@@ -453,6 +551,9 @@ sub perform {
             aws => {
               'type' => 'gp3',
               'encrypted' => $self->TRUE,
+            },
+            stackit => {
+              'type' => 'storage_premium_perf6',
             },
           },
         ),
