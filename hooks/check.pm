@@ -111,7 +111,7 @@ sub check_environment_parameters {
 
 	$self->start_check('environment');
 
-	unless(self->wants_feature('ocfp')) {
+	unless($self->wants_feature('ocfp')) {
 		# Common required parameters
 		# Check for required IP parameter
 		my $has_ip = defined($self->env->lookup('params.ip', undef));

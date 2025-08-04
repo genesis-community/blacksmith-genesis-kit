@@ -35,7 +35,8 @@ sub perform {
               size => 0,
               statics => 0,
             },
-            cloud_properties_for_iaas => {
+          },
+          cloud_properties_for_iaas => {
               openstack => {
                 'net_id' => $self->network_reference('id'),
                 'security_groups' => ['default']
