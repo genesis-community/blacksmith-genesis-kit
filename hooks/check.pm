@@ -73,40 +73,32 @@ sub check_cloud_config {
 	$self->start_check('cloud-config');
 
 	# Skip cloud config check for external BOSH or OCFP
-	return $self->check_result('cloud-config', 'skipped', "not applicable for external-bosh/OCFP environments") 
+	return $self->check_result('cloud-config', 'skipped', "not applicable for external-bosh/OCFP environments")
 		if $self->want_feature('external-bosh') || $self->want_feature('ocfp');
-	
-	return $self->check_result('cloud-config', 'failed', "no cloud config found") 
+
+	return $self->check_result('cloud-config', 'failed', "no cloud config found")
 		unless $self->env->has_config('cloud');
 
 	# Validate required cloud config components for Blacksmith
 	# These are the minimal requirements for deploying service instances
-	
+
 	# Check for required VM types
 	my @required_vm_types = qw(default small);
 	for my $vm_type (@required_vm_types) {
-		$self->has_entry('cloud-config', 'vm_type', $vm_type,
-			msg => "VM type '$vm_type' is recommended for service deployments"
-		);
+		$self->has_entry('cloud-config', 'vm_type', $vm_type);
 	}
-	
+
 	# Check for required disk types
 	my @required_disk_types = qw(default);
 	for my $disk_type (@required_disk_types) {
-		$self->has_entry('cloud-config', 'disk_type', $disk_type,
-			msg => "Disk type '$disk_type' is required for persistent storage"
-		);
+		$self->has_entry('cloud-config', 'disk_type', $disk_type);
 	}
-	
+
 	# Check for required networks
-	$self->has_entry('cloud-config', 'network', 'default',
-		msg => "Network 'default' is required for service deployments"
-	);
-	
+	$self->has_entry('cloud-config', 'network', 'default');
+
 	# Check for compilation configuration
-	$self->has_entry('cloud-config', 'compilation',
-		msg => "Compilation configuration is required"
-	);
+	$self->has_entry('cloud-config', 'compilation');
 
 	return $self->check_result('cloud-config');
 }
@@ -118,89 +110,85 @@ sub check_environment_parameters {
 	my ($self) = @_;
 
 	$self->start_check('environment');
-	
-	# Common required parameters
-	$self->has_entry('environment', 'params', 'ip',
-		required => 1, 
-		msg => "Static IP address for Blacksmith is required"
-	);
-	
+
+	unless(self->want_feature('ocfp')) {
+		# Common required parameters
+		# Check for required IP parameter
+		my $has_ip = defined($self->env->lookup('params.ip', undef));
+		$self->has_entry('environment', 'params', 'ip') unless $has_ip;
+		if (!$has_ip) {
+			error("Static IP address for Blacksmith is required (params.ip)");
+		}
+	}
+
 	# IaaS-specific parameter validation
 	my $iaas = $self->_determine_iaas();
-	
+
 	if ($iaas eq 'vsphere') {
 		# vSphere requires datastore configuration
 		for my $ds_type (qw(ephemeral persistent)) {
 			my $param_name = "vsphere_${ds_type}_datastores";
-			$self->has_entry('environment', 'params', $param_name, 
-				type => 'array', 
-				required => 1,
-				msg => "$ds_type datastore list is required for vSphere"
-			);
+			my $ds_value = $self->env->lookup("params.$param_name", undef);
+			if (!defined($ds_value) || ref($ds_value) ne 'ARRAY') {
+				error("$ds_type datastore list is required for vSphere (params.$param_name)");
+			}
 		}
-		
+
 		# Check for required vSphere parameters
 		for my $param (qw(vsphere_datacenter vsphere_clusters)) {
-			$self->has_entry('environment', 'params', $param,
-				required => 1,
-				msg => "$param is required for vSphere deployments"
-			);
+			if (!defined($self->env->lookup("params.$param", undef))) {
+				error("$param is required for vSphere deployments (params.$param)");
+			}
 		}
 	}
 	elsif ($iaas eq 'aws') {
 		# AWS requires region and security groups
-		$self->has_entry('environment', 'params', 'aws_region',
-			required => 1,
-			msg => "AWS region is required"
-		);
-		
-		$self->has_entry('environment', 'params', 'aws_default_sgs',
-			type => 'array',
-			required => 1,
-			msg => "AWS security groups are required"
-		);
+		if (!defined($self->env->lookup('params.aws_region', undef))) {
+			error("AWS region is required (params.aws_region)");
+		}
+
+		my $sgs = $self->env->lookup('params.aws_default_sgs', undef);
+		if (!defined($sgs) || ref($sgs) ne 'ARRAY') {
+			error("AWS security groups are required (params.aws_default_sgs)");
+		}
 	}
 	elsif ($iaas eq 'azure') {
 		# Azure requires resource group and security group
-		$self->has_entry('environment', 'params', 'azure_resource_group',
-			required => 1,
-			msg => "Azure resource group is required"
-		);
-		
-		$self->has_entry('environment', 'params', 'azure_default_sg',
-			required => 1,
-			msg => "Azure default security group is required"
-		);
+		if (!defined($self->env->lookup('params.azure_resource_group', undef))) {
+			error("Azure resource group is required (params.azure_resource_group)");
+		}
+
+		if (!defined($self->env->lookup('params.azure_default_sg', undef))) {
+			error("Azure default security group is required (params.azure_default_sg)");
+		}
 	}
 	elsif ($iaas eq 'google') {
 		# GCP requires project ID
-		$self->has_entry('environment', 'params', 'google_project',
-			required => 1,
-			msg => "Google Cloud project ID is required"
-		);
+		if (!defined($self->env->lookup('params.google_project', undef))) {
+			error("Google Cloud project ID is required (params.google_project)");
+		}
 	}
 	elsif ($iaas eq 'openstack') {
 		# OpenStack requires several parameters
 		for my $param (qw(openstack_auth_url openstack_region openstack_ssh_key)) {
-			$self->has_entry('environment', 'params', $param,
-				required => 1,
-				msg => "$param is required for OpenStack deployments"
-			);
+			if (!defined($self->env->lookup("params.$param", undef))) {
+				error("$param is required for OpenStack deployments (params.$param)");
+			}
 		}
-		
-		$self->has_entry('environment', 'params', 'openstack_default_security_groups',
-			type => 'array',
-			required => 1,
-			msg => "OpenStack security groups are required"
-		);
+
+		my $sgs = $self->env->lookup('params.openstack_default_security_groups', undef);
+		if (!defined($sgs) || ref($sgs) ne 'ARRAY') {
+			error("OpenStack security groups are required (params.openstack_default_security_groups)");
+		}
 	}
-	
+
 	# Check broker TLS parameters if feature is enabled
 	if ($self->want_feature('broker-tls')) {
 		if ($self->env->lookup('params.blacksmith_port', 3000) == 3000) {
-			$self->has_entry('environment', 'params', 'blacksmith_tls_port',
-				msg => "Consider setting blacksmith_tls_port (defaults to 443) when using broker-tls"
-			);
+			my $has_tls_port = defined($self->env->lookup('params.blacksmith_tls_port', undef));
+			if (!$has_tls_port) {
+				warning("Consider setting blacksmith_tls_port (defaults to 443) when using broker-tls");
+			}
 		}
 	}
 
@@ -212,15 +200,15 @@ sub check_environment_parameters {
 # _determine_iaas - Helper to determine which IaaS is being used {{{1
 sub _determine_iaas {
 	my ($self) = @_;
-	
+
 	# Check features for IaaS
 	for my $iaas (qw(aws azure google openstack vsphere stackit)) {
 		return $iaas if $self->want_feature($iaas);
 	}
-	
+
 	# If using external-bosh or ocfp, we might not have an IaaS feature
 	return 'unknown' if $self->want_feature('external-bosh') || $self->want_feature('ocfp');
-	
+
 	return 'none';
 }
 
@@ -261,16 +249,16 @@ sub check_certificates {
 # check_version_compatibility - Validate kit version upgrade compatibility {{{1
 sub check_version_compatibility {
 	my ($self) = @_;
-	
+
 	$self->start_check('version compatibility');
-	
+
 	my $exodus_data = $self->exodus_data;
 	my $last_version = $exodus_data->{kit_version};
-	
+
 	# If no previous deployment, skip version check
 	return $self->check_result('version compatibility', 'skipped', 'no previous deployment found')
 		unless $last_version;
-	
+
 	# Check if upgrade is supported
 	if ($last_version && !new_enough($last_version, "2.0.0")) {
 		return $self->check_result(
@@ -279,7 +267,7 @@ sub check_version_compatibility {
 			"cannot upgrade from v$last_version directly to v3.x. Please upgrade to at least v2.0.0 first"
 		);
 	}
-	
+
 	return $self->check_result('version compatibility');
 }
 
@@ -288,19 +276,19 @@ sub check_version_compatibility {
 # check_runtime_config - Validate runtime configuration {{{1
 sub check_runtime_config {
 	my ($self) = @_;
-	
+
 	$self->start_check('runtime-config');
-	
+
 	# Skip for external BOSH or OCFP
 	return $self->check_result('runtime-config', 'skipped', 'not applicable for external-bosh/OCFP environments')
 		if $self->want_feature('external-bosh') || $self->want_feature('ocfp');
-	
+
 	return $self->check_result('runtime-config', 'failed', 'no runtime config found')
 		unless $self->env->has_config('runtime');
-	
+
 	# Could add specific runtime config checks here if needed
 	# For example, checking for required addons
-	
+
 	return $self->check_result('runtime-config');
 }
 
@@ -309,38 +297,25 @@ sub check_runtime_config {
 # check_feature_compatibility - Validate feature combinations {{{1
 sub check_feature_compatibility {
 	my ($self) = @_;
-	
+
 	$self->start_check('feature compatibility');
-	
+
 	my @errors;
-	
+
 	# Check for conflicting forge TLS features without base forge
 	if ($self->want_feature('redis-tls') && !$self->want_feature('redis')) {
 		push @errors, "redis-tls feature requires redis forge to be enabled";
 	}
-	
+
 	if ($self->want_feature('rabbitmq-tls') && !$self->want_feature('rabbitmq')) {
 		push @errors, "rabbitmq-tls feature requires rabbitmq forge to be enabled";
 	}
-	
+
 	# Check for shield features consistency
 	if ($self->want_feature('shield-backups') && !$self->env->lookup('params.shield_url', undef)) {
 		push @errors, "shield-backups feature requires shield connection parameters";
 	}
-	
-	# Check OCFP feature compatibility
-	if ($self->want_feature('ocfp')) {
-		# OCFP implies external BOSH
-		if ($self->want_feature('external-bosh')) {
-			push @errors, "ocfp feature already implies external-bosh, no need to specify both";
-		}
-		
-		# Check for required OCFP parameters
-		unless ($self->env->lookup('params.ocfp_env', undef)) {
-			push @errors, "ocfp feature requires params.ocfp_env to be set";
-		}
-	}
-	
+
 	if (@errors) {
 		return $self->check_result(
 			'feature compatibility',
@@ -349,7 +324,7 @@ sub check_feature_compatibility {
 ", @errors)
 		);
 	}
-	
+
 	return $self->check_result('feature compatibility');
 }
 
