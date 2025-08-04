@@ -24,316 +24,339 @@ use Genesis qw/bail info warning error in_array/;
 ## - Addons: broker-tls, shield-*, redis-*, rabbitmq-*, cf-route-registrar
 ##
 
-# init - Initialize the hook {{{
+# init - Initialize the hook {{{1
 sub init {
-  my $class = shift;
-  my $obj = $class->SUPER::init(@_);
-  $obj->{files} = [];
-  $obj->check_minimum_genesis_version('3.1.0-rc.20');
-  return $obj;
+	my $class = shift;
+	my $obj = $class->SUPER::init(@_);
+	$obj->check_minimum_genesis_version('3.1.0');
+	return $obj;
 }
 
 # }}}
 
-# perform - Main hook execution {{{
+# perform - Main hook execution {{{1
 sub perform {
-  my ($self) = @_;
+	my ($self) = @_;
 
-  # Add base files
-  $self->add_files(qw(
-    manifests/blacksmith/blacksmith.yml
-    manifests/releases/blacksmith.yml
-  ));
+	# Add base files
+	$self->add_files(qw(
+		manifests/blacksmith/blacksmith.yml
+		manifests/releases/blacksmith.yml
+	));
 
-  # Handle deprecated features
-  $self->handle_deprecated_features();
+	# Validate features using modern pattern
+	$self->validate_blacksmith_features();
 
-  # Process and validate features
-  my ($iaas_count, $external_bosh_count, $forge_count) = $self->process_features();
+	# Process validated features
+	my ($iaas_count, $external_bosh_count, $forge_count) = $self->process_features();
 
-  # Apply post-processing based on features
-  $self->apply_post_processing($iaas_count, $external_bosh_count);
+	# Apply post-processing based on features
+	$self->apply_post_processing($iaas_count, $external_bosh_count);
 
-  # Validate final configuration
-  $self->validate_configuration($iaas_count, $external_bosh_count, $forge_count);
+	# Validate final configuration
+	$self->validate_configuration($iaas_count, $external_bosh_count, $forge_count);
 
-  return $self->done();
+	return $self->done();
 }
 
 # }}}
 
-# process_features - Process all configured features {{{
+# validate_blacksmith_features - Validate features using modern Genesis pattern {{{1
+sub validate_blacksmith_features {
+	my ($self) = @_;
+
+	# Build valid features list with IaaS-specific additions
+	my @valid_features = qw(
+		external-bosh
+		ocfp
+		aws
+		azure
+		google
+		openstack
+		vsphere
+		stackit
+		rabbitmq
+		redis
+		postgresql
+		mariadb
+		kubernetes
+		broker-tls
+		shield-backups
+		shield-agent
+		redis-tls
+		redis-dual-mode
+		rabbitmq-tls
+		rabbitmq-dual-mode
+		rabbitmq-dashboard-registration
+		rabbitmq-autoscale
+		cf-route-registrar
+	);
+
+	# Pre-validation custom checks
+	my (@warnings, @errors) = ();
+
+	# Check for required parameters based on features
+	if ($self->want_feature('cf-route-registrar')) {
+		push @errors, "Feature 'cf-route-registrar' requires params.cf_domain to be defined"
+			unless $self->env->lookup('params.cf_domain');
+	}
+
+	# IaaS-specific parameter validation
+	if ($self->want_feature('external-bosh')) {
+		my $bosh_env = $self->env->lookup('params.bosh_environment');
+		push @errors, "Feature 'external-bosh' requires params.bosh_environment"
+			unless $bosh_env;
+	}
+
+	# Perform validation with modern pattern
+	$self->validate_features(
+		valid_features              => \@valid_features,
+		deprecated_features         => {
+			# Legacy feature migrations
+			'minimum-vms'          => 'small-footprint',
+			'broker-tls-enabled'   => 'broker-tls',
+			
+			# Features now default behavior
+			'basic-auth' => {
+				msg => '- basic authentication is now enabled by default',
+				replace => []
+			},
+			
+			# Removed features
+			'experimental-k8s' => {
+				msg => 'Experimental Kubernetes support has been removed. Use the kubernetes forge feature instead.'
+				# No replace = invalid feature
+			}
+		},
+		mutually_exclusive_features => {
+			'iaas'     => [qw/aws azure google openstack vsphere stackit/],
+			'bosh-type' => [qw/external-bosh ocfp/],
+			'redis-tls' => [qw/redis-tls redis-dual-mode/],
+			'rabbitmq-tls' => [qw/rabbitmq-tls rabbitmq-dual-mode/]
+		},
+		warnings                    => \@warnings,
+		errors                      => \@errors
+	);
+}
+
+# }}}
+
+# process_features - Process all configured features {{{1
 sub process_features {
-  my ($self) = @_;
+	my ($self) = @_;
 
-  my $iaas_count = 0;
-  my $external_bosh_count = 0;
-  my $forge_count = 0;
+	my $iaas_count = 0;
+	my $external_bosh_count = 0;
+	my $forge_count = 0;
 
-  for my $feature ($self->features) {
-    # Process BOSH-related features
-    if ($self->is_bosh_feature($feature)) {
-      $external_bosh_count += $self->process_bosh_feature($feature);
-    }
-    # Process IaaS features
-    elsif ($self->is_iaas_feature($feature)) {
-      $iaas_count += $self->process_iaas_feature($feature);
-    }
-    # Process forge features
-    elsif ($self->is_forge_feature($feature)) {
-      $forge_count += $self->process_forge_feature($feature);
-    }
-    # Process addon features
-    elsif ($self->is_addon_feature($feature)) {
-      $self->process_addon_feature($feature);
-    }
-    # Process custom ops files
-    elsif (-f $self->env->path("ops/$feature.yml")) {
-      $self->add_files("ops/$feature.yml");
-    }
-    else {
-      warning("Unknown feature: #C{%s} - ignoring", $feature);
-    }
-  }
+	for my $feature ($self->features) {
+		# Process BOSH-related features
+		if ($self->is_bosh_feature($feature)) {
+			$external_bosh_count += $self->process_bosh_feature($feature);
+		}
+		# Process IaaS features
+		elsif ($self->is_iaas_feature($feature)) {
+			$iaas_count += $self->process_iaas_feature($feature);
+		}
+		# Process forge features
+		elsif ($self->is_forge_feature($feature)) {
+			$forge_count += $self->process_forge_feature($feature);
+		}
+		# Process addon features
+		elsif ($self->is_addon_feature($feature)) {
+			$self->process_addon_feature($feature);
+		}
+		# Process custom ops files
+		elsif (-f $self->env->path("ops/$feature.yml")) {
+			$self->add_files("ops/$feature.yml");
+		}
+	}
 
-  return ($iaas_count, $external_bosh_count, $forge_count);
+	return ($iaas_count, $external_bosh_count, $forge_count);
 }
 
 # }}}
 
-# Feature detection methods {{{{
+# Feature detection methods {{{1
 
-# is_bosh_feature - Check if feature is BOSH-related {{{
+# is_bosh_feature - Check if feature is BOSH-related {{{2
 sub is_bosh_feature {
-  my ($self, $feature) = @_;
-  return $feature =~ /^(ocfp|external-bosh)$/;
+	my ($self, $feature) = @_;
+	return $feature =~ /^(ocfp|external-bosh)$/;
 }
 # }}}
 
-# is_iaas_feature - Check if feature is IaaS-related {{{
+# is_iaas_feature - Check if feature is IaaS-related {{{2
 sub is_iaas_feature {
-  my ($self, $feature) = @_;
-  return $feature =~ /^(aws|azure|google|openstack|vsphere|stackit)$/;
+	my ($self, $feature) = @_;
+	return $feature =~ /^(aws|azure|google|openstack|vsphere|stackit)$/;
 }
 # }}}
 
-# is_forge_feature - Check if feature is forge-related {{{
+# is_forge_feature - Check if feature is forge-related {{{2
 sub is_forge_feature {
-  my ($self, $feature) = @_;
-  return $feature =~ /^(rabbitmq|redis|postgresql|mariadb|kubernetes)$/;
+	my ($self, $feature) = @_;
+	return $feature =~ /^(rabbitmq|redis|postgresql|mariadb|kubernetes)$/;
 }
 # }}}
 
-# is_addon_feature - Check if feature is addon-related {{{
+# is_addon_feature - Check if feature is addon-related {{{2
 sub is_addon_feature {
-  my ($self, $feature) = @_;
-  return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar)$/;
+	my ($self, $feature) = @_;
+	return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar)$/;
 }
 # }}}
 
 # }}}
 
-# Feature processing methods {{{{
+# Feature processing methods {{{1
 
-# process_bosh_feature - Process BOSH-related features {{{
+# process_bosh_feature - Process BOSH-related features {{{2
 sub process_bosh_feature {
-  my ($self, $feature) = @_;
-  
-  if ($feature eq 'ocfp') {
-    # OCFP Ref Arch requires external bosh
-    return 1;
-  }
-  elsif ($feature eq 'external-bosh') {
-    $self->add_files("manifests/blacksmith/external-bosh.yml");
-    return 1;
-  }
-  
-  return 0;
+	my ($self, $feature) = @_;
+	
+	if ($feature eq 'ocfp') {
+		# OCFP Ref Arch requires external bosh
+		return 1;
+	}
+	elsif ($feature eq 'external-bosh') {
+		$self->add_files("manifests/blacksmith/external-bosh.yml");
+		return 1;
+	}
+	
+	return 0;
 }
 # }}}
 
-# process_iaas_feature - Process IaaS features {{{
+# process_iaas_feature - Process IaaS features {{{2
 sub process_iaas_feature {
-  my ($self, $feature) = @_;
-  
-  # Store the IaaS type for later use
-  $ENV{OCFP_IAAS} = $feature;
-  return 1;
+	my ($self, $feature) = @_;
+	
+	# Store the IaaS type for later use
+	$ENV{OCFP_IAAS} = $feature;
+	return 1;
 }
 # }}}
 
-# process_forge_feature - Process forge features {{{
+# process_forge_feature - Process forge features {{{2
 sub process_forge_feature {
-  my ($self, $feature) = @_;
-  
-  $self->add_files("manifests/forges/$feature.yml");
-  return 1;
+	my ($self, $feature) = @_;
+	
+	$self->add_files("manifests/forges/$feature.yml");
+	return 1;
 }
 # }}}
 
-# process_addon_feature - Process addon features {{{
+# process_addon_feature - Process addon features {{{2
 sub process_addon_feature {
-  my ($self, $feature) = @_;
-  
-  if ($feature eq 'broker-tls') {
-    $self->add_files("manifests/blacksmith/broker-tls.yml");
-  }
-  elsif ($feature eq 'shield-backups') {
-    $self->add_files("manifests/blacksmith/shield-backups.yml");
-  }
-  elsif ($feature eq 'shield-agent') {
-    $self->add_files(
-      "manifests/blacksmith/shield-agent.yml",
-      "manifests/releases/shield-agent.yml"
-    );
-  }
-  elsif ($feature eq 'redis-tls') {
-    $self->add_files("manifests/forges/redis-tls.yml");
-  }
-  elsif ($feature eq 'redis-dual-mode') {
-    $self->add_files("manifests/forges/redis-dual-mode.yml");
-  }
-  elsif ($feature eq 'rabbitmq-tls') {
-    $self->add_files("manifests/forges/rabbitmq-tls.yml");
-  }
-  elsif ($feature eq 'rabbitmq-dual-mode') {
-    $self->add_files("manifests/forges/rabbitmq-dual-mode.yml");
-  }
-  elsif ($feature eq 'rabbitmq-dashboard-registration') {
-    $self->add_files("manifests/forges/rabbitmq-dashboard-registration.yml");
-  }
-  elsif ($feature eq 'rabbitmq-autoscale') {
-    $self->add_files("manifests/forges/rabbitmq-autoscale.yml");
-  }
-  elsif ($feature eq 'cf-route-registrar') {
-    $self->add_files("manifests/blacksmith/cf-route-registrar.yml");
-  }
+	my ($self, $feature) = @_;
+	
+	if ($feature eq 'broker-tls') {
+		$self->add_files("manifests/blacksmith/broker-tls.yml");
+	}
+	elsif ($feature eq 'shield-backups') {
+		$self->add_files("manifests/blacksmith/shield-backups.yml");
+	}
+	elsif ($feature eq 'shield-agent') {
+		$self->add_files(
+			"manifests/blacksmith/shield-agent.yml",
+			"manifests/releases/shield-agent.yml"
+		);
+	}
+	elsif ($feature eq 'redis-tls') {
+		$self->add_files("manifests/forges/redis-tls.yml");
+	}
+	elsif ($feature eq 'redis-dual-mode') {
+		$self->add_files("manifests/forges/redis-dual-mode.yml");
+	}
+	elsif ($feature eq 'rabbitmq-tls') {
+		$self->add_files("manifests/forges/rabbitmq-tls.yml");
+	}
+	elsif ($feature eq 'rabbitmq-dual-mode') {
+		$self->add_files("manifests/forges/rabbitmq-dual-mode.yml");
+	}
+	elsif ($feature eq 'rabbitmq-dashboard-registration') {
+		$self->add_files("manifests/forges/rabbitmq-dashboard-registration.yml");
+	}
+	elsif ($feature eq 'rabbitmq-autoscale') {
+		$self->add_files("manifests/forges/rabbitmq-autoscale.yml");
+	}
+	elsif ($feature eq 'cf-route-registrar') {
+		$self->add_files("manifests/blacksmith/cf-route-registrar.yml");
+	}
 }
 
 # }}}
 
 # }}}
 
-# apply_post_processing - Apply post-processing based on features {{{
+# apply_post_processing - Apply post-processing based on features {{{1
 sub apply_post_processing {
-  my ($self, $iaas_count, $external_bosh_count) = @_;
-  
-  # Add internal BOSH if no external BOSH specified
-  if ($external_bosh_count == 0) {
-    $self->add_files("manifests/blacksmith/bosh.yml");
-  }
+	my ($self, $iaas_count, $external_bosh_count) = @_;
+	
+	# Add internal BOSH if no external BOSH specified
+	if ($external_bosh_count == 0) {
+		$self->add_files("manifests/blacksmith/bosh.yml");
+	}
 
-  # Add the IaaS manifest only if we are not using the OCFP feature.
-  if (!$self->want_feature("ocfp") && $iaas_count != 0) {
-    $self->add_files("manifests/iaas/$ENV{OCFP_IAAS}.yml");
+	# Add the IaaS manifest only if we are not using the OCFP feature.
+	if (!$self->want_feature("ocfp") && $iaas_count != 0) {
+		$self->add_files("manifests/iaas/$ENV{OCFP_IAAS}.yml");
 
-    if (!$self->want_feature("vsphere")) {
-      # vSphere doesn't need a registry, but everyone else does...
-      $self->add_files("manifests/addons/registry.yml");
-    }
-  }
+		if (!$self->want_feature("vsphere")) {
+			# vSphere doesn't need a registry, but everyone else does...
+			$self->add_files("manifests/addons/registry.yml");
+		}
+	}
 
-  # Handle OCFP-specific files
-  if ($self->want_feature("ocfp")) {
-    $self->add_files(
-      "ocfp/meta.yml",
-      "ocfp/ocfp.yml",
-      "ocfp/$ENV{OCFP_IAAS}/ocf.yml"
-    );
+	# Handle OCFP-specific files
+	if ($self->want_feature("ocfp")) {
+		$self->add_files(
+			"ocfp/meta.yml",
+			"ocfp/ocfp.yml",
+			"ocfp/$ENV{OCFP_IAAS}/ocf.yml"
+		);
 
-    if ($self->want_feature("shield-backups")) {
-      $self->add_files("ocfp/shield-backups.yml");
-    }
+		if ($self->want_feature("shield-backups")) {
+			$self->add_files("ocfp/shield-backups.yml");
+		}
 
-    if ($self->want_feature("shield-agent")) {
-      $self->add_files("ocfp/shield-agent.yml");
-    }
-  }
+		if ($self->want_feature("shield-agent")) {
+			$self->add_files("ocfp/shield-agent.yml");
+		}
+	}
 }
 
 # }}}
 
-# validate_configuration - Validate the final configuration {{{
+# validate_configuration - Validate the final configuration {{{1
 sub validate_configuration {
-  my ($self, $iaas_count, $external_bosh_count, $forge_count) = @_;
-  
-  my @errors;
-  
-  # Validate IaaS selection
-  if ($iaas_count == 0 && $external_bosh_count == 0) {
-    push @errors, "You have not enabled an IaaS feature flag. Please specify one of: aws, azure, google, openstack, vsphere, stackit, or use external-bosh/ocfp.";
-  }
-  
-  if ($iaas_count > 1) {
-    push @errors, "You have enabled more than one IaaS feature flag. Please specify only one.";
-  }
-  
-  # Validate forge selection
-  if ($forge_count == 0) {
-    push @errors, "You have not activated any Blacksmith Forges. Please specify at least one of: rabbitmq, redis, postgresql, mariadb, kubernetes.";
-  }
-  
-  # Bail if we have errors
-  if (@errors) {
-    error("Blueprint validation failed:");
-    for my $err (@errors) {
-      error("  - %s", $err);
-    }
-    bail("Cannot continue with invalid configuration.");
-  }
-}
-
-# }}}
-
-# handle_deprecated_features - Process deprecated features and provide guidance {{{
-sub handle_deprecated_features {
-  my ($self) = @_;
-  
-  # Define deprecated features and their replacements
-  my %deprecated = (
-    # Example structure for future use:
-    # 'old-feature' => {
-    #   replacement => 'new-feature',
-    #   message => 'Custom migration message'
-    # }
-  );
-  
-  my @warnings;
-  my @updated_features;
-  
-  for my $feature ($self->features) {
-    if (exists $deprecated{$feature}) {
-      my $info = $deprecated{$feature};
-      
-      if ($info->{replacement}) {
-        push @warnings, sprintf(
-          "Feature #y{%s} is deprecated and has been replaced with #c{%s}",
-          $feature, $info->{replacement}
-        );
-        push @updated_features, $info->{replacement};
-      } else {
-        push @warnings, sprintf(
-          "Feature #y{%s} is deprecated and will be removed in a future version",
-          $feature
-        );
-        push @warnings, $info->{message} if $info->{message};
-      }
-    } else {
-      push @updated_features, $feature;
-    }
-  }
-  
-  # Display warnings if any
-  if (@warnings) {
-    warning("Feature deprecation notices:");
-    for my $warn (@warnings) {
-      warning("  - %s", $warn);
-    }
-    info("");
-  }
-  
-  # Update features list with replacements
-  $self->set_features(@updated_features) if @warnings;
+	my ($self, $iaas_count, $external_bosh_count, $forge_count) = @_;
+	
+	my @errors;
+	
+	# Validate IaaS selection
+	if ($iaas_count == 0 && $external_bosh_count == 0) {
+		push @errors, "You have not enabled an IaaS feature flag. Please specify one of: aws, azure, google, openstack, vsphere, stackit, or use external-bosh/ocfp.";
+	}
+	
+	if ($iaas_count > 1) {
+		push @errors, "You have enabled more than one IaaS feature flag. Please specify only one.";
+	}
+	
+	# Validate forge selection
+	if ($forge_count == 0) {
+		push @errors, "You have not activated any Blacksmith Forges. Please specify at least one of: rabbitmq, redis, postgresql, mariadb, kubernetes.";
+	}
+	
+	# Bail if we have errors
+	if (@errors) {
+		error("Blueprint validation failed:");
+		for my $err (@errors) {
+			error("  - %s", $err);
+		}
+		bail("Cannot continue with invalid configuration.");
+	}
 }
 
 # }}}

@@ -1,55 +1,68 @@
-package Genesis::Hook::Addon::Blacksmith::Boss v3.0.0;
+package Genesis::Hook::Addon::Blacksmith::Boss;
 
-use v5.20; # Genesis min perl version is 5.20
+use v5.20;
 use warnings;
 
 # Only needed for development
-BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/lib'}
+BEGIN { push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME} . '/.genesis/lib' }
 
 use parent qw(Genesis::Hook::Addon);
 
 use Genesis qw/bail info warning error run/;
 
-# init - Initialize the addon {{{
-sub init {
-  my $class = shift;
-  my $obj = $class->SUPER::init(@_);
-  $obj->check_minimum_genesis_version('3.1.0-rc.20');
-  return $obj;
+# Include common methods from mixin
+BEGIN {
+	require File::Basename;
+	my $mixin_file = File::Basename::dirname(__FILE__) . '/_addon.pm';
+	do $mixin_file or die "Failed to include addon mixin $mixin_file: $!";
 }
 
-# }}}
-
-# cmd_details - Return command details {{{
 sub cmd_details {
-  return
-    "Interacts with the Blacksmith broker via the 'boss' CLI.\n".
-    "The boss CLI must be installed separately.\n".
-    "See https://github.com/blacksmith-community/boss for details.";
+	return
+		"Interacts with the Blacksmith broker via the 'boss' CLI.\n".
+		"The boss CLI must be installed separately.\n".
+		"See https://github.com/blacksmith-community/boss for details.";
 }
 
-# }}}
-
-# perform - Execute the addon command {{{
 sub perform {
-  my ($self) = @_;
+	my ($self) = @_;
+	my $env = $self->env;
 
-  # Check if boss is installed
-  my ($boss_check, $boss_rc) = run({stderr => '/dev/null'}, 'command -v boss >/dev/null 2>&1');
-  if ($boss_rc != 0) {
-    info("  !!! install the 'boss' cli first!");
-    info("      (https://github.com/blacksmith-community/boss)");
-    return $self->done(0);
-  }
+	# Check if boss is installed using mixin method
+	my $install_hints = [
+		{ os => 'All', cmd => 'Download from https://github.com/blacksmith-community/boss/releases' }
+	];
+	
+	unless ($self->check_command_availability('boss', $install_hints)) {
+		info("\n");
+		info("The 'boss' CLI is the Blacksmith OSB Service Broker client.\n");
+		info("It provides a command-line interface for managing service instances.\n");
+		info("\n");
+		info("For installation instructions, visit:\n");
+		info("  #B{https://github.com/blacksmith-community/boss}\n");
+		return $self->done(0);
+	}
 
-  # Execute boss with all provided arguments
-  my ($out, $rc, $err) = run({interactive => 1}, 'boss "$@"', @{$self->{args}});
-  bail("Failed to run boss command: %s", $err) if $rc != 0;
+	# Get connection details using mixin method
+	my $connection_info = $self->get_blacksmith_connection_info();
+	
+	# Set environment variables for boss
+	$ENV{BOSS_URL} = $connection_info->{url};
+	$ENV{BOSS_USERNAME} = $connection_info->{username};
+	$ENV{BOSS_PASSWORD} = $connection_info->{password};
+	
+	info("Connecting to Blacksmith at #C{%s}...\n", $connection_info->{url});
+	
+	# Execute boss with all provided arguments
+	my ($out, $rc, $err) = run({interactive => 1}, 'boss "$@"', @{$self->{args}});
+	
+	if ($rc != 0) {
+		error("\nBoss command failed: %s\n", $err || 'Unknown error');
+		return $self->done(0);
+	}
 
-  return $self->done();
+	return $self->done();
 }
-
-# }}}
 
 1;
 # vim: set ts=2 sw=2 sts=2 noet fdm=marker foldlevel=1:
