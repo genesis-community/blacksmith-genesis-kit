@@ -48,6 +48,7 @@ sub perform {
               },
               google => {},
               vsphere => {},
+              stackit => {},
             },
           },
         )
