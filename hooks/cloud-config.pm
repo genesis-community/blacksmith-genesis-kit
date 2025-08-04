@@ -26,13 +26,14 @@ sub perform {
 
   my $iaas = $self->env->iaas;
 
-  my $config = $self->build_cloud_config({
-      'networks' => [
-        $self->network_definition('blacksmith',
-          strategy => 'ocfp',
-          dynamic_subnets => {
-            allocation => {
-              size => 0,
+  my $config = $self->build_cloud_config(
+		{
+			'networks' => [
+				$self->network_definition('blacksmith',
+					strategy => 'ocfp',
+					dynamic_subnets => {
+						allocation => {
+							size => 0,
               statics => 0,
             },
             cloud_properties_for_iaas => {
@@ -53,6 +54,7 @@ sub perform {
                 'security_groups' => $self->env->lookup('stackit_default_security_groups', ['default'])
               }
             }
+					}
         )
       ],
       'vm_types' => [
@@ -561,7 +563,8 @@ sub perform {
           },
         ),
       ],
-    });
+    }
+	);
 
   $self->done($config);
 
