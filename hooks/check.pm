@@ -116,7 +116,7 @@ sub check_environment_parameters {
 	$self->start_check('environment');
 	
 	# Common required parameters
-	$self->has_entry('environment', 'params', 'ip', 
+	$self->has_entry('environment', 'params', 'ip', undef,
 		required => 1, 
 		msg => "Static IP address for Blacksmith is required"
 	);
@@ -194,7 +194,7 @@ sub check_environment_parameters {
 	# Check broker TLS parameters if feature is enabled
 	if ($self->want_feature('broker-tls')) {
 		if ($self->env->lookup('params.blacksmith_port', 3000) == 3000) {
-			$self->has_entry('environment', 'params', 'blacksmith_tls_port',
+			$self->has_entry('environment', 'params', 'blacksmith_tls_port', undef,
 				msg => "Consider setting blacksmith_tls_port (defaults to 443) when using broker-tls"
 			);
 		}
@@ -231,7 +231,7 @@ sub check_certificates {
 	my $ip = $env->lookup('params.ip');
 	info("Checking if our certificates match the director static IP ($ip)...");
 
-	my $vault = $env->secrets_mount . '/' . $env->vault_prefix;
+	my $vault = $env->secrets_mount . '/' . $env->vault_path;
 	for my $cert (qw(tls/director tls/nats/server)) {
 		if (!$self->vault->exists("$vault/$cert")) {
 			info("    - $vault/$cert [#Y{MISSING}]");

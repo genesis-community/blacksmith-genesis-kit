@@ -28,7 +28,8 @@ sub perform {
 
   my $config = $self->build_cloud_config({
       'networks' => [
-        $self->network_definition('blacksmith', strategy => 'ocfp',
+        $self->network_definition('blacksmith', 
+          strategy => 'ocfp',
           dynamic_subnets => {
             allocation => {
               size => 0,

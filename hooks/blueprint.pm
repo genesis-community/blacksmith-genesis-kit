@@ -124,7 +124,7 @@ sub validate_blacksmith_features {
 			
 			# Removed features
 			'experimental-k8s' => {
-				msg => 'Experimental Kubernetes support has been removed. Use the kubernetes forge feature instead.'
+				msg => 'Experimental Kubernetes support has been removed. Use the kubernetes forge feature instead.',
 				# No replace = invalid feature
 			}
 		},
