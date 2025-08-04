@@ -5,6 +5,10 @@
 # Note: This file relies on the importing module to have the necessary
 # 'use' statements for Genesis, Genesis::UI, etc.
 
+# Include common utilities
+use File::Basename qw/dirname/;
+do dirname(__FILE__) . '/_util.pm';
+
 # Override init to add version check
 sub init {
 	my $class = shift;
@@ -19,8 +23,8 @@ sub get_blacksmith_connection_info {
 	my $env = $self->env;
 	
 	# Set up connection details
-	my $vault = $env->secrets_mount . '/' . $env->vault_prefix;
-	my $ip = $env->lookup('params.ip');
+	my $vault = $env->secrets_base;
+	my $ip = $self->_get_blacksmith_ip();
 	my $fqdn = $env->lookup('params.fqdn', '');
 	my $host = $fqdn || $ip;
 

@@ -9,6 +9,10 @@ BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/
 use parent qw(Genesis::Hook::PostDeploy);
 
 use Genesis qw/info warning error/;
+use File::Basename qw/dirname/;
+
+# Include common utilities
+do dirname(__FILE__) . '/_util.pm';
 
 # init - Initialize the hook and check minimum Genesis version {{{
 sub init {
@@ -65,7 +69,7 @@ sub export_deployment_info {
   my $manifest = $self->env->manifest;
   
   # Export Blacksmith endpoint information
-  my $ip = $env->lookup('params.ip');
+  my $ip = $self->_get_blacksmith_ip();
   my $port = $self->want_feature('broker-tls') 
     ? $env->lookup('params.blacksmith_tls_port', 443)
     : $env->lookup('params.blacksmith_port', 3000);
@@ -165,7 +169,7 @@ sub validate_deployment {
   info("\n#Bu{Post-deployment Validation}\n\n");
   
   # Check Blacksmith API connectivity
-  my $ip = $env->lookup('params.ip');
+  my $ip = $self->_get_blacksmith_ip();
   my $port = $self->want_feature('broker-tls')
     ? $env->lookup('params.blacksmith_tls_port', 443)
     : $env->lookup('params.blacksmith_port', 3000);

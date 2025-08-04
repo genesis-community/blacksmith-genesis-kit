@@ -50,7 +50,7 @@ sub perform {
               vsphere => {},
             },
           },
-        )
+        })
       ],
       'vm_types' => [
         $self->vm_type_definition('blacksmith',

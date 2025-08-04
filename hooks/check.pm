@@ -11,6 +11,10 @@ use parent qw(Genesis::Hook::Check);
 
 # Import required functions
 use Genesis qw/bail info warning error run in_array new_enough/;
+use File::Basename qw/dirname/;
+
+# Include common utilities
+do dirname(__FILE__) . '/_util.pm';
 
 ##
 ## Blacksmith Check Hook
@@ -116,7 +120,7 @@ sub check_environment_parameters {
 	$self->start_check('environment');
 	
 	# Common required parameters
-	$self->has_entry('environment', 'params', 'ip', undef,
+	$self->has_entry('environment', 'params', 'ip',
 		required => 1, 
 		msg => "Static IP address for Blacksmith is required"
 	);
@@ -194,7 +198,7 @@ sub check_environment_parameters {
 	# Check broker TLS parameters if feature is enabled
 	if ($self->want_feature('broker-tls')) {
 		if ($self->env->lookup('params.blacksmith_port', 3000) == 3000) {
-			$self->has_entry('environment', 'params', 'blacksmith_tls_port', undef,
+			$self->has_entry('environment', 'params', 'blacksmith_tls_port',
 				msg => "Consider setting blacksmith_tls_port (defaults to 443) when using broker-tls"
 			);
 		}
@@ -228,10 +232,11 @@ sub check_certificates {
 	my $env = $self->env;
 	my $ok = 1;
 
-	my $ip = $env->lookup('params.ip');
+	my $ip = $self->_get_blacksmith_ip();
+	return 1 unless $ip; # Skip cert check if no IP is set
 	info("Checking if our certificates match the director static IP ($ip)...");
 
-	my $vault = $env->secrets_mount . '/' . $env->vault_path;
+	my $vault = $env->secrets_base;
 	for my $cert (qw(tls/director tls/nats/server)) {
 		if (!$self->vault->exists("$vault/$cert")) {
 			info("    - $vault/$cert [#Y{MISSING}]");

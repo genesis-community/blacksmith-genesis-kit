@@ -11,6 +11,10 @@ use parent qw(Genesis::Hook);
 
 # Import required functions
 use Genesis qw/bail info warning error run/;
+use File::Basename qw/dirname/;
+
+# Include common utilities
+do dirname(__FILE__) . '/_util.pm';
 
 # init - Initialize the hook {{{
 sub init {
@@ -66,7 +70,7 @@ sub gather_deployment_info {
   my %info = ();
   
   # Basic deployment information
-  $info{ip} = $env->lookup('params.ip', '');
+  $info{ip} = $self->_get_blacksmith_ip();
   $info{fqdn} = $env->lookup('params.fqdn', '');
   $info{host} = $info{fqdn} || $info{ip};
   
