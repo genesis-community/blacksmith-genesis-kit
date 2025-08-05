@@ -33,7 +33,7 @@ meta:
 
     disk_type: (( concat meta.ocfp.env.cloud "disk-blacksmith" ))
     vm_type:   (( concat meta.ocfp.env.cloud "vm-blacksmith" ))
-    network:   (( concat genesis.env "-ocf" ))
+    network:   (( concat meta.ocfp.env.cloud "net-blacksmith" ))
 
     debug:      (( grab params.blacksmith_debug || false ))
     shareable:  (( grab params.blacksmith_sharable || false ))
