@@ -2,6 +2,7 @@
 meta:
   ocfp:
     env:
+      cloud: (( concat genesis.env "." genesis.type "." ))
       scale: (( grab params.ocfp_env_scale || "dev" ))
 
     vault:
@@ -30,8 +31,8 @@ meta:
     fqdn:   (( vault meta.ocfp.vault.tf "/ocf/fqdns:blacksmith" ))
     az:     (( concat genesis.env "-z1" ))
 
-    disk_type: blacksmith
-    vm_type:   blacksmith
+    disk_type: (( concat meta.ocfp.env.cloud "disk-blacksmith" ))
+    vm_type:   (( concat meta.ocfp.env.cloud "vm-blacksmith" ))
     network:   (( concat genesis.env "-ocf" ))
 
     debug:      (( grab params.blacksmith_debug || false ))

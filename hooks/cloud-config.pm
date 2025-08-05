@@ -26,8 +26,7 @@ sub perform {
 
   my $iaas = $self->env->iaas;
 
-  my $config = $self->build_cloud_config(
-		{
+  my $config = $self->build_cloud_config({
 			'networks' => [
 				$self->network_definition('blacksmith',
 					strategy => 'ocfp',
