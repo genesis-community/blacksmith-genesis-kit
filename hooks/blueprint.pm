@@ -96,13 +96,15 @@ sub validate_blacksmith_features {
 	my (@warnings, @errors) = ();
 
 	# Check for required parameters based on features
-	if ($self->want_feature('cf-route-registrar')) {
+	# Skip param validations for ocfp as it provides these via its reference architecture
+	if ($self->want_feature('cf-route-registrar') && !$self->want_feature('ocfp')) {
 		push @errors, "Feature 'cf-route-registrar' requires params.cf_domain to be defined"
 			unless $self->env->lookup('params.cf_domain');
 	}
 
 	# IaaS-specific parameter validation
-	if ($self->want_feature('external-bosh')) {
+	# Skip param validations for ocfp as it provides these via its reference architecture
+	if ($self->want_feature('external-bosh') && !$self->want_feature('ocfp')) {
 		my $bosh_env = $self->env->lookup('params.bosh_environment');
 		push @errors, "Feature 'external-bosh' requires params.bosh_environment"
 			unless $bosh_env;
@@ -130,7 +132,7 @@ sub validate_blacksmith_features {
 		},
 		mutually_exclusive_features => {
 			'iaas'     => [qw/aws azure google openstack vsphere stackit/],
-			'bosh-type' => [qw/external-bosh ocfp/],
+			# ocfp requires external-bosh, so they are not mutually exclusive
 			'redis-tls' => [qw/redis-dual-mode/],
 			'rabbitmq-tls' => [qw/rabbitmq-dual-mode/]
 		},
@@ -217,6 +219,7 @@ sub process_bosh_feature {
 
 	if ($feature eq 'ocfp') {
 		# OCFP Ref Arch requires external bosh
+		$self->add_files("manifests/blacksmith/external-bosh.yml");
 		return 1;
 	}
 	elsif ($feature eq 'external-bosh') {
