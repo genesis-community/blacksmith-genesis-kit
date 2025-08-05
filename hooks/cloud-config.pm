@@ -16,7 +16,7 @@ use JSON::PP;
 sub init {
   my $class = shift;
   my $obj = $class->SUPER::init(@_);
-  $obj->check_minimum_genesis_version('3.1.0-rc.20');
+  $obj->check_minimum_genesis_version('3.1.0');
   return $obj;
 }
 
@@ -42,16 +42,16 @@ sub perform {
                 'security_groups' => ['default']
               },
               aws => {
-                'security_groups' => $self->env->lookup('aws_default_sgs', ['default']),
+                'security_groups' => scalar $self->env->lookup('aws_default_sgs', ['default']),
               },
               azure => {
-                'security_group' => $self->env->lookup('azure_default_sg', 'default'),
+                'security_group' => scalar $self->env->lookup('azure_default_sg', 'default'),
               },
               google => {},
               vsphere => {},
               stackit => {
                 'net_id' => $self->network_reference('id'),
-                'security_groups' => $self->env->lookup('stackit_default_security_groups', ['default'])
+                'security_groups' => scalar $self->env->lookup('stackit_default_security_groups', ['default'])
               }
             }
 					}
