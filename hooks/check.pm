@@ -254,12 +254,16 @@ sub check_version_compatibility {
 
 	$self->start_check('version compatibility');
 
+	# Skip version compatibility check for OCFP
+	return $self->check_result('version compatibility', 'skipped', 'not applicable for OCFP environments')
+		if $self->wants_feature('ocfp');
+
 	my $exodus_data = $self->exodus_data;
 	my $last_version = $exodus_data->{kit_version};
 
 	# If no previous deployment, skip version check
 	return $self->check_result('version compatibility', 'skipped', 'no previous deployment found')
-		unless $last_version;
+	unless $last_version;
 
 	# Check if upgrade is supported
 	if ($last_version && !new_enough($last_version, "2.0.0")) {
