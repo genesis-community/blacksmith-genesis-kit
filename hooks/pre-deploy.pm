@@ -318,7 +318,7 @@ sub _validate_vsphere_requirements {
   
   my @missing;
   for my $secret (@required_secrets) {
-    unless ($self->vault->exists($secret)) {
+    unless ($self->env->vault->exists($secret)) {
       push @missing, $secret;
     }
   }
@@ -351,7 +351,7 @@ sub _validate_aws_requirements {
   
   my @missing;
   for my $secret (@required_secrets) {
-    unless ($self->vault->exists($secret)) {
+    unless ($self->env->vault->exists($secret)) {
       push @missing, $secret;
     }
   }
@@ -365,7 +365,7 @@ sub _validate_aws_requirements {
   }
   
   # Check for SSH key
-  unless ($self->vault->exists("${vault_base}aws/ssh:public")) {
+  unless ($self->env->vault->exists("${vault_base}aws/ssh:public")) {
     warning("  AWS SSH key not found in vault\n");
     warning("  Run 'genesis add-secrets' to generate it\n");
   }
@@ -392,7 +392,7 @@ sub _validate_azure_requirements {
   
   my @missing;
   for my $secret (@required_secrets) {
-    unless ($self->vault->exists($secret)) {
+    unless ($self->env->vault->exists($secret)) {
       push @missing, $secret;
     }
   }
@@ -418,7 +418,7 @@ sub _validate_gcp_requirements {
   
   # Check for required GCP credentials
   my $vault_base = $env->secrets_base;
-  unless ($self->vault->exists("${vault_base}google:json_key")) {
+  unless ($self->env->vault->exists("${vault_base}google:json_key")) {
     error("  Missing GCP service account key in vault\n");
     error("    - ${vault_base}google:json_key\n");
     return 0;
@@ -446,7 +446,7 @@ sub _validate_openstack_requirements {
   
   my @missing;
   for my $secret (@required_secrets) {
-    unless ($self->vault->exists($secret)) {
+    unless ($self->env->vault->exists($secret)) {
       push @missing, $secret;
     }
   }
