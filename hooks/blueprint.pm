@@ -115,13 +115,13 @@ sub validate_blacksmith_features {
 			# Legacy feature migrations
 			'minimum-vms'          => 'small-footprint',
 			'broker-tls-enabled'   => 'broker-tls',
-			
+
 			# Features now default behavior
 			'basic-auth' => {
 				msg => '- basic authentication is now enabled by default',
 				replace => []
 			},
-			
+
 			# Removed features
 			'experimental-k8s' => {
 				msg => 'Experimental Kubernetes support has been removed. Use the kubernetes forge feature instead.',
@@ -131,8 +131,8 @@ sub validate_blacksmith_features {
 		mutually_exclusive_features => {
 			'iaas'     => [qw/aws azure google openstack vsphere stackit/],
 			'bosh-type' => [qw/external-bosh ocfp/],
-			'redis-tls' => [qw/redis-tls redis-dual-mode/],
-			'rabbitmq-tls' => [qw/rabbitmq-tls rabbitmq-dual-mode/]
+			'redis-tls' => [qw/redis-dual-mode/],
+			'rabbitmq-tls' => [qw/rabbitmq-dual-mode/]
 		},
 		warnings                    => \@warnings,
 		errors                      => \@errors
@@ -214,7 +214,7 @@ sub is_addon_feature {
 # process_bosh_feature - Process BOSH-related features {{{2
 sub process_bosh_feature {
 	my ($self, $feature) = @_;
-	
+
 	if ($feature eq 'ocfp') {
 		# OCFP Ref Arch requires external bosh
 		return 1;
@@ -223,7 +223,7 @@ sub process_bosh_feature {
 		$self->add_files("manifests/blacksmith/external-bosh.yml");
 		return 1;
 	}
-	
+
 	return 0;
 }
 # }}}
@@ -231,7 +231,7 @@ sub process_bosh_feature {
 # process_iaas_feature - Process IaaS features {{{2
 sub process_iaas_feature {
 	my ($self, $feature) = @_;
-	
+
 	# Store the IaaS type for later use
 	$ENV{OCFP_IAAS} = $feature;
 	return 1;
@@ -241,7 +241,7 @@ sub process_iaas_feature {
 # process_forge_feature - Process forge features {{{2
 sub process_forge_feature {
 	my ($self, $feature) = @_;
-	
+
 	$self->add_files("manifests/forges/$feature.yml");
 	return 1;
 }
@@ -250,7 +250,7 @@ sub process_forge_feature {
 # process_addon_feature - Process addon features {{{2
 sub process_addon_feature {
 	my ($self, $feature) = @_;
-	
+
 	if ($feature eq 'broker-tls') {
 		$self->add_files("manifests/blacksmith/broker-tls.yml");
 	}
@@ -293,7 +293,7 @@ sub process_addon_feature {
 # apply_post_processing - Apply post-processing based on features {{{1
 sub apply_post_processing {
 	my ($self, $iaas_count, $external_bosh_count) = @_;
-	
+
 	# Add internal BOSH if no external BOSH specified
 	if ($external_bosh_count == 0) {
 		$self->add_files("manifests/blacksmith/bosh.yml");
@@ -332,23 +332,23 @@ sub apply_post_processing {
 # validate_configuration - Validate the final configuration {{{1
 sub validate_configuration {
 	my ($self, $iaas_count, $external_bosh_count, $forge_count) = @_;
-	
+
 	my @errors;
-	
+
 	# Validate IaaS selection
 	if ($iaas_count == 0 && $external_bosh_count == 0) {
 		push @errors, "You have not enabled an IaaS feature flag. Please specify one of: aws, azure, google, openstack, vsphere, stackit, or use external-bosh/ocfp.";
 	}
-	
+
 	if ($iaas_count > 1) {
 		push @errors, "You have enabled more than one IaaS feature flag. Please specify only one.";
 	}
-	
+
 	# Validate forge selection
 	if ($forge_count == 0) {
 		push @errors, "You have not activated any Blacksmith Forges. Please specify at least one of: rabbitmq, redis, postgresql, mariadb, kubernetes.";
 	}
-	
+
 	# Bail if we have errors
 	if (@errors) {
 		error("Blueprint validation failed:");

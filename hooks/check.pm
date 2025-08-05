@@ -142,14 +142,16 @@ sub check_environment_parameters {
 		}
 	}
 	elsif ($iaas eq 'aws') {
-		# AWS requires region and security groups
-		if (!defined($self->env->lookup('params.aws_region', undef))) {
-			error("AWS region is required (params.aws_region)");
-		}
+		# AWS requires region and security groups (unless using OCFP where they come from vault)
+		unless ($self->wants_feature('ocfp')) {
+			if (!defined($self->env->lookup('params.aws_region', undef))) {
+				error("AWS region is required (params.aws_region)");
+			}
 
-		my $sgs = $self->env->lookup('params.aws_default_sgs', undef);
-		if (!defined($sgs) || ref($sgs) ne 'ARRAY') {
-			error("AWS security groups are required (params.aws_default_sgs)");
+			my $sgs = $self->env->lookup('params.aws_default_sgs', undef);
+			if (!defined($sgs) || ref($sgs) ne 'ARRAY') {
+				error("AWS security groups are required (params.aws_default_sgs)");
+			}
 		}
 	}
 	elsif ($iaas eq 'azure') {
@@ -182,8 +184,8 @@ sub check_environment_parameters {
 		}
 	}
 
-	# Check broker TLS parameters if feature is enabled
-	if ($self->wants_feature('broker-tls')) {
+	# Check broker TLS parameters if feature is enabled (unless using OCFP)
+	if ($self->wants_feature('broker-tls') && !$self->wants_feature('ocfp')) {
 		if ($self->env->lookup('params.blacksmith_port', 3000) == 3000) {
 			my $has_tls_port = defined($self->env->lookup('params.blacksmith_tls_port', undef));
 			if (!$has_tls_port) {
