@@ -342,6 +342,14 @@ sub _validate_aws_requirements {
   my ($self) = @_;
   my $env = $self->env;
   
+  # Skip AWS credential validation for external-bosh or ocfp
+  # When using external-bosh, BOSH director handles the AWS credentials
+  if ($self->want_feature('external-bosh') || $self->want_feature('ocfp')) {
+    info("  AWS credential validation skipped for external-bosh/OCFP\n");
+    info("  AWS requirements [#G{OK}] (handled by BOSH director)\n");
+    return 1;
+  }
+  
   # Check for required AWS credentials
   my $vault_base = $env->secrets_base;
   my @required_secrets = (
