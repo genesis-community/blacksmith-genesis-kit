@@ -228,15 +228,15 @@ sub check_certificates {
 
 	my $vault = $env->secrets_base;
 	for my $cert (qw(tls/director tls/nats/server)) {
-		if (!$self->vault->exists("$vault/$cert")) {
+		if (!$self->vault->exists("$vault$cert")) {
 			info("    - $vault/$cert [#Y{MISSING}]");
 		} else {
-			my ($out, $rc) = run({stderr => '/dev/null'}, 'safe --quiet x509 validate "$1" --for "$2"', "$vault/$cert", "$ip");
+			my ($out, $rc) = run({stderr => '/dev/null'}, 'safe --quiet x509 validate "$1" --for "$2"', "$vault$cert", "$ip");
 			if ($rc == 0) {
 				info("    - $vault/$cert [#G{OK}]");
 			} else {
 				info("    - $vault/$cert [#R{INVALID}]");
-				my ($validation_out, $valid_rc) = run('safe x509 validate "$1" --for "$2" 2>&1', "$vault/$cert", "$ip");
+				my ($validation_out, $valid_rc) = run('safe x509 validate "$1" --for "$2" 2>&1', "$vault$cert", "$ip");
 				info("      %s", $validation_out);
 				$ok = 0;
 			}

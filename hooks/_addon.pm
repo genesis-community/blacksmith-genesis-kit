@@ -42,7 +42,7 @@ sub get_blacksmith_connection_info {
 	# Get password from vault
 	my $blacksmith_password;
 	eval {
-		$blacksmith_password = $self->vault->get("$vault/broker:password");
+		$blacksmith_password = $self->vault->get("${vault}broker:password");
 	};
 	if ($@) {
 		bail("Failed to retrieve Blacksmith password from vault: %s", $@);

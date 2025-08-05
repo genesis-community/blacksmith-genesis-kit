@@ -46,7 +46,7 @@ sub ca_sync {
 	info("Syncing Blacksmith CA certificates...\n");
 	
 	# Sync Blacksmith services CA
-	my $broker_ca_path = $env->secrets_mount . '/' . $env->vault_prefix . '/broker/ca';
+	my $broker_ca_path = $env->secrets_base . 'broker/ca';
 	
 	# Check if CA exists
 	unless ($self->vault->exists($broker_ca_path)) {
@@ -71,7 +71,7 @@ sub ca_sync {
 
 	# Sync NATS client certificate if needed
 	my $exodus_path = $env->secrets_mount . '/exodus/' . $cf_env_name . '/cf';
-	my $cf_vault_path = $env->secrets_mount . '/' . $env->vault_prefix =~ s/blacksmith/cf/r;
+	my $cf_vault_path = $env->secrets_base =~ s/blacksmith/cf/r;
 	
 	if ($self->vault->exists("$exodus_path:nats_client_cert")) {
 		info("  Setting nats_client_cert in Credhub...\n");

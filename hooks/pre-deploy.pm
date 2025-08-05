@@ -55,6 +55,12 @@ sub check_version_upgrade {
   
   info("Checking version compatibility...\n");
   
+  # Skip version check for OCFP
+  if ($self->want_feature('ocfp')) {
+    info("  Version check skipped for OCFP\n");
+    return 1;
+  }
+  
   my $previous_version = $env->exodus_lookup('kit_version', undef);
   return 1 unless $previous_version; # No previous deployment
   
@@ -303,11 +309,11 @@ sub _validate_vsphere_requirements {
   my $env = $self->env;
   
   # Check for required vSphere credentials in vault
-  my $vault_base = $env->secrets_mount . '/' . $env->vault_prefix;
+  my $vault_base = $env->secrets_base;
   my @required_secrets = (
-    "$vault_base/vsphere:password",
-    "$vault_base/vsphere:user",
-    "$vault_base/vsphere:address"
+    "${vault_base}vsphere:password",
+    "${vault_base}vsphere:user",
+    "${vault_base}vsphere:address"
   );
   
   my @missing;
@@ -337,10 +343,10 @@ sub _validate_aws_requirements {
   my $env = $self->env;
   
   # Check for required AWS credentials
-  my $vault_base = $env->secrets_mount . '/' . $env->vault_prefix;
+  my $vault_base = $env->secrets_base;
   my @required_secrets = (
-    "$vault_base/aws:access_key",
-    "$vault_base/aws:secret_key"
+    "${vault_base}aws:access_key",
+    "${vault_base}aws:secret_key"
   );
   
   my @missing;
@@ -359,7 +365,7 @@ sub _validate_aws_requirements {
   }
   
   # Check for SSH key
-  unless ($self->vault->exists("$vault_base/aws/ssh:public")) {
+  unless ($self->vault->exists("${vault_base}aws/ssh:public")) {
     warning("  AWS SSH key not found in vault\n");
     warning("  Run 'genesis add-secrets' to generate it\n");
   }
@@ -376,12 +382,12 @@ sub _validate_azure_requirements {
   my $env = $self->env;
   
   # Check for required Azure credentials
-  my $vault_base = $env->secrets_mount . '/' . $env->vault_prefix;
+  my $vault_base = $env->secrets_base;
   my @required_secrets = (
-    "$vault_base/azure:client_id",
-    "$vault_base/azure:client_secret",
-    "$vault_base/azure:tenant_id",
-    "$vault_base/azure:subscription_id"
+    "${vault_base}azure:client_id",
+    "${vault_base}azure:client_secret",
+    "${vault_base}azure:tenant_id",
+    "${vault_base}azure:subscription_id"
   );
   
   my @missing;
@@ -411,10 +417,10 @@ sub _validate_gcp_requirements {
   my $env = $self->env;
   
   # Check for required GCP credentials
-  my $vault_base = $env->secrets_mount . '/' . $env->vault_prefix;
-  unless ($self->vault->exists("$vault_base/google:json_key")) {
+  my $vault_base = $env->secrets_base;
+  unless ($self->vault->exists("${vault_base}google:json_key")) {
     error("  Missing GCP service account key in vault\n");
-    error("    - $vault_base/google:json_key\n");
+    error("    - ${vault_base}google:json_key\n");
     return 0;
   }
   
@@ -430,12 +436,12 @@ sub _validate_openstack_requirements {
   my $env = $self->env;
   
   # Check for required OpenStack credentials
-  my $vault_base = $env->secrets_mount . '/' . $env->vault_prefix;
+  my $vault_base = $env->secrets_base;
   my @required_secrets = (
-    "$vault_base/openstack/creds:username",
-    "$vault_base/openstack/creds:password",
-    "$vault_base/openstack/creds:domain",
-    "$vault_base/openstack/creds:project"
+    "${vault_base}openstack/creds:username",
+    "${vault_base}openstack/creds:password",
+    "${vault_base}openstack/creds:domain",
+    "${vault_base}openstack/creds:project"
   );
   
   my @missing;

@@ -87,9 +87,9 @@ sub gather_deployment_info {
   $info{blacksmith_username} = 'blacksmith';
   
   # Vault information
-  my $vault_path = $env->secrets_mount . '/' . $env->vault_prefix;
+  my $vault_path = $env->secrets_base;
   eval {
-    $info{blacksmith_password} = $self->vault->get("$vault_path/broker:password");
+    $info{blacksmith_password} = $self->vault->get("${vault_path}broker:password");
   };
   if ($@) {
     warning("Failed to retrieve Blacksmith password from vault: %s", $@);
