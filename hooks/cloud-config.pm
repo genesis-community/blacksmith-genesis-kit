@@ -32,6 +32,7 @@ sub perform {
 				$self->network_definition('blacksmith',
 					strategy => 'ocfp',
 					dynamic_subnets => {
+						subnets => ['ocfp-0'],
 						allocation => {
 							size => 0,
               statics => 0,
