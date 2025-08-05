@@ -42,6 +42,7 @@ sub perform {
                 'security_groups' => ['default']
               },
               aws => {
+                'subnet' => $self->subnet_reference('id'),
                 'security_groups' => scalar $self->env->lookup('aws_default_sgs', ['default']),
               },
               azure => {
