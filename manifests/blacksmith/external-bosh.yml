@@ -1,13 +1,11 @@
 ---
 meta:
-  default_bosh_exodus_path:     (( concat $GENESIS_ENVIRONMENT "/bosh" ))
-  bosh_exodus_path:             (( grab params.bosh_exodus_path || meta.default_bosh_exodus_path ))
-  bosh_exodus_src:              (( concat $GENESIS_EXODUS_MOUNT meta.bosh_exodus_path ":" ))
-  
-  external_bosh_username: (( vault meta.bosh_exodus_src "blacksmith_user" ))
-  external_bosh_password: (( vault meta.bosh_exodus_src "blacksmith_password" ))
-  external_bosh_address: (( vault meta.bosh_exodus_src "url" ))
-  external_bosh_cacert: (( vault meta.bosh_exodus_src "ca_cert" ))
+  bosh:
+    exodus: (( concat $GENESIS_EXODUS_MOUNT genesis.env "/bosh" ))
+  external_bosh_username: (( vault meta.bosh.exodus ":blacksmith_user" ))
+  external_bosh_password: (( vault meta.bosh.exodus ":blacksmith_password" ))
+  external_bosh_address: (( vault meta.bosh.exodus ":url" ))
+  external_bosh_cacert: (( vault meta.bosh.exodus ":ca_cert" ))
 
 exodus:
   bosh_cacert: (( grab params.external_bosh.cacert || meta.external_bosh_cacert ))
