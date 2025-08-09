@@ -47,6 +47,9 @@ sub perform {
 	# Validate features using modern pattern
 	$self->validate_blacksmith_features();
 
+	# Store the IaaS type for later use
+	$ENV{OCFP_IAAS} = $self->env->iaas;
+
 	# Process validated features
 	my ($iaas_count, $external_bosh_count, $forge_count) = $self->process_features();
 
@@ -234,9 +237,6 @@ sub process_bosh_feature {
 # process_iaas_feature - Process IaaS features {{{2
 sub process_iaas_feature {
 	my ($self, $feature) = @_;
-
-	# Store the IaaS type for later use
-	$ENV{OCFP_IAAS} = $feature;
 	return 1;
 }
 # }}}
