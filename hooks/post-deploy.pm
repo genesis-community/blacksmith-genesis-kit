@@ -31,16 +31,13 @@ sub perform {
 
   if ($self->deploy_successful) {
     info("\n#G{✓} #M{%s} Blacksmith Service Broker deployed successfully!\n", $env->name);
-    
-    # Export deployment information to exodus
-    $self->export_deployment_info();
-    
+
     # Provide helpful post-deployment information
     $self->display_deployment_summary();
-    
+
     # Run post-deployment validations
     $self->validate_deployment();
-    
+
     # Display next steps
     $self->display_next_steps();
   } else {
@@ -58,80 +55,29 @@ sub perform {
 
 # }}}
 
-# export_deployment_info - Export deployment information to exodus {{{
-sub export_deployment_info {
-  my ($self) = @_;
-  my $env = $self->env;
-  
-  info("Exporting deployment information...\n");
-  
-  # Get deployment manifest to extract information
-  my $manifest = $self->env->manifest;
-  
-  # Export Blacksmith endpoint information
-  my $ip = $self->_get_blacksmith_ip();
-  my $port = $self->want_feature('broker-tls') 
-    ? $env->lookup('params.blacksmith_tls_port', 443)
-    : $env->lookup('params.blacksmith_port', 3000);
-  my $scheme = $self->want_feature('broker-tls') ? 'https' : 'http';
-  
-  $env->exodus_set('blacksmith_url', "$scheme://$ip:$port");
-  $env->exodus_set('blacksmith_ip', $ip);
-  $env->exodus_set('blacksmith_port', $port);
-  
-  # Export internal BOSH director information if not using external BOSH
-  unless ($self->want_feature('external-bosh') || $self->want_feature('ocfp')) {
-    # These would be set by the BOSH deployment
-    $env->exodus_inherit('bosh_address');
-    $env->exodus_inherit('bosh_username');
-    $env->exodus_inherit('bosh_password');
-    $env->exodus_inherit('bosh_cacert');
-  }
-  
-  # Export enabled features
-  my @features;
-  push @features, 'redis' if $self->want_feature('redis');
-  push @features, 'postgresql' if $self->want_feature('postgresql');
-  push @features, 'rabbitmq' if $self->want_feature('rabbitmq');
-  push @features, 'mariadb' if $self->want_feature('mariadb');
-  
-  $env->exodus_set('enabled_forges', join(',', @features)) if @features;
-  
-  # Export Shield information if enabled
-  if ($self->want_feature('shield-backups')) {
-    $env->exodus_inherit('shield_url');
-    $env->exodus_inherit('shield_username');
-    $env->exodus_inherit('shield_password');
-  }
-  
-  info("  Deployment information exported [#G{OK}]\n");
-}
-
-# }}}
-
 # display_deployment_summary - Display deployment summary information {{{
 sub display_deployment_summary {
   my ($self) = @_;
   my $env = $self->env;
   my $cmd_with_env = $env->get_call_path_with_env();
-  
+
   info("\n#Bu{Deployment Summary}\n\n");
-  
+
   # Basic deployment info
   info("Environment:  #C{%s}\n", $env->name);
   info("Kit:          #C{%s v%s}\n", $ENV{GENESIS_KIT_NAME}, $ENV{GENESIS_KIT_VERSION});
-  
+
   # IaaS information
   my $iaas = $self->_determine_iaas();
   info("IaaS:         #C{%s}\n", $iaas);
-  
+
   # Enabled forges
   my @forges;
   push @forges, 'Redis' if $self->want_feature('redis');
   push @forges, 'PostgreSQL' if $self->want_feature('postgresql');
   push @forges, 'RabbitMQ' if $self->want_feature('rabbitmq');
   push @forges, 'MariaDB' if $self->want_feature('mariadb');
-  
+
   if (@forges) {
     info("\nEnabled Service Forges:\n");
     for my $forge (@forges) {
@@ -140,18 +86,18 @@ sub display_deployment_summary {
   } else {
     warning("\n#Y{Warning:} No service forges are enabled.\n");
   }
-  
+
   # Security features
   info("\nSecurity Features:\n");
-  info("  • Broker TLS:  %s\n", 
+  info("  • Broker TLS:  %s\n",
     $self->want_feature('broker-tls') ? '#G{Enabled}' : '#Y{Disabled}');
-  info("  • Redis TLS:   %s\n", 
+  info("  • Redis TLS:   %s\n",
     $self->want_feature('redis-tls') ? '#G{Enabled}' : '#Y{Disabled}')
     if $self->want_feature('redis');
-  info("  • RabbitMQ TLS: %s\n", 
+  info("  • RabbitMQ TLS: %s\n",
     $self->want_feature('rabbitmq-tls') ? '#G{Enabled}' : '#Y{Disabled}')
     if $self->want_feature('rabbitmq');
-  
+
   # Backup configuration
   if ($self->want_feature('shield-backups')) {
     info("\nBackup Configuration:\n");
@@ -165,9 +111,9 @@ sub display_deployment_summary {
 sub validate_deployment {
   my ($self) = @_;
   my $env = $self->env;
-  
+
   info("\n#Bu{Post-deployment Validation}\n\n");
-  
+
   # Check Blacksmith API connectivity
   my $ip = $self->_get_blacksmith_ip();
   my $port = $self->want_feature('broker-tls')
@@ -175,21 +121,21 @@ sub validate_deployment {
     : $env->lookup('params.blacksmith_port', 3000);
   my $scheme = $self->want_feature('broker-tls') ? 'https' : 'http';
   my $url = "$scheme://$ip:$port";
-  
+
   info("Checking Blacksmith API availability...\n");
   my ($curl_out, $curl_rc) = run(
     {stderr => 0},
     'curl -k -s -o /dev/null -w "%{http_code}" --connect-timeout 5 "$1/v2/catalog"',
     $url
   );
-  
+
   if ($curl_rc == 0 && $curl_out =~ /^[23]\d\d$/) {
     info("  ✓ API endpoint is responding (HTTP %s)\n", $curl_out);
   } else {
     warning("  ✗ API endpoint is not responding\n");
     warning("  The service may still be starting up.\n");
   }
-  
+
   # Check internal BOSH director if applicable
   unless ($self->want_feature('external-bosh') || $self->want_feature('ocfp')) {
     info("\nChecking internal BOSH director...\n");
@@ -209,29 +155,29 @@ sub display_next_steps {
   my ($self) = @_;
   my $env = $self->env;
   my $cmd_with_env = $env->get_call_path_with_env();
-  
+
   info("\n#Bu{Next Steps}\n\n");
-  
+
   info("1. View deployment details:\n");
   info("   #G{%s info}\n\n", $cmd_with_env);
-  
+
   info("2. Access the Blacksmith Web UI:\n");
   info("   #G{%s do visit}\n\n", $cmd_with_env);
-  
+
   info("3. Register with Cloud Foundry (if applicable):\n");
   info("   #G{%s do register <cf-deployment>}\n\n", $cmd_with_env);
-  
+
   info("4. Access the internal BOSH director:\n");
   info("   #G{%s do bosh}\n\n", $cmd_with_env);
-  
+
   info("5. View the service catalog:\n");
   info("   #G{%s do boss catalog}\n\n", $cmd_with_env);
-  
+
   if ($self->want_feature('shield-backups')) {
     info("6. Configure Shield backup schedules:\n");
     info("   Access Shield UI and configure backup policies\n\n");
   }
-  
+
   info("For troubleshooting service provisioning issues:\n");
   info("  - Check BOSH tasks: #G{%s do bosh tasks}\n", $cmd_with_env);
   info("  - View BOSH VMs: #G{%s do bosh vms}\n", $cmd_with_env);
@@ -243,11 +189,11 @@ sub display_next_steps {
 # _determine_iaas - Helper to determine which IaaS is being used {{{
 sub _determine_iaas {
   my ($self) = @_;
-  
+
   for my $iaas (qw(aws azure google openstack vsphere)) {
     return uc($iaas) if $self->want_feature($iaas);
   }
-  
+
   return 'External BOSH' if $self->want_feature('external-bosh');
   return 'OCFP' if $self->want_feature('ocfp');
   return 'Unknown';
