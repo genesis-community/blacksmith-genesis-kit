@@ -123,7 +123,7 @@ sub validate_deployment {
   my $url = "$scheme://$ip:$port";
 
   info("Checking Blacksmith API availability...\n");
-	info('curl -k -s -o /dev/null -w "%{http_code}" --connect-timeout 5 "%s/v2/catalog"', $url );
+	info('curl -k -s -o /dev/null -w "\%{http_code}" --connect-timeout 5 "%s/v2/catalog"', $url );
   my ($curl_out, $curl_rc) = run(
     {stderr => 0},
     'curl -k -s -o /dev/null -w "%{http_code}" --connect-timeout 5 "$%s/v2/catalog"',
