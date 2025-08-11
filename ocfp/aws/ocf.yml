@@ -44,8 +44,8 @@ instance_groups:
     azs:
       - (( grab meta.blacksmith.az ))
 
-    networks:
-      - (( replace )) 
+    networks: 
+      - (( replace ))
       - name: (( grab params.network ))
 
     jobs:

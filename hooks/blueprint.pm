@@ -327,6 +327,10 @@ sub apply_post_processing {
 		if ($self->want_feature("shield-agent")) {
 			$self->add_files("ocfp/shield-agent.yml");
 		}
+		
+	if ($self->env->ocfp_config_lookup('net.topology', 'v2') eq 'v1') {
+    	$self->add_files("ocfp/network-v1.yml");
+    }
 	}
 }
 
