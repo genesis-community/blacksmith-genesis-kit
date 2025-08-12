@@ -304,16 +304,15 @@ sub _register_service_broker {
 	info("\nRegistering service broker...\n");
 
 	info("  Checking if broker already exists...\n");
-	my ($exists_out, $exists_rc) = run(
-		{stderr => 0},
-		'cf curl /v2/service_brokers | jq --arg env_name "$1" -r \'.resources[].entity | select(.name==$env_name) | .name\'',
+	my ($exists_out, $exists_rc) = run( 
+		{interactive => 0},
+		'cf curl /v3/service_brokers | jq --arg env_name "$1" -r \'.resources[] | select(.name==$env_name) | .name\'',
 		$broker_name
 	);
-
 	if ($exists_out && $exists_out =~ /\S/) {
 		info("  Updating existing service broker #M{%s}...\n", $broker_name);
 		my ($update_out, $update_rc, $update_err) = run(
-			{stderr => 0},
+			{interactive => 0},
 			'cf update-service-broker "$1" "$2" "$3" "$4"',
 			$broker_name,
 			$connection_info->{username},
@@ -326,10 +325,10 @@ sub _register_service_broker {
 			return 0;
 		}
 	} else {
-		# Create new broker
 		info("  Creating service broker #M{%s}...\n", $broker_name);
 		my ($create_out, $create_rc, $create_err) = run(
-			{stderr => 0},
+			#{stderr => 0},
+			{interactive => 0},
 			'cf create-service-broker "$1" "$2" "$3" "$4"',
 			$broker_name,
 			$connection_info->{username},
@@ -354,18 +353,13 @@ sub _enable_service_access {
 
 	info("\nEnabling service access...\n");
 
-	# Get service catalog
 	info("  Retrieving service catalog...\n");
-	my ($services_out, $services_rc, $services_err) = run(
-		{stderr => 0},
-		'curl -Lsk -u "$1:$2" "$3/v2/catalog" -H Accept:application/json | jq -r \'.services[].name\'',
-		$connection_info->{username},
-		$connection_info->{password},
-		$connection_info->{url}
+	my ($services_out, $services_rc) = run(
+		{interactive => 0},
+		'cf curl "/v3/service_offerings" | jq -r \'.resources[].name\''
 	);
-
 	if ($services_rc != 0 || !$services_out) {
-		error("  Failed to retrieve service catalog: %s\n", $services_err || 'Empty catalog');
+		error("  Failed to retrieve service catalog: %s\n", $services_out || 'Empty catalog');
 		return 0;
 	}
 
@@ -373,8 +367,8 @@ sub _enable_service_access {
 	my $enabled_count = 0;
 
 	for my $service_name (@service_names) {
-		next unless $service_name =~ /\S/;
 
+		next unless $service_name =~ /\S/;
 		info("  Enabling access for #C{%s}...\n", $service_name);
 		my ($enable_out, $enable_rc) = run(
 			{stderr => 0},

@@ -47,9 +47,10 @@ sub get_blacksmith_connection_info {
 	if ($@) {
 		bail("Failed to retrieve Blacksmith password from vault: %s", $@);
 	}
-	
+	# my $url = $scheme://$host:$port"
+  my $url = $self->exodus_data->{broker_url};
 	return {
-		url => "$scheme://$host:$port",
+		url => $url, 
 		username => $blacksmith_username,
 		password => $blacksmith_password,
 		scheme => $scheme,
