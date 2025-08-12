@@ -48,6 +48,7 @@ instance_groups:
     networks: 
       - (( replace ))
       - name: (( grab params.network ))
+        static_ips: (( grab meta.blacksmith.ip ))
 
     jobs:
       - release: blacksmith

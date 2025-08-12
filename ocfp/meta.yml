@@ -6,7 +6,8 @@ meta:
       scale: (( grab params.ocfp_env_scale || "dev" ))
 
     vault:
-      tf: (( concat genesis.secrets_mount "tf/" genesis.vault_env ))
+      config_prefix: (( grab params.ocfp_vault_config_prefix || "config/" ))
+      config:        (( concat genesis.ocfp_config_mount genesis.ocfp_env ))
 
     certs:
       trusted:
@@ -28,8 +29,9 @@ meta:
   blacksmith:
     cloud_config: {} # TODO: OCFP Reference Arch based Cloud Config
 
-    fqdn:   (( vault meta.ocfp.vault.tf "/ocf/fqdns:blacksmith" ))
-    az:     (( concat genesis.env "-z1" ))
+    fqdn:   (( vault meta.ocfp.vault.config "/fqdns:blacksmith" ))
+    ip:     (( vault meta.ocfp.vault.config "/net/subnets/ocfp-1/reserved-ips:blacksmith_ip" ))
+    az:     (( concat genesis.env "-z2" ))
 
     disk_type: (( concat meta.ocfp.env.cloud "disk-blacksmith" ))
     vm_type:   (( concat meta.ocfp.env.cloud "vm-blacksmith" ))

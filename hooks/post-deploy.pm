@@ -8,7 +8,7 @@ BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/
 
 use parent qw(Genesis::Hook::PostDeploy);
 
-use Genesis qw/info warning error/;
+use Genesis qw/info warning error run/;
 use File::Basename qw/dirname/;
 
 # Include common utilities
@@ -122,8 +122,7 @@ sub validate_deployment {
   my $scheme = $self->want_feature('broker-tls') ? 'https' : 'http';
   my $url = "$scheme://$ip:$port";
 
-  info("Checking Blacksmith API availability...\n");
-	info('curl -k -s -o /dev/null -w "\%{http_code}" --connect-timeout 5 "%s/v2/catalog"', $url );
+  info("Checking Blacksmith API availability (%s/v2/catalog)...\n", $url);
   my ($curl_out, $curl_rc) = run(
     {stderr => 0},
     'curl -k -s -o /dev/null -w "%{http_code}" --connect-timeout 5 "$%s/v2/catalog"',
