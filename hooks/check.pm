@@ -221,22 +221,28 @@ sub check_certificates {
 	my ($self) = @_;
 	my $env = $self->env;
 	my $ok = 1;
+	my $subject = "";
 
-	my $ip = $self->_get_blacksmith_ip();
-	return 1 unless $ip; # Skip cert check if no IP is set
-	info("Checking if our certificates match the director static IP ($ip)...");
+	if ($self->wants_feature('ocfp')) {
+		info("ocfp uses route registrar, no need to check certificate.");
+		return 1;
+	} else {
+		$subject = $self->_get_blacksmith_ip();
+	}
+	return 1 unless $subject; # Skip cert check if no IP is set
+	info("Checking if our certificates match the director subject: ($subject)...");
 
 	my $vault = $env->secrets_base;
 	for my $cert (qw(tls/director tls/nats/server)) {
-		if (!$self->vault->exists("$vault$cert")) {
-			info("    - $vault/$cert [#Y{MISSING}]");
+		if (!$self->env->vault->has("$vault$cert")) {
+			info("    - $vault$cert [#Y{MISSING}]");
 		} else {
-			my ($out, $rc) = run({stderr => '/dev/null'}, 'safe --quiet x509 validate "$1" --for "$2"', "$vault$cert", "$ip");
+			my ($out, $rc) = run({stderr => '/dev/null'}, 'safe --quiet x509 validate "$1" --for "$2"', "$vault$cert", "$subject");
 			if ($rc == 0) {
-				info("    - $vault/$cert [#G{OK}]");
+				info("    - $vault$cert [#G{OK}]");
 			} else {
-				info("    - $vault/$cert [#R{INVALID}]");
-				my ($validation_out, $valid_rc) = run('safe x509 validate "$1" --for "$2" 2>&1', "$vault$cert", "$ip");
+				info("    - $vault$cert [#R{INVALID}]");
+				my ($validation_out, $valid_rc) = run('safe x509 validate "$1" --for "$2" 2>&1', "$vault$cert", "$subject");
 				info("      %s", $validation_out);
 				$ok = 0;
 			}
