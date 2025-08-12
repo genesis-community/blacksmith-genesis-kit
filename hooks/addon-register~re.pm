@@ -48,8 +48,8 @@ sub ca_sync {
 	# Sync Blacksmith services CA
 	my $broker_ca_path = $env->secrets_base . 'broker/ca';
 	
-	# Check if CA exists
-	unless ($self->vault->exists($broker_ca_path)) {
+	info("Checking if Blacksmith Services CA Exists: $broker_ca_path\n");
+	unless ($self->env->vault->has($broker_ca_path)) {
 		warning("  Blacksmith broker CA not found at: $broker_ca_path\n");
 		warning("  Skipping CA synchronization.\n");
 		return 1;
@@ -73,7 +73,7 @@ sub ca_sync {
 	my $exodus_path = $env->secrets_mount . '/exodus/' . $cf_env_name . '/cf';
 	my $cf_vault_path = $env->secrets_base =~ s/blacksmith/cf/r;
 	
-	if ($self->vault->exists("$exodus_path:nats_client_cert")) {
+	if ($self->env->vault->has("$exodus_path:nats_client_cert")) {
 		info("  Setting nats_client_cert in Credhub...\n");
 		
 		($out, $rc, $err) = run(
@@ -123,11 +123,7 @@ sub perform {
 		return $self->done(0);
 	}
 
-	# Get CF environment name
-	my $cf_env = $self->_determine_cf_environment();
-	unless ($cf_env) {
-		return $self->done(0);
-	}
+	my $cf_env = $self->env->name;
 
 	# Sync CA certificates
 	unless ($self->ca_sync($cf_env)) {

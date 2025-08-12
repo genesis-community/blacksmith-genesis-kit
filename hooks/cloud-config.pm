@@ -25,15 +25,14 @@ sub perform {
   return 1 if $self->completed;
 
   my $iaas = $self->env->iaas;
-  my $network_topology = $self->env->ocfp_config_lookup('net.topology', 'v2');
   my $config = $self->build_cloud_config({
-			'networks' => [$network_topology eq 'v1' ? () :
+			'networks' => [
 				$self->network_definition('blacksmith',
 					strategy => 'ocfp',
 					dynamic_subnets => {
-						subnets => ['ocfp-0'],
+						subnets => ['ocfp-1'],
 						allocation => {
-							size => 1,
+							size => 0,
               statics => 0,
             },
             cloud_properties_for_iaas => {

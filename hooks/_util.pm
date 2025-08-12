@@ -10,16 +10,17 @@ sub _get_blacksmith_ip {
 	my ($self) = @_;
 	my $env = $self->env;
 
-	# For OCFP deployments, get IP from vault
   if ($self->want_feature('ocfp')) {
-    # Construct the vault path for OCFP reserved IPs
     my $vault_path = $env->secrets_base."ocf/net/subnets/ocfp-1/reserved-ips";
     if ($env->vault->has($vault_path, "blacksmith_ip")) {
       my $ip = $env->vault->get($vault_path, "blacksmith_ip");
       return $ip;
     } else {
-      # Fall back to params.ip if vault lookup fails
-      warning("Could not retrieve Blacksmith IP from OCFP vault path $vault_path:blacksmith_ip, falling back to params.ip");
+      bail(
+        "\nCould not retrieve Blacksmith IP from OCFP vault path:\n".
+        " $vault_path:blacksmith_ip! \n".
+        " Ensure it is set and then retry.\n"
+      );
     }
   }
   # Default: get IP from params

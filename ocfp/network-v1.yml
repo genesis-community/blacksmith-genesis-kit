@@ -1,4 +1,0 @@
----
-meta:
-  blacksmith:
-    network: (( concat genesis.env ".cf.net-ocf" ))

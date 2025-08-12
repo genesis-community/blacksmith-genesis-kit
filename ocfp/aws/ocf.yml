@@ -13,6 +13,7 @@ params:
   disk_type:    (( grab meta.blacksmith.disk_type ))
   vm_type:      (( grab meta.blacksmith.vm_type ))
   network:      (( grab meta.blacksmith.network ))
+  blacksmith_services_network: (( concat genesis.env ".cf.net-ocf" ))
 
   releases: []
   stemcells: []
