@@ -38,6 +38,15 @@ sub perform {
         $self->add_feature('rabbitmq-dashboard-registration');
       }
     }
+
+    # Auto-include TLS features for dual-mode forges
+    if ($feature eq 'rabbitmq-dual-mode') {
+      $self->add_feature('rabbitmq-tls');
+    }
+
+    if ($feature eq 'redis-dual-mode') {
+      $self->add_feature('redis-tls');
+    }
   }
 
   return $self->done();

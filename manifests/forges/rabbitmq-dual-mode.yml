@@ -1,4 +1,9 @@
 ---
+meta:
+  rabbitmq:
+    tls:
+      dual-mode: true
+      
 instance_groups:
 - name: blacksmith
   jobs:
