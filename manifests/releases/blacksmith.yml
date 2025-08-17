@@ -21,6 +21,6 @@ releases:
     url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/routing-release?v=" releases.routing.version ))
 
   - name:    bosh-dns-aliases
-    version: "1.39.14"
-    sha1:    sha256:3360619931a19b20c15200e32792e3aaa3d960e9938804d408219aa95041174d
+    version: "0.0.4"
+    sha1:    sha256:27ef8965dc4f1633479613743e782566e3b7fba5d28dad3d50488c2919eac0da
     url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/bosh-dns-aliases-release?v=" releases.bosh-dns-aliases.version ))
