@@ -1,4 +1,4 @@
-package Genesis::Hook::Addon::Blacksmith::Open;
+package Genesis::Hook::Addon::Blacksmith::Open v0.16.4;
 
 use v5.20;
 use warnings;
