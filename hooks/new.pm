@@ -9,8 +9,6 @@ use parent qw(Genesis::Hook);
 
 # Import required functions
 use Genesis qw/trace bug bail warning info/;
-use Genesis::Term qw/prompt_for_boolean prompt_for_select prompt_for_line prompt_for prompt_for_block in_controlling_terminal/;
-use Genesis::UI qw/output/;
 use Data::Dumper;
 use File::Basename qw/basename dirname/;
 use File::Path qw/mkpath/;
@@ -33,6 +31,8 @@ sub init {
 }
 
 sub perform {
+  my ($self) = @_;
+
   return $self->done();
 }
 
