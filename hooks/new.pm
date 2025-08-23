@@ -4,13 +4,15 @@ use strict;
 use warnings;
 use v5.20; # Genesis supports min perl v5.20.
 
+BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/lib'}
+
 # Parent class inheritance
 use parent qw(Genesis::Hook);
 
 # Import required functions
 use Genesis qw/trace bug bail warning info/;
 use Data::Dumper;
-use File::Basename qw/basename dirname/;
+use File::Basename qw/bail basename dirname/;
 use File::Path qw/mkpath/;
 
 sub init {
