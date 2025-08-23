@@ -11,7 +11,7 @@ sub _get_blacksmith_ip {
 	my $env = $self->env;
 
   if ($self->want_feature('ocfp')) {
-    my $vault_path = $env->secrets_base."ocf/net/subnets/ocfp-1/reserved-ips";
+    my $vault_path = $env->ocfp_config_base."/net/subnets/ocfp-1/reserved-ips";
     if ($env->vault->has($vault_path, "blacksmith_ip")) {
       my $ip = $env->vault->get($vault_path, "blacksmith_ip");
       return $ip;

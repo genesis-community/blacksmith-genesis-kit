@@ -188,7 +188,7 @@ sub setup_shield_integration {
   
   my @missing;
   for my $param (@required_params) {
-    my $value = $env->lookup($param, undef);
+    my $value = $env->partial_manifest_lookup($param, undef);
     push @missing, $param unless $value;
   }
   
@@ -201,13 +201,13 @@ sub setup_shield_integration {
   }
   
   # Get Shield configuration
-  my $shield_admin_username = $env->lookup('meta.shield.admin_username');
-  my $shield_admin_password = $env->lookup('meta.shield.admin_password');
-  my $shield_address = $env->lookup('meta.shield.address');
-  
-  my $blacksmith_shield_username = $env->lookup('params.shield_username');
-  my $blacksmith_shield_password = $env->lookup('params.shield_password');
-  my $blacksmith_shield_tenant = $env->lookup('params.shield_tenant');
+  my $shield_admin_username = $env->partial_manifest_lookup('meta.shield.admin_username');
+  my $shield_admin_password = $env->partial_manifest_lookup('meta.shield.admin_password');
+  my $shield_address = $env->partial_manifest_lookup('meta.shield.address');
+
+  my $blacksmith_shield_username = $env->partial_manifest_lookup('params.shield_username');
+  my $blacksmith_shield_password = $env->partial_manifest_lookup('params.shield_password');
+  my $blacksmith_shield_tenant = $env->partial_manifest_lookup('params.shield_tenant');
   
   # Set up Shield environment
   $ENV{BLACKSMITH_SHIELD_USERNAME} = $blacksmith_shield_username;

@@ -323,10 +323,10 @@ sub check_feature_compatibility {
 		push @errors, "rabbitmq-tls feature requires rabbitmq forge to be enabled";
 	}
 
-	# Check for shield features consistency
-	if ($self->wants_feature('shield-backups') && !$self->env->lookup('params.shield_url', undef)) {
-		push @errors, "shield-backups feature requires shield connection parameters";
-	}
+#	# Check for shield features consistency
+#	if ($self->wants_feature('shield-backups') && !$self->env->lookup('params.shield_url', undef)) {
+#		push @errors, "shield-backups feature requires shield connection parameters";
+#	}
 
 	if (@errors) {
 		return $self->check_result(

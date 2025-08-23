@@ -173,7 +173,8 @@ sub process_features {
 		}
 		# Process custom ops files
 		elsif (-f $self->env->path("ops/$feature.yml")) {
-			$self->add_files("ops/$feature.yml");
+			my $ops_file = $self->env->path("ops/$feature.yml");
+			$self->add_files($ops_file);
 		}
 	}
 

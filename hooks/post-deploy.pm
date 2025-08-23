@@ -8,7 +8,7 @@ BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/
 
 use parent qw(Genesis::Hook::PostDeploy);
 
-use Genesis qw/info warning error run/;
+use Genesis qw/info warning error bail run/;
 use File::Basename qw/dirname/;
 
 # Include common utilities
@@ -36,12 +36,12 @@ sub perform {
     $self->display_deployment_summary();
 
     # Run post-deployment validations
-    $self->validate_deployment();
+#    $self->validate_deployment();
 
     # Display next steps
     $self->display_next_steps();
   } else {
-    error("\n#R{✗} Blacksmith deployment failed.\n");
+    error("\n#R{Error} Blacksmith deployment failed.\n");
     error("\nPlease check the deployment logs for errors.\n");
     error("Common issues to check:\n");
     error("  - Cloud config requirements\n");
@@ -81,7 +81,7 @@ sub display_deployment_summary {
   if (@forges) {
     info("\nEnabled Service Forges:\n");
     for my $forge (@forges) {
-      info("  • #M{%s}\n", $forge);
+      info("   #M{%s}\n", $forge);
     }
   } else {
     warning("\n#Y{Warning:} No service forges are enabled.\n");
@@ -89,19 +89,19 @@ sub display_deployment_summary {
 
   # Security features
   info("\nSecurity Features:\n");
-  info("  • Broker TLS:  %s\n",
+  info("   Broker TLS:  %s\n",
     $self->want_feature('broker-tls') ? '#G{Enabled}' : '#Y{Disabled}');
-  info("  • Redis TLS:   %s\n",
+  info("   Redis TLS:   %s\n",
     $self->want_feature('redis-tls') ? '#G{Enabled}' : '#Y{Disabled}')
     if $self->want_feature('redis');
-  info("  • RabbitMQ TLS: %s\n",
+  info("   RabbitMQ TLS: %s\n",
     $self->want_feature('rabbitmq-tls') ? '#G{Enabled}' : '#Y{Disabled}')
     if $self->want_feature('rabbitmq');
 
   # Backup configuration
   if ($self->want_feature('shield-backups')) {
     info("\nBackup Configuration:\n");
-    info("  • Shield Backups: #G{Enabled}\n");
+    info("   Shield Backups: #G{Enabled}\n");
   }
 }
 

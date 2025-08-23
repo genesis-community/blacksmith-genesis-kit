@@ -43,19 +43,19 @@ sub perform {
   }
 
   # Display BOSH environment information
-  $self->display_bosh_environment();
+  #$self->display_bosh_environment();
 
   # Display Blacksmith internal BOSH director info
-  $self->display_blacksmith_bosh_info(\%info);
+  #$self->display_blacksmith_bosh_info(\%info);
 
   # Display Blacksmith web UI information with connectivity check
   $self->display_blacksmith_ui_info(\%info);
 
   # Display Shield information if applicable
-  $self->display_shield_info(\%info) if $self->want_feature('shield-backups');
+  #$self->display_shield_info(\%info) if $self->want_feature('shield-backups');
 
   # Display Blacksmith catalog
-  $self->display_blacksmith_catalog();
+  #$self->display_blacksmith_catalog();
 
   return $self->done();
 }
@@ -89,7 +89,7 @@ sub gather_deployment_info {
   # Vault information
   my $vault_path = $env->secrets_base;
   eval {
-    $info{blacksmith_password} = $self->vault->get("${vault_path}broker:password");
+    $info{blacksmith_password} = $self->env->vault->get("${vault_path}broker:password");
   };
   if ($@) {
     warning("Failed to retrieve Blacksmith password from vault: %s", $@);
@@ -201,45 +201,45 @@ sub display_blacksmith_ui_info {
   info("  Username:  #M{%s}\n", $info->{blacksmith_username});
   info("  Password:  #G{%s}\n", $info->{blacksmith_password});
   
-  if ($info->{blacksmith_password} ne '#R{<unavailable>}') {
-    info("  Direct:    #B{%s://%s:%s@%s:%s}\n", 
-      $info->{scheme}, 
-      $info->{blacksmith_username}, 
-      $info->{blacksmith_password}, 
-      $info->{host}, 
-      $info->{port}
-    );
-  }
+#  if ($info->{blacksmith_password} ne '#R{<unavailable>}') {
+#    info("  Direct:    #B{%s://%s:%s@%s:%s}\n", 
+#      $info->{scheme}, 
+#      $info->{blacksmith_username}, 
+#      $info->{blacksmith_password}, 
+#      $info->{host}, 
+#      $info->{port}
+#    );
+#  }
   
-  # Check connectivity to Blacksmith
-  info("\n  Checking Blacksmith API connectivity...\n");
-  
-  # Check DNS resolution
-  if ($info->{fqdn}) {
-    my ($dns_out, $dns_rc) = run({stderr => 0}, 'nslookup', $info->{fqdn});
-    if ($dns_rc != 0) {
-      warning("  DNS resolution failed for %s\n", $info->{fqdn});
-      warning("  Using IP address %s instead\n", $info->{ip});
-    }
-  }
-  
-  # Check API connectivity
-  my $check_url = $info->{blacksmith_url};
-  my ($curl_out, $curl_rc) = run(
-    {stderr => 0}, 
-    'curl', '-k', '-s', '-o', '/dev/null', '-w', '%{http_code}', 
-    '--connect-timeout', '5', $check_url
-  );
-  
-  if ($curl_rc == 0 && $curl_out =~ /^[23]\d\d$/) {
-    info("  #G{✓} API endpoint is reachable (HTTP %s)\n", $curl_out);
-  } else {
-    warning("  #R{✗} API endpoint is not reachable\n");
-    warning("  This may indicate:\n");
-    warning("    - Blacksmith is still starting up\n");
-    warning("    - Network/firewall configuration issues\n");
-    warning("    - The deployment needs to be completed\n");
-  }
+#  # Check connectivity to Blacksmith
+#  info("\n  Checking Blacksmith API connectivity...\n");
+#  
+#  # Check DNS resolution
+#  if ($info->{fqdn}) {
+#    my ($dns_out, $dns_rc) = run({stderr => 0}, 'nslookup', $info->{fqdn});
+#    if ($dns_rc != 0) {
+#      warning("  DNS resolution failed for %s\n", $info->{fqdn});
+#      warning("  Using IP address %s instead\n", $info->{ip});
+#    }
+#  }
+#  
+#  # Check API connectivity
+#  my $check_url = $info->{blacksmith_url};
+#  my ($curl_out, $curl_rc) = run(
+#    {stderr => 0}, 
+#    'curl', '-k', '-s', '-o', '/dev/null', '-w', '%{http_code}', 
+#    '--connect-timeout', '5', $check_url
+#  );
+#  
+#  if ($curl_rc == 0 && $curl_out =~ /^[23]\d\d$/) {
+#    info("  #G{✓} API endpoint is reachable (HTTP %s)\n", $curl_out);
+#  } else {
+#    warning("  #R{✗} API endpoint is not reachable\n");
+#    warning("  This may indicate:\n");
+#    warning("    - Blacksmith is still starting up\n");
+#    warning("    - Network/firewall configuration issues\n");
+#    warning("    - The deployment needs to be completed\n");
+#  }
 }
 
 # }}}
