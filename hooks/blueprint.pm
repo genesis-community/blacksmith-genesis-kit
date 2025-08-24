@@ -93,6 +93,7 @@ sub validate_blacksmith_features {
 		rabbitmq-dashboard-registration
 		rabbitmq-autoscale
 		cf-route-registrar
+		cf-integration
 	);
 
 	# Pre-validation custom checks
@@ -209,7 +210,7 @@ sub is_forge_feature {
 # is_addon_feature - Check if feature is addon-related {{{2
 sub is_addon_feature {
 	my ($self, $feature) = @_;
-	return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar)$/;
+	return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar|cf-integration)$/;
 }
 # }}}
 
@@ -288,6 +289,9 @@ sub process_addon_feature {
 	elsif ($feature eq 'cf-route-registrar') {
 		$self->add_files("manifests/blacksmith/cf-route-registrar.yml");
 	}
+  elsif ($feature eq 'cf-integration') {
+		$self->add_files("ocfp/cf-integration.yml");
+	}
 }
 
 # }}}
@@ -328,7 +332,7 @@ sub apply_post_processing {
 		if ($self->want_feature("shield-agent")) {
 			$self->add_files("ocfp/shield-agent.yml");
 		}
-		
+
 	}
 }
 

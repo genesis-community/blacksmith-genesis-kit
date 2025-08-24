@@ -28,6 +28,7 @@ sub perform {
       $self->add_feature('broker-tls');
       $self->add_feature('external-bosh');
       $self->add_feature('cf-route-registrar');
+      $self->add_feature('cf-integration');
 
       if ($self->has_feature('redis')) {
         $self->add_feature('redis-tls');
