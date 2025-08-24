@@ -1,4 +1,4 @@
-package Genesis::Hook::Addon::Blacksmith::Curl v1.0.0;
+package Genesis::Hook::Addon::Blacksmith::Curl v1.0.1;
 
 use v5.20;
 use warnings;
