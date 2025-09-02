@@ -1,4 +1,4 @@
-package Genesis::Hook::CloudConfig::Blacksmith v1.0.8;
+package Genesis::Hook::CloudConfig::Blacksmith v1.0.9;
 
 use v5.20;
 use warnings; # Genesis min perl version is 5.20
