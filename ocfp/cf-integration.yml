@@ -9,7 +9,7 @@ instance_groups:
             apis:
               ocf:
                 name: (( concat genesis.env "-cf" ))
-                endpoint: (( vault meta.cf.exodus ":api_domain" ))
-                username: (( vault meta.cf.exodus ":admin_username" ))
-                password: (( vault meta.cf.exodus ":admin_password" ))
+                endpoint: (( vault meta.cf.exodus_path ":api_domain" ))
+                username: (( vault meta.cf.exodus_path ":admin_username" ))
+                password: (( vault meta.cf.exodus_path ":admin_password" ))
 
