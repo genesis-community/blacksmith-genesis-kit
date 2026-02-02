@@ -319,6 +319,9 @@ sub check_feature_compatibility {
 		push @errors, "redis-tls feature requires redis forge to be enabled";
 	}
 
+	if ($self->wants_feature('valkey-tls') && !$self->wants_feature('valkey')) {
+		push @errors, "valkey-tls feature requires valkey forge to be enabled";
+	}
 	if ($self->wants_feature('rabbitmq-tls') && !$self->wants_feature('rabbitmq')) {
 		push @errors, "rabbitmq-tls feature requires rabbitmq forge to be enabled";
 	}

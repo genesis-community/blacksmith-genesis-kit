@@ -74,6 +74,7 @@ sub display_deployment_summary {
   # Enabled forges
   my @forges;
   push @forges, 'Redis' if $self->want_feature('redis');
+  push @forges, 'Valkey' if $self->want_feature('valkey');
   push @forges, 'PostgreSQL' if $self->want_feature('postgresql');
   push @forges, 'RabbitMQ' if $self->want_feature('rabbitmq');
   push @forges, 'MariaDB' if $self->want_feature('mariadb');
