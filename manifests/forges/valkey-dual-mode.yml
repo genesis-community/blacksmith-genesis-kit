@@ -1,0 +1,9 @@
+instance_groups:
+- name: blacksmith
+  jobs:
+  - release: valkey-forge
+    name:    valkey-blacksmith-plans
+    properties:
+      valkey:
+        tls:
+          dual-mode: true

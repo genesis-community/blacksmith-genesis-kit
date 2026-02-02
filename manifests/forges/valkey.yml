@@ -1,0 +1,82 @@
+---
+meta:
+  environment: (( grab genesis.env || params.env ))
+  bosh_env: (( grab genesis.bosh_env || params.bosh_env || params.env ))
+
+  default:
+    valkey_tags:
+    - blacksmith
+    - dedicated
+    - valkey
+
+    valkey_plans:
+      standalone-7:
+        name: standalone-7
+        description: A dedicated Valkey 7 server, with no redundancy or replication
+        limit: 7
+        type: standalone-7
+        vm_type: default
+      standalone-8:
+        name: standalone-8
+        description: A dedicated Valkey 8 server, with no redundancy or replication
+        limit: 7
+        type: standalone-8
+        vm_type: default
+      standalone-9:
+        name: standalone-9
+        description: A dedicated Valkey 9 server, with no redundancy or replication
+        limit: 7
+        type: standalone-9
+        vm_type: default
+      cluster-7:
+        name: cluster-7
+        description: A Valkey 7 cluster with 3 master nodes and 3 replica nodes
+        limit: 5
+        type: cluster-7
+        vm_type: default
+        masters: 3
+        replicas: 1
+      cluster-8:
+        name: cluster-8
+        description: A Valkey 8 cluster with 3 master nodes and 3 replica nodes
+        limit: 5
+        type: cluster-8
+        vm_type: default
+        masters: 3
+        replicas: 1
+      cluster-9:
+        name: cluster-9
+        description: A Valkey 9 cluster with 3 master nodes and 3 replica nodes
+        limit: 5
+        type: cluster-9
+        vm_type: default
+        masters: 3
+        replicas: 1
+
+releases:
+- name: valkey-forge
+  version: 0+dev.5
+
+
+params:
+  releases:
+  - (( append ))
+  - (( grab releases.valkey-forge ))
+
+instance_groups:
+- name: blacksmith
+  jobs:
+  - release: valkey-forge
+    name:    valkey-blacksmith-plans
+    properties:
+      environment: (( grab meta.environment ))
+      bosh_env: (( grab meta.bosh_env ))
+
+      plans: (( grab params.valkey_plans || meta.default.valkey_plans ))
+      service:
+        id:          (( grab params.valkey_service_id          || "valkey" ))
+        name:        (( grab params.valkey_service_name        || params.valkey_service_id || "valkey" ))
+        description: (( grab params.valkey_service_description || "A dedicated Valkey instance, deployed on-demand" ))
+        tags:        (( grab params.valkey_service_tags        || meta.default.valkey_tags ))
+        limit:       (( grab params.valkey_service_limit       || 0 ))
+        type:        (( grab params.valkey_service_type        || "standalone-9" ))
