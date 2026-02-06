@@ -57,3 +57,4 @@ instance_groups:
         tags:        (( grab params.redis_service_tags        || meta.default.redis_tags ))
         limit:       (( grab params.redis_service_limit       || 0 ))
         type:        (( grab params.redis_service_type        || "standalone" ))
+        stemcell:    (( grab params.redis_stemcell_version    || "latest" ))
