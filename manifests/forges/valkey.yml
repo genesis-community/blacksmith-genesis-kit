@@ -8,6 +8,7 @@ meta:
     - blacksmith
     - dedicated
     - valkey
+    - redis
 
     valkey_plans:
       standalone-7:
