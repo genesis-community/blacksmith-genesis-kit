@@ -18,9 +18,9 @@ meta:
 
 releases:
 - name: rabbitmq-forge
-  version: 1.4.4
-  url: https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v1.4.4/rabbitmq-forge-1.4.4.tgz
-  sha1: sha256:36b7ceacbc190ddec608f3b7eb532f5c385335e8ea578174c0f3088d471befc8
+  version: 1.4.5
+  url: https://github.com/blacksmith-community/rabbitmq-forge-boshrelease/releases/download/v1.4.5/rabbitmq-forge-1.4.5.tgz
+  sha1: sha256:407f681d91d0327b1ba215d5c736f6c574362bb96855ff0af1b658f2644c9437
 
 params:
   releases:
