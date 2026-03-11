@@ -13,7 +13,7 @@ automatically, syncing data from all source masters to the destination.
 ## Prerequisites
 
 - CF CLI authenticated with space developer permissions
-- `redis-cli` available (installed on the jumpbox or BOSH VMs)
+- `redis-cli` with TLS support (see [TLS-Enabled redis-cli](#tls-enabled-redis-cli) below)
 - [RedisShake v4.5.0+](https://github.com/tair-opensource/RedisShake/releases)
   installed on the jumpbox
 - A healthy Redis cluster service instance with data to migrate
@@ -28,6 +28,28 @@ tar xzf redis-shake.tar.gz
 cp redis-shake-v4.5.0-linux-amd64/redis-shake .
 ./redis-shake -v
 ```
+
+## TLS-Enabled redis-cli
+
+When the `redis-tls` feature is enabled, the Blacksmith-packaged `redis-cli`
+(toolbelt-redis) is compiled without TLS support. You need to build a
+TLS-capable `redis-cli` on the jumpbox to interact with TLS-enabled clusters.
+
+```bash
+sudo apt-get install -y build-essential libssl-dev pkg-config
+curl -sL https://download.redis.io/releases/redis-7.2.3.tar.gz | tar xz
+cd redis-7.2.3
+make BUILD_TLS=yes
+sudo cp src/redis-cli /usr/local/bin/redis-cli
+redis-cli -v
+```
+
+All `redis-cli` commands in this guide assume TLS is enabled. Add `--tls
+--insecure` to every command, or use `--tls --cacert <path>` if you have
+the CA certificate available.
+
+For `redis-dual-mode` deployments where both plain and TLS ports are active,
+TLS flags are only required when connecting to the TLS port (16379).
 
 ## Create Services
 
@@ -188,6 +210,23 @@ If the `CLUSTER MEET` command in the post-deploy script uses port 6379,
 the cluster will try bus port 16379 (6379 + 10000) instead of 26379,
 causing nodes to never discover each other. The fix is to use the TLS
 port (16379) in the CLUSTER MEET command when TLS dual-mode is enabled.
+
+### redis-cli Returns No Output
+
+If `redis-cli` connects but returns no output and no error, the cluster
+likely has TLS enabled. The client sends plain-text but the server expects
+a TLS handshake, silently dropping the connection.
+
+Add `--tls --insecure` to your commands:
+
+```bash
+redis-cli -h $HOST -p $PORT -a "$PASS" --tls --insecure cluster info
+```
+
+If your `redis-cli` does not support `--tls` (e.g. `Unrecognized option`),
+it was compiled without TLS support. See
+[TLS-Enabled redis-cli](#tls-enabled-redis-cli) above to build a
+TLS-capable version.
 
 ### Cluster Health Issues
 
