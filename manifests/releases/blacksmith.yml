@@ -2,9 +2,9 @@
 releases:
 releases:
 - name:    blacksmith
-  version: 2.0.15
-  url:     https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v2.0.15/blacksmith-2.0.15.tgz
-  sha1:    sha256:060cf101fe904f583fb613423e343b4e37e4a78a5255fe47e15d1c7326fb2da3
+  version: 2.1.1
+  url:     https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v2.1.1/blacksmith-2.1.1.tgz
+  sha1:    sha256:5390931e47f652e5af548f99a0ecf0dcdb13c61bad62e35eb41e090c0d2e18ab
 
 - name:    bosh
   version: "282.0.7"
