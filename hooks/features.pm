@@ -1,4 +1,4 @@
-package Genesis::Hook::Features::Blacksmith v1.1.0;
+package Genesis::Hook::Features::Blacksmith v1.1.1;
 
 use v5.20;
 use warnings; # Genesis min perl version is 5.20
@@ -34,6 +34,10 @@ sub perform {
         $self->add_feature('redis-tls');
       }
 
+      if ($self->has_feature('valkey')) {
+        $self->add_feature('valkey-tls');
+      }
+
       if ($self->has_feature('rabbitmq')) {
         $self->add_feature('rabbitmq-tls');
         $self->add_feature('rabbitmq-dashboard-registration');
@@ -47,6 +51,10 @@ sub perform {
 
     if ($feature eq 'redis-dual-mode') {
       $self->add_feature('redis-tls');
+    }
+
+    if ($feature eq 'valkey-dual-mode') {
+      $self->add_feature('valkey-tls');
     }
   }
 

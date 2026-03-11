@@ -468,6 +468,71 @@ Blacksmith uses "forges" to deploy different types of services. You can activate
   - `redis-dual-mode` - When enabled along with `redis-tls`, allows both
     TLS and non-TLS communication.
 
+#### Valkey
+
+- `valkey` (Blacksmith Forge) - Enables the Blacksmith Service
+  Broker to deploy Valkey key-value instances. Valkey is a Redis-compatible
+  open-source key-value store supporting versions 7, 8, and 9.
+
+  Activating this feature also activates the following parameters:
+
+  - `valkey_plans` - A YAML fragment that contains the set of
+     Cloud Foundry Valkey service plans to offer. Supports both
+     standalone and cluster deployment types.
+
+  - `valkey_service_name` - The name of the service, to be
+    shown in the services marketplace.
+
+    Defaults to `valkey`.
+
+  - `valkey_service_id` - A globally unique (internal)
+    identifier for this service.
+
+    Defaults to `valkey`.
+
+  - `valkey_service_description` - A long-form description of
+    the service, for use in both console and web-based UIs.
+
+    Defaults to `A dedicated Valkey instance, deployed
+    on-demand.`
+
+  - `valkey_service_tags` - The list of tags to apply to all
+    new instances of this service.
+
+    Defaults to `blacksmith`, `valkey`, `dedicated` and `redis`. If
+    you specify this, and you want the defaults too, you have to
+    provide them explicitly.
+
+  - `valkey_service_limit` - An upper limit on the number of
+    service instances _total_ that can be provisioned, regardless
+    of per-plan limits. `0` (the default) imposes no global
+    limit.
+
+  Example configuration:
+  ```yaml
+  valkey_plans:
+    standalone-9:
+      name: standalone-9
+      description: A dedicated Valkey 9 server
+      type: standalone-9
+      vm_type: default
+      limit: 10
+      
+    cluster-9:
+      name: cluster-9
+      description: A Valkey 9 cluster with 3 masters and 3 replicas
+      type: cluster-9
+      vm_type: default
+      limit: 5
+  ```
+
+  Additional Valkey features:
+
+  - `valkey-tls` - Enables TLS encryption for Valkey communications.
+
+  - `valkey-dual-mode` - When enabled along with `valkey-tls`, allows both
+    TLS and non-TLS communication.
+
 #### MariaDB
 
 - `mariadb` (Blacksmith Forge) - Enables the Blacksmith Service

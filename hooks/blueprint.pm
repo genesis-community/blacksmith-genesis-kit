@@ -1,4 +1,4 @@
-package Genesis::Hook::Blueprint::Blacksmith v1.1.0;
+package Genesis::Hook::Blueprint::Blacksmith v1.1.1;
 
 use v5.20; # Genesis min perl version is 5.20
 use warnings;
@@ -80,6 +80,7 @@ sub validate_blacksmith_features {
 		stackit
 		rabbitmq
 		redis
+		valkey
 		postgresql
 		mariadb
 		kubernetes
@@ -88,6 +89,8 @@ sub validate_blacksmith_features {
 		shield-agent
 		redis-tls
 		redis-dual-mode
+		valkey-tls
+		valkey-dual-mode
 		rabbitmq-tls
 		rabbitmq-dual-mode
 		rabbitmq-dashboard-registration
@@ -203,14 +206,14 @@ sub is_iaas_feature {
 # is_forge_feature - Check if feature is forge-related {{{2
 sub is_forge_feature {
 	my ($self, $feature) = @_;
-	return $feature =~ /^(rabbitmq|redis|postgresql|mariadb|kubernetes)$/;
+	return $feature =~ /^(rabbitmq|redis|valkey|postgresql|mariadb|kubernetes)$/;
 }
 # }}}
 
 # is_addon_feature - Check if feature is addon-related {{{2
 sub is_addon_feature {
 	my ($self, $feature) = @_;
-	return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar|cf-integration)$/;
+	return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|valkey-tls|valkey-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar|cf-integration)$/;
 }
 # }}}
 
@@ -273,6 +276,12 @@ sub process_addon_feature {
 	}
 	elsif ($feature eq 'redis-dual-mode') {
 		$self->add_files("manifests/forges/redis-dual-mode.yml");
+	}
+	elsif ($feature eq 'valkey-tls') {
+		$self->add_files("manifests/forges/valkey-tls.yml");
+	}
+	elsif ($feature eq 'valkey-dual-mode') {
+		$self->add_files("manifests/forges/valkey-dual-mode.yml");
 	}
 	elsif ($feature eq 'rabbitmq-tls') {
 		$self->add_files("manifests/forges/rabbitmq-tls.yml");
@@ -355,7 +364,7 @@ sub validate_configuration {
 
 	# Validate forge selection
 	if ($forge_count == 0) {
-		push @errors, "You have not activated any Blacksmith Forges. Please specify at least one of: rabbitmq, redis, postgresql, mariadb, kubernetes.";
+		push @errors, "You have not activated any Blacksmith Forges. Please specify at least one of: rabbitmq, redis, valkey, postgresql, mariadb, kubernetes.";
 	}
 
 	# Bail if we have errors

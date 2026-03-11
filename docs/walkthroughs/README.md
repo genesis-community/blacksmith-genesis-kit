@@ -53,6 +53,11 @@ Select the walkthrough that matches your target infrastructure:
 - For **Google Cloud**: Follow [Google Cloud Deployment](google-deployment.md)
 - For **vSphere**: Refer to examples in the [main manual](../MANUAL.md)
 
+## Migration Guides
+
+- [Redis to Valkey Standalone](valkey-standalone-migration.md) - Migrate from Redis to Valkey standalone using live replication
+- [Redis Cluster to Valkey Cluster](valkey-cluster-migration.md) - Migrate from Redis cluster to Valkey cluster using RedisShake
+
 ## Additional Resources
 
 After completing the basic deployment, you may want to explore:
