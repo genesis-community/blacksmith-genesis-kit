@@ -511,17 +511,19 @@ Blacksmith uses "forges" to deploy different types of services. You can activate
   Example configuration:
   ```yaml
   valkey_plans:
-    standalone-9:
-      name: standalone-9
-      description: A dedicated Valkey 9 server
-      type: standalone-9
+    standalone:
+      name: standalone
+      description: A dedicated Valkey server
+      type: standalone
+      version: 8
       vm_type: default
       limit: 10
-      
-    cluster-9:
-      name: cluster-9
-      description: A Valkey 9 cluster with 3 masters and 3 replicas
-      type: cluster-9
+
+    cluster:
+      name: cluster
+      description: A Valkey cluster with 3 masters and 3 replicas
+      type: cluster
+      version: 8
       vm_type: default
       limit: 5
   ```

@@ -4,7 +4,7 @@ The Valkey forge provides on-demand Valkey key-value store instances. Valkey is 
 
 ## Features
 
-- **Multiple Versions**: Support for Valkey 7, 8, and 9
+- **Version Selection**: Parameterized version control (default: LTS v8, configurable to 7 or 9)
 - **Standalone Mode**: Single-node deployment for development and small workloads
 - **Cluster Mode**: Multi-node clusters with automatic sharding and replication
 - **TLS Support**: Optional TLS encryption for data in transit
@@ -24,19 +24,12 @@ kit:
 
 ## Service Plans
 
-The forge provides default plans for both standalone and cluster deployments across all supported versions:
+The forge provides two default plans. Both default to the LTS version (currently v8):
 
-### Standalone Plans
+- `standalone`: Single-node Valkey instance (default: v8)
+- `cluster`: Multi-node Valkey cluster with 3 masters + 3 replicas (default: v8)
 
-- `standalone-7`: Valkey 7.x single-node instance
-- `standalone-8`: Valkey 8.x single-node instance  
-- `standalone-9`: Valkey 9.x single-node instance
-
-### Cluster Plans
-
-- `cluster-7`: Valkey 7.x cluster (3 masters + 3 replicas)
-- `cluster-8`: Valkey 8.x cluster (3 masters + 3 replicas)
-- `cluster-9`: Valkey 9.x cluster (3 masters + 3 replicas)
+The `version` parameter selects which Valkey major version to deploy (7, 8, or 9). Operators can define additional plans at different versions (e.g., a `standalone-edge` plan using version 9).
 
 ## Configuration Parameters
 
@@ -66,27 +59,40 @@ You can customize plans or create new ones:
 ```yaml
 params:
   valkey_plans:
-    standalone-9:
-      name: standalone-9
-      description: A dedicated Valkey 9 server, with no redundancy or replication
+    standalone:
+      name: standalone
+      description: A dedicated Valkey server, with no redundancy or replication
       limit: 7
-      type: standalone-9
+      type: standalone
+      version: 8
       vm_type: default
-    
-    cluster-9:
-      name: cluster-9
-      description: A Valkey 9 cluster with 3 master nodes and 3 replica nodes
+
+    cluster:
+      name: cluster
+      description: A Valkey cluster with 3 master nodes and 3 replica nodes
       limit: 5
-      type: cluster-9
+      type: cluster
+      version: 8
       vm_type: default
-      
+
+    standalone-edge:
+      name: standalone-edge
+      description: Valkey 9 server with latest features
+      limit: 3
+      type: standalone
+      version: 9
+      vm_type: default
+
     custom-large:
       name: custom-large
-      description: Large Valkey 9 instance with extra memory
+      description: Large Valkey instance with extra memory
       limit: 3
-      type: standalone-9
+      type: standalone
+      version: 8
       vm_type: large
 ```
+
+**Note:** The `type` field must be `standalone` or `cluster` — it selects the plan template. The `version` field selects which Valkey binary to use (7, 8, or 9). Multiple plans can share the same type with different versions.
 
 ## TLS Configuration
 
@@ -134,11 +140,13 @@ Cluster plans deploy a multi-node Valkey cluster with automatic sharding and rep
 
 ## Version Selection
 
-Choose the Valkey version based on your requirements:
+Set the `version` parameter on any plan to select the Valkey major version:
 
-- **Valkey 7**: Stable, Redis 7.x compatible
-- **Valkey 8**: Latest stable with new features, Redis 7.x+ compatible
-- **Valkey 9**: Latest version with advanced features, Redis 7.x+ compatible
+| Version | Description | Default |
+|---------|-------------|---------|
+| 7 | Stable, Redis 7.x compatible | |
+| 8 | LTS, recommended for production | yes |
+| 9 | Latest with advanced features | |
 
 ## Connection Information
 
@@ -151,7 +159,7 @@ VCAP_SERVICES: {
       "binding_guid": "99a7fd19-376d-42eb-bd7b-f0c4a77a63de",
       "binding_name": null,
       "credentials": {
-        "host": "65d620db-590a-4060-a41f-d40fe6dfcad8.standalone.ocfp-aws-lab-ocf-us-east-1-cf-net-ocf.valkey-standalone-8-d618ff1d-6b50-403e-9d11-2f9d6c0ae72b.bosh",
+        "host": "65d620db-590a-4060-a41f-d40fe6dfcad8.standalone.ocfp-aws-lab-ocf-us-east-1-cf-net-ocf.valkey-standalone-d618ff1d-6b50-403e-9d11-2f9d6c0ae72b.bosh",
         "password": "E1bOo1bwUK18Bo0kM7xj9eiVVgPe3mgsvPmyQxCt70nRIIw9Xz1UcP7KtFJ1HGf4",
         "port": 6379,
         "tls_port": 16379,
@@ -164,7 +172,7 @@ VCAP_SERVICES: {
       "instance_name": "valkeys8",
       "label": "valkey",
       "name": "valkeys8",
-      "plan": "standalone-8",
+      "plan": "standalone",
       "provider": null,
       "syslog_drain_url": null,
       "tags": [
@@ -188,7 +196,7 @@ VCAP_SERVICES: {
       "binding_guid": "cc451ee5-6adc-4f67-af61-7d37daad6f8a",
       "binding_name": null,
       "credentials": {
-        "host": "48f45726-df6f-4274-b8b7-3f846e30bd15.node.ocfp-aws-lab-ocf-us-east-1-cf-net-ocf.valkey-cluster-8-470fb7bb-1726-4471-a143-470dc1c01e6d.bosh",
+        "host": "48f45726-df6f-4274-b8b7-3f846e30bd15.node.ocfp-aws-lab-ocf-us-east-1-cf-net-ocf.valkey-cluster-470fb7bb-1726-4471-a143-470dc1c01e6d.bosh",
         "hosts": [
           "10.0.2.41",
           "10.0.2.103",
@@ -209,7 +217,7 @@ VCAP_SERVICES: {
       "instance_name": "valkeyc8",
       "label": "valkey",
       "name": "valkeyc8",
-      "plan": "cluster-8",
+      "plan": "cluster",
       "provider": null,
       "syslog_drain_url": null,
       "tags": [
@@ -261,50 +269,28 @@ params:
   valkey_service_limit: 50
   
   valkey_plans:
-    standalone-7:
-      name: standalone-7
-      description: A dedicated Valkey 7 server, with no redundancy or replication
+    standalone:
+      name: standalone
+      description: A dedicated Valkey server, with no redundancy or replication
       limit: 7
-      type: standalone-7
+      type: standalone
+      version: 8
       vm_type: redis-small
       .: (( inject meta.valkey_plan ))
-    standalone-8:
-      name: standalone-8
-      description: A dedicated Valkey 8 server, with no redundancy or replication
+    standalone-edge:
+      name: standalone-edge
+      description: A dedicated Valkey 9 server with edge features
       limit: 7
-      type: standalone-8
+      type: standalone
+      version: 9
       vm_type: redis-small
       .: (( inject meta.valkey_plan ))
-    standalone-9:
-      name: standalone-9
-      description: A dedicated Valkey 9 server, with no redundancy or replication
-      limit: 7
-      type: standalone-9
-      vm_type: redis-small
-      .: (( inject meta.valkey_plan ))
-    cluster-7:
-      name: cluster-7
-      description: A Valkey 7 cluster with 3 master nodes and 3 replica nodes
+    cluster:
+      name: cluster
+      description: A Valkey cluster with 3 master nodes and 3 replica nodes
       limit: 5
-      type: cluster-7
-      vm_type: redis-small
-      masters: 3
-      replicas: 1
-      .: (( inject meta.valkey_plan ))
-    cluster-8:
-      name: cluster-8
-      description: A Valkey 8 cluster with 3 master nodes and 3 replica nodes
-      limit: 5
-      type: cluster-8
-      vm_type: redis-small
-      masters: 3
-      replicas: 1
-      .: (( inject meta.valkey_plan ))
-    cluster-9:
-      name: cluster-9
-      description: A Valkey 9 cluster with 3 master nodes and 3 replica nodes
-      limit: 5
-      type: cluster-9
+      type: cluster
+      version: 8
       vm_type: redis-small
       masters: 3
       replicas: 1
