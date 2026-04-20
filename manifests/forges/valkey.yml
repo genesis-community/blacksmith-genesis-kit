@@ -11,54 +11,28 @@ meta:
     - redis
 
     valkey_plans:
-      standalone-7:
-        name: standalone-7
-        description: A dedicated Valkey 7 server, with no redundancy or replication
+      standalone:
+        name: standalone
+        description: A dedicated Valkey server, with no redundancy or replication
         limit: 7
-        type: standalone-7
+        type: standalone
+        version: 8
         vm_type: default
-      standalone-8:
-        name: standalone-8
-        description: A dedicated Valkey 8 server, with no redundancy or replication
-        limit: 7
-        type: standalone-8
-        vm_type: default
-      standalone-9:
-        name: standalone-9
-        description: A dedicated Valkey 9 server, with no redundancy or replication
-        limit: 7
-        type: standalone-9
-        vm_type: default
-      cluster-7:
-        name: cluster-7
-        description: A Valkey 7 cluster with 3 master nodes and 3 replica nodes
+      cluster:
+        name: cluster
+        description: A Valkey cluster with 3 master nodes and 3 replica nodes
         limit: 5
-        type: cluster-7
-        vm_type: default
-        masters: 3
-        replicas: 1
-      cluster-8:
-        name: cluster-8
-        description: A Valkey 8 cluster with 3 master nodes and 3 replica nodes
-        limit: 5
-        type: cluster-8
-        vm_type: default
-        masters: 3
-        replicas: 1
-      cluster-9:
-        name: cluster-9
-        description: A Valkey 9 cluster with 3 master nodes and 3 replica nodes
-        limit: 5
-        type: cluster-9
+        type: cluster
+        version: 8
         vm_type: default
         masters: 3
         replicas: 1
 
 releases:
  - name: valkey-forge
-   version: 1.0.1
-   url: https://github.com/blacksmith-community/valkey-forge-boshrelease/releases/download/v1.0.1/valkey-forge-1.0.1.tar.gz
-   sha1: sha256:f501b918934ad7e16daaa47d5b30415162dcdfa1b3b23474faa4b8d4718f898c
+   version: 1.1.0
+   url: https://github.com/blacksmith-community/valkey-forge-boshrelease/releases/download/v1.1.0/valkey-forge-1.1.0.tgz
+   sha1: sha256:b1110dfa9506ae26a655a137cc903d74fdad2b13166926b40aa62e8003ada484
 
 params:
   releases:
@@ -81,4 +55,4 @@ instance_groups:
         description: (( grab params.valkey_service_description || "A dedicated Valkey instance, deployed on-demand" ))
         tags:        (( grab params.valkey_service_tags        || meta.default.valkey_tags ))
         limit:       (( grab params.valkey_service_limit       || 0 ))
-        type:        (( grab params.valkey_service_type        || "standalone-9" ))
+        type:        (( grab params.valkey_service_type        || "standalone" ))
