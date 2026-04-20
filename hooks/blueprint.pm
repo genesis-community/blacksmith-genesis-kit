@@ -1,4 +1,4 @@
-package Genesis::Hook::Blueprint::Blacksmith v1.1.1;
+package Genesis::Hook::Blueprint::Blacksmith v1.2.0;
 
 use v5.20; # Genesis min perl version is 5.20
 use warnings;
