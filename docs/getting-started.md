@@ -40,7 +40,7 @@ During environment creation, you'll be prompted for:
 - Environment name
 - IaaS provider (vsphere, aws, azure, google, openstack, stackit, or external-bosh)
 - IaaS-specific credentials and configuration
-- Service forges to enable (postgresql, rabbitmq, redis, valkey, mariadb, kubernetes)
+- Service forges to enable (postgresql, rabbitmq, valkey, mariadb, kubernetes; redis is deprecated — use valkey)
 - Static IP for the Blacksmith broker
 - Additional features (TLS, SHIELD backups, etc.)
 

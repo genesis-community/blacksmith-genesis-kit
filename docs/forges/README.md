@@ -8,8 +8,8 @@ Blacksmith currently supports the following service forges:
 
 - PostgreSQL - PostgreSQL database services (standalone and clustered)
 - RabbitMQ - RabbitMQ message broker services (with TLS, clustering, and autoscaling)
-- Redis - Redis key-value store services (persistent and cache modes)
-- Valkey- Valkey key-value store services (Redis-compatible, versions 7/8/9)
+- Valkey - Valkey key-value store services (Redis-compatible, versions 7/8/9)
+- Redis (deprecated) - Redis key-value store services; use Valkey for new instances
 - MariaDB - MariaDB/MySQL database services
 
 ## Forge Configuration 
@@ -23,7 +23,7 @@ All forges follow a similar configuration pattern:
 ```yaml
 kit:
   features:
-    - forge-name  # E.g., postgresql, rabbitmq, redis, valkey, etc.
+    - forge-name  # E.g., postgresql, rabbitmq, valkey, etc.
 
 params:
   forge_service_name: "service-name"          # Name in the marketplace
@@ -75,13 +75,13 @@ Some forges have additional feature flags that enable special capabilities:
   - `rabbitmq-dashboard-registration` - Register management UI with CF routes
   - `rabbitmq-autoscale` - Enable autoscaling based on queue depth
 
-- **Redis**:
-  - `redis-tls` - Enable TLS encryption
-  - `redis-dual-mode` - Allow both TLS and non-TLS connections
-
 - **Valkey**:
   - `valkey-tls` - Enable TLS encryption
   - `valkey-dual-mode` - Allow both TLS and non-TLS connections
+
+- **Redis** (deprecated — use Valkey for new instances):
+  - `redis-tls` - Enable TLS encryption
+  - `redis-dual-mode` - Allow both TLS and non-TLS connections
 
 ## Using Service Instances
 

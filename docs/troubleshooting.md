@@ -256,7 +256,12 @@ cf ssh <app-name> -c "nc -zv <service-host> <service-port>"
 
 - For more RabbitMQ troubleshooting, see the [RabbitMQ Walkthrough](../rabbitmq-walkthrough.md)
 
-### Redis Issues
+### Redis Issues (deprecated forge)
+
+> The Redis forge is deprecated — use Valkey for new service
+> instances. These notes apply to existing Redis instances; see the
+> [Redis to Valkey migration walkthroughs](walkthroughs/README.md)
+> for moving off Redis.
 
 - **Error**: "WRONGPASS Invalid Password"
   - Verify credentials in the binding

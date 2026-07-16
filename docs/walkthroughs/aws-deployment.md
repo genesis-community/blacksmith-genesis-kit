@@ -378,7 +378,7 @@ aws service-quotas get-service-quota \
    - Set up S3 bucket policies for backups
 
 2. **Add more service offerings**:
-   - Configure Redis, RabbitMQ, or other services
+   - Configure Valkey, RabbitMQ, or other services
    - Define appropriate AWS VM and disk types
 
 3. **Set up monitoring**:

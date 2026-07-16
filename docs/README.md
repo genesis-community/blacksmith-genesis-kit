@@ -17,8 +17,8 @@ Welcome to the Blacksmith Genesis Kit documentation. This directory contains det
 - [Service Forges](forges/README.md) - Configuring service forges
   - [PostgreSQL](forges/postgresql.md)
   - [RabbitMQ](forges/rabbitmq.md)
-  - [Redis](forges/redis.md)
   - [Valkey](forges/valkey.md)
+  - Redis (deprecated) - see [Valkey](forges/valkey.md)
   - [MariaDB](forges/mariadb.md)
   - [Kubernetes](forges/kubernetes.md)
 - [Addons](addons.md) - Using Blacksmith addons

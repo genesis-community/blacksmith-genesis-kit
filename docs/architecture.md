@@ -12,7 +12,7 @@ Blacksmith consists of several key components:
 
 2. **Internal BOSH Director** - A dedicated BOSH director used by Blacksmith to deploy and manage service VMs.
 
-3. **Forges** - Specialized components that know how to deploy specific types of services (PostgreSQL, RabbitMQ, Redis, etc.)
+3. **Forges** - Specialized components that know how to deploy specific types of services (PostgreSQL, RabbitMQ, Valkey, etc.)
 
 4. **Service Instances** - BOSH deployments that run the actual service software.
 

@@ -404,7 +404,12 @@ Blacksmith uses "forges" to deploy different types of services. You can activate
     along with the `app-autoscaler-integration` feature enabled.
     Autoscaling itself requires cf-app-autoscaler-genesis-kit.
 
-#### Redis
+#### Redis (deprecated)
+
+> **Deprecated**: The Redis forge is deprecated. Use the
+> [Valkey](#valkey) forge for all new service instances. Existing
+> Redis instances remain supported; see the Redis-to-Valkey
+> migration walkthroughs in `docs/walkthroughs/` for moving them.
 
 - `redis` (Blacksmith Forge) - Enables the Blacksmith Service
   Broker to deploy Redis key-value instances that are either
