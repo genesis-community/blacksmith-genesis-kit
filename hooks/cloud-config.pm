@@ -80,7 +80,7 @@ sub perform {
                 }, 't3.medium'),
               'ephemeral_disk' => {
                 'size' => $self->for_scale({
-                    dev => 4096,
+                    dev => 8192,
                     prod => 16384
                   }, 4096),
                 'type' => 'gp3',
