@@ -10,9 +10,11 @@ meta:
       config:        (( concat genesis.ocfp_config_mount genesis.ocfp_env ))
 
     certs:
-      trusted:
-        - (( vault genesis.secrets_mount "certs/org:ca" )) # Organization CA, if exists
-        - (( vault genesis.secrets_mount "certs/dbs:ca" )) # External Databases CA
+      # Optional org / external-DB trust anchors. These vault paths are not
+      # present in every bloc (e.g. the PVE lab), the vault operator has no
+      # fallback, and nothing in the kit consumes this list, so default it empty
+      # and let an env/overlay append real CAs where they exist.
+      trusted: []
 
   stemcell:
     name:    (( grab params.stemcell_name    || "default" ))
