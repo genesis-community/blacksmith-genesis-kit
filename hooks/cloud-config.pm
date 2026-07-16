@@ -52,6 +52,9 @@ sub perform {
               stackit => {
                 'net_id' => $self->network_reference('id'),
                 'security_groups' => scalar $self->env->lookup('stackit_default_security_groups', ['default'])
+              },
+              pve => {
+                'bridge' => scalar($self->env->lookup('bosh-configs.cpi.pve_network_bridge', 'lvnet001')),
               }
             }
 					}
@@ -122,6 +125,12 @@ sub perform {
                 'size' => 32
               },
             },
+            pve => {
+              'cpu'            => scalar($self->env->lookup('bosh-configs.cpi.pve_blacksmith_cpu',  $self->for_scale({ dev => 2, prod => 4 }, 2))),
+              'ram'            => scalar($self->env->lookup('bosh-configs.cpi.pve_blacksmith_ram',  $self->for_scale({ dev => 4096, prod => 8192 }, 4096))),
+              'disk'           => scalar($self->env->lookup('bosh-configs.cpi.pve_blacksmith_disk', $self->for_scale({ dev => 32768, prod => 65536 }, 32768))),
+              'network_bridge' => scalar($self->env->lookup('bosh-configs.cpi.pve_network_bridge', 'lvnet001')),
+            },
           },
         ),
         # PostgreSQL VM Types
@@ -133,6 +142,12 @@ sub perform {
               'root_disk' => {
                 'size' => 16
               },
+            },
+            pve => {
+              'cpu'            => scalar($self->env->lookup('bosh-configs.cpi.pve_postgres_small_cpu',  $self->for_scale({ dev => 1, prod => 2 }, 1))),
+              'ram'            => scalar($self->env->lookup('bosh-configs.cpi.pve_postgres_small_ram',  $self->for_scale({ dev => 2048, prod => 4096 }, 2048))),
+              'disk'           => scalar($self->env->lookup('bosh-configs.cpi.pve_postgres_small_disk', $self->for_scale({ dev => 16384, prod => 32768 }, 16384))),
+              'network_bridge' => scalar($self->env->lookup('bosh-configs.cpi.pve_network_bridge', 'lvnet001')),
             },
             aws => {
               'instance_type' => $self->for_scale({
@@ -162,6 +177,12 @@ sub perform {
                 'size' => 32
               },
             },
+            pve => {
+              'cpu'            => scalar($self->env->lookup('bosh-configs.cpi.pve_postgres_medium_cpu',  $self->for_scale({ dev => 2, prod => 4 }, 2))),
+              'ram'            => scalar($self->env->lookup('bosh-configs.cpi.pve_postgres_medium_ram',  $self->for_scale({ dev => 4096, prod => 8192 }, 4096))),
+              'disk'           => scalar($self->env->lookup('bosh-configs.cpi.pve_postgres_medium_disk', $self->for_scale({ dev => 32768, prod => 65536 }, 32768))),
+              'network_bridge' => scalar($self->env->lookup('bosh-configs.cpi.pve_network_bridge', 'lvnet001')),
+            },
             aws => {
               'instance_type' => $self->for_scale({
                   dev => 't3.medium',
@@ -189,6 +210,12 @@ sub perform {
               'root_disk' => {
                 'size' => 64
               },
+            },
+            pve => {
+              'cpu'            => scalar($self->env->lookup('bosh-configs.cpi.pve_postgres_large_cpu',  $self->for_scale({ dev => 2, prod => 8 }, 2))),
+              'ram'            => scalar($self->env->lookup('bosh-configs.cpi.pve_postgres_large_ram',  $self->for_scale({ dev => 8192, prod => 16384 }, 8192))),
+              'disk'           => scalar($self->env->lookup('bosh-configs.cpi.pve_postgres_large_disk', $self->for_scale({ dev => 65536, prod => 131072 }, 65536))),
+              'network_bridge' => scalar($self->env->lookup('bosh-configs.cpi.pve_network_bridge', 'lvnet001')),
             },
             aws => {
               'instance_type' => $self->for_scale({
@@ -234,6 +261,10 @@ sub perform {
             },
             vsphere => {},
             stackit => {},
+            pve => {
+              'storage'     => scalar($self->env->lookup('bosh-configs.cpi.pve_disk_storage', 'zfs-1')),
+              'disk_format' => scalar($self->env->lookup('bosh-configs.cpi.pve_disk_format', 'raw')),
+            },
           },
         ),
         # PostgreSQL Disk Types
@@ -252,6 +283,10 @@ sub perform {
               'type' => 'gp3',
               'encrypted' => $self->TRUE,
             },
+            pve => {
+              'storage'     => scalar($self->env->lookup('bosh-configs.cpi.pve_disk_storage', 'zfs-1')),
+              'disk_format' => scalar($self->env->lookup('bosh-configs.cpi.pve_disk_format', 'raw')),
+            },
           },
         ),
         $self->disk_type_definition('postgres-medium',
@@ -269,6 +304,10 @@ sub perform {
               'type' => 'gp3',
               'encrypted' => $self->TRUE,
             },
+            pve => {
+              'storage'     => scalar($self->env->lookup('bosh-configs.cpi.pve_disk_storage', 'zfs-1')),
+              'disk_format' => scalar($self->env->lookup('bosh-configs.cpi.pve_disk_format', 'raw')),
+            },
           },
         ),
         $self->disk_type_definition('postgres-large',
@@ -285,6 +324,10 @@ sub perform {
             },
             stackit => {
               'type' => 'storage_premium_perf6',
+            },
+            pve => {
+              'storage'     => scalar($self->env->lookup('bosh-configs.cpi.pve_disk_storage', 'zfs-1')),
+              'disk_format' => scalar($self->env->lookup('bosh-configs.cpi.pve_disk_format', 'raw')),
             },
           },
         ),
