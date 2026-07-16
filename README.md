@@ -19,8 +19,8 @@ Blacksmith is an on-demand service broker that uses BOSH to provision dedicated 
 - **Comprehensive Service Support**: Deploy a variety of data services including:
   - PostgreSQL databases
   - RabbitMQ message brokers (with TLS, clustering, and autoscaling)
-  - Redis key-value stores (with persistence and TLS)
   - Valkey key-value stores (with persistence and TLS)
+  - Redis key-value stores (deprecated — use Valkey for new service instances)
   - MariaDB databases
   - Kubernetes clusters
 - **Security Features**: TLS support, credential management, and role-based access control
@@ -84,15 +84,16 @@ Blacksmith provides "forges" that know how to deploy specific data services:
 - Autoscaling based on queue depth
 - See [rabbitmq-walkthrough.md](rabbitmq-walkthrough.md) for details
 
-### Redis
-- Standalone and clustered depployments with optional persistence
+### Valkey
+- Standalone and clustered deployments with optional persistence
 - TLS encryption for secure communication
 - Cache and data store configurations
 
-### Valkey
-- Standalone and clustered depployments with optional persistence
+### Redis (deprecated)
+- Deprecated — use the Valkey forge for all new service instances
+- Retained for existing service instances only
+- Standalone and clustered deployments with optional persistence
 - TLS encryption for secure communication
-- Cache and data store configurations
 
 ### MariaDB
 - MySQL-compatible database deployments
