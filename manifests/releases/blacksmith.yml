@@ -12,8 +12,8 @@ releases:
   url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/bosh?v=" releases.bosh.version ))
 
 - name:    "bpm"
-  version: "1.4.20"
-  sha1:    sha256:1984129b352cd414e29a7dcffcf076049a776afa511cd44b587065f6e618cc6d
+  version: "1.4.26"
+  sha1:    sha256:40af85114d2a8a67812bf65212076581ea42cefcf67ee6b8d78d778ed1ca2b85
   url:     (( concat "https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=" releases.bpm.version ))
 
 - name:    routing
