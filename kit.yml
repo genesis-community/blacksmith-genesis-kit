@@ -72,6 +72,9 @@ certificates:
           signed_by: broker/ca
           names:
             - blacksmith.services.bosh-internal
+            # gorouter validates the backend cert against the route's
+            # server_cert_domain_san (params.fqdn), so it must be a SAN here
+            - ${params.fqdn}
             - ${params.ip}
 
 credentials:
