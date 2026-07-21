@@ -26,6 +26,25 @@ sub perform {
 
   my $iaas = $self->env->iaas;
   my $config = $self->build_cloud_config({
+      'azs' => [
+        # The valkey-forge (and other) release job plans hardcode a bare
+        # "z1" az default (`meta.azs || [z1]`). Live directors only define
+        # env-namespaced azs (eg <env>-z1/-z2/-z3) via the director's own
+        # config, never a plain "z1" - so the default plan can't resolve
+        # without this. Provided as a raw entry, bypassing az naming
+        # helpers, mirroring the vm_type "default" raw-hashref approach
+        # below. If a future base/named config also defines a plain "z1",
+        # BOSH's cloud-config merge applies to whichever named configs are
+        # attached to the deployment - this entry is not deduplicated
+        # against other named configs, so watch for a collision there.
+        ($self->want_feature('valkey') ?
+          ({
+            name => 'z1',
+            ($self->cpi_enabled ? (cpi => $self->cpi_name) : ()),
+            cloud_properties => {},
+          }) : ()
+        ),
+      ],
 			'networks' => [
 				$self->network_definition('blacksmith',
 					strategy => 'ocfp',
