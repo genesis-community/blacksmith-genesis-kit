@@ -85,7 +85,16 @@ sub perform {
         # uploaded supplemental cloud config. name_prefix => '' opts out of
         # the usual env-namespaced naming that network_definition applies.
         ($self->want_feature('valkey') ?
-          ($self->network_definition('valkey-service',
+          (map {
+            my $net = $_;
+            # The subnet inherits an env-namespaced az (eg <env>-z2) from
+            # the ocfp subnet data, but the default plans deploy instance
+            # groups into the bare "z1" az defined above - BOSH requires
+            # the instance group az to match an az of its network's
+            # subnets, so realign the generated subnets to "z1".
+            $_->{az} = 'z1' for @{$net->{subnets} // []};
+            $net;
+          } $self->network_definition('valkey-service',
             strategy => 'ocfp',
             name_prefix => '',
             dynamic_subnets => {
