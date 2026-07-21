@@ -1,0 +1,14 @@
+---
+# PVE bloc invariant: ubuntu-noble only (the OCFP PVE CPI is built and tested
+# against noble; jammy is unsupported). The kit's own base default
+# (ocfp/meta.yml, grabbed by both the broker's stemcells block and the
+# per-forge stemcell_os/stemcell_version job properties) already defaults
+# params.stemcell_os to ubuntu-noble, but pin it again here so PVE never
+# silently drifts back to jammy if that base default is ever changed for
+# another bloc's sake.
+#
+# No version pin: the base default leaves params.stemcell_version at
+# "latest", which resolves to the newest noble uploaded to the deploying
+# director. Pin per-env via params.stemcell_version if ever needed.
+params:
+  stemcell_os: ubuntu-noble
