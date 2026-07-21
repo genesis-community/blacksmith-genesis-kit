@@ -58,9 +58,86 @@ sub perform {
               }
             }
 					}
-        )
+        ),
+        # The valkey-forge release job hardcodes this bare network name as
+        # its default (see valkey-blacksmith-plans job's standalone/cluster
+        # plan templates: `meta.net || "valkey-service"`), so it must exist
+        # unprefixed for the default plan to resolve without a manually
+        # uploaded supplemental cloud config. name_prefix => '' opts out of
+        # the usual env-namespaced naming that network_definition applies.
+        ($self->want_feature('valkey') ?
+          ($self->network_definition('valkey-service',
+            strategy => 'ocfp',
+            name_prefix => '',
+            dynamic_subnets => {
+              subnets => ['ocfp-1'],
+              allocation => {
+                size => 0,
+                statics => 0,
+              },
+              cloud_properties_for_iaas => {
+                openstack => {
+                  'net_id' => $self->network_reference('id'),
+                  'security_groups' => ['default']
+                },
+                aws => {
+                  'subnet' => $self->subnet_reference('id'),
+                  'security_groups' => $self->get_network_security_groups(),
+                },
+                azure => {
+                  'security_group' => scalar $self->env->lookup('azure_default_sg', 'default'),
+                },
+                google => {},
+                vsphere => {},
+                stackit => {
+                  'net_id' => $self->network_reference('id'),
+                  'security_groups' => scalar $self->env->lookup('stackit_default_security_groups', ['default'])
+                },
+                pve => {
+                  'bridge' => scalar($self->env->lookup('bosh-configs.cpi.pve_network_bridge', 'lvnet001')),
+                }
+              }
+            }
+          )) : ()
+        ),
       ],
       'vm_types' => [
+        # The valkey/redis/rabbitmq/postgresql forge releases all hardcode
+        # this bare vm_type name as their default plan's sizing (see each
+        # forge's *-blacksmith-plans job templates). Provided as a raw
+        # cloud-config entry (bypassing vm_type_definition's automatic
+        # env-namespaced naming) so the default plan resolves without an
+        # operator having to hand-upload a supplemental cloud config.
+        {
+          name => 'default',
+          cloud_properties => scalar($self->_cloud_properties_for_iaas(
+            openstack => {
+              'instance_type' => $self->for_scale({ dev => 'g1a.2d', prod => 'g1a.4d' }, 'g1a.2d'),
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => { 'size' => 16 },
+            },
+            aws => {
+              'instance_type' => $self->for_scale({ dev => 't3.small', prod => 'c6i.large' }, 't3.small'),
+              'ephemeral_disk' => {
+                'size' => $self->for_scale({ dev => 4096, prod => 8192 }, 4096),
+                'type' => 'gp3',
+                'encrypted' => $self->TRUE,
+              },
+              'metadata_options' => { 'http_tokens' => 'required' },
+            },
+            stackit => {
+              'instance_type' => 'g1a.2d',
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => { 'size' => 16 },
+            },
+            pve => {
+              'cpu'            => scalar($self->env->lookup('bosh-configs.cpi.pve_service_default_cpu',  $self->for_scale({ dev => 1, prod => 2 }, 1))),
+              'ram'            => scalar($self->env->lookup('bosh-configs.cpi.pve_service_default_ram',  $self->for_scale({ dev => 2048, prod => 4096 }, 2048))),
+              'disk'           => scalar($self->env->lookup('bosh-configs.cpi.pve_service_default_disk', $self->for_scale({ dev => 16384, prod => 32768 }, 16384))),
+              'network_bridge' => scalar($self->env->lookup('bosh-configs.cpi.pve_network_bridge', 'lvnet001')),
+            },
+          )),
+        },
         $self->vm_type_definition('blacksmith',
           cloud_properties_for_iaas => {
             openstack => {
