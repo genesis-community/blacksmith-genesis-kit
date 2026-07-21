@@ -38,36 +38,15 @@ sub ca_sync {
 	info("\n#Bu{Certificate Synchronization}\n\n");
 
 	# Check if we need to sync certificates
-	unless ($self->_needs_ca_sync()) {
+	unless ($self->_needs_blacksmith_ca_sync()) {
 		info("  Certificate sync not required for this configuration.\n");
 		return 1;
 	}
 
 	info("Syncing Blacksmith CA certificates...\n");
 
-	# Sync Blacksmith services CA
-	my $broker_ca_path = $env->secrets_base . 'broker/ca';
-
-	info("Checking if Blacksmith Services CA Exists: $broker_ca_path\n");
-	unless ($self->env->vault->has($broker_ca_path)) {
-		warning("  Blacksmith broker CA not found at: $broker_ca_path\n");
-		warning("  Skipping CA synchronization.\n");
-		return 1;
-	}
-
-	info("  Setting blacksmith_services_ca in Credhub...\n");
-	my ($out, $rc, $err) = run(
-		{stderr => 0},
-		'genesis credhub $1 set -t certificate -n "/$1-bosh/$1-blacksmith/blacksmith_services_ca" '.
-		'-c <(safe get "$2:certificate") -p <(safe get "$2:key")',
-		$env->name, $broker_ca_path
-	);
-
-	if ($rc != 0) {
-		error("  Failed to set CA certificate in Credhub: %s\n", $err || 'Unknown error');
-		return 0;
-	}
-	info("  ✓ Blacksmith services CA synchronized\n");
+	# Sync Blacksmith services CA (shared with post-deploy; see _util.pm)
+	return 0 unless $self->_sync_blacksmith_services_ca();
 
 	# Sync NATS client certificate if needed
 	my $exodus_path = $env->secrets_mount . '/exodus/' . $cf_env_name . '/cf';
@@ -76,7 +55,7 @@ sub ca_sync {
 	if ($self->env->vault->has("$exodus_path:nats_client_cert")) {
 		info("  Setting nats_client_cert in Credhub...\n");
 
-		($out, $rc, $err) = run(
+		my ($out, $rc, $err) = run(
 			{stderr => 0},
 			'genesis credhub $1 set -t certificate -n "/$1-bosh/$1-cf/nats_client_cert" '.
 			'-c <(safe get "$2:nats_client_cert") -p <(safe get "$2:nats_client_key") '.
@@ -191,19 +170,6 @@ sub _determine_cf_environment {
 	}
 
 	return $cf_env;
-}
-# }}}
-
-# _needs_ca_sync - Check if CA sync is needed {{{2
-sub _needs_ca_sync {
-	my ($self) = @_;
-
-	# CA sync is needed for certain features or when using internal services
-	return 1 if $self->want_feature('broker-tls');
-	return 1 if $self->want_feature('rabbitmq-tls');
-	return 1 if $self->want_feature('redis-tls');
-
-	return 0;
 }
 # }}}
 

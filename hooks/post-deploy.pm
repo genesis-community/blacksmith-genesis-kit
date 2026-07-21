@@ -32,6 +32,11 @@ sub perform {
   if ($self->deploy_successful) {
     info("\n#G{✓} #M{%s} Blacksmith Service Broker deployed successfully!\n", $env->name);
 
+    # Seed the blacksmith_services_ca into this deployment's config server
+    # so forge service instances can resolve it without requiring the
+    # operator to have run the "register" addon first.
+    $self->sync_blacksmith_services_ca();
+
     # Provide helpful post-deployment information
     $self->display_deployment_summary();
 
@@ -51,6 +56,27 @@ sub perform {
   }
 
   return $self->done();
+}
+
+# }}}
+
+# sync_blacksmith_services_ca - Seed blacksmith_services_ca into credhub {{{
+sub sync_blacksmith_services_ca {
+  my ($self) = @_;
+
+  return 1 unless $self->_needs_blacksmith_ca_sync();
+
+  info("\n#Bu{Certificate Synchronization}\n\n");
+
+  unless ($self->_sync_blacksmith_services_ca()) {
+    warning("\n#Y{Warning:} Failed to synchronize blacksmith_services_ca.\n");
+    warning("Service instance provisioning will fail with a credhub\n");
+    warning("404 for blacksmith_services_ca until this is resolved.\n");
+    warning("Run '#G{%s do register}' to retry synchronization.\n", $self->env->get_call_path_with_env());
+    return 0;
+  }
+
+  return 1;
 }
 
 # }}}
