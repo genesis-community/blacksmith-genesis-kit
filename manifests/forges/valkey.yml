@@ -48,6 +48,9 @@ instance_groups:
       environment: (( grab meta.environment ))
       bosh_env: (( grab meta.bosh_env ))
 
+      stemcell_os:      (( grab params.stemcell_os      || "ubuntu-jammy" ))
+      stemcell_version: (( grab params.stemcell_version || "latest" ))
+
       plans: (( grab params.valkey_plans || meta.default.valkey_plans ))
       service:
         id:          (( grab params.valkey_service_id          || "valkey" ))
