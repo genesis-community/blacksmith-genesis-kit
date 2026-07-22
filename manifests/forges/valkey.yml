@@ -3,6 +3,13 @@ meta:
   environment: (( grab genesis.env || params.env ))
   bosh_env: (( grab genesis.bosh_env || params.bosh_env || params.env ))
 
+  # The valkey-forge plan template renders `version: <%= p('stemcell_version') %>`
+  # (bare ERB), so a numeric-looking pin such as 1.460 gets YAML
+  # float-normalised to 1.46 when the broker re-merges the plan and BOSH
+  # then can't find the stemcell. Pre-quoting the value here makes the
+  # emitted scalar a quoted string end-to-end.
+  stemcell_version_pin: (( grab params.stemcell_version || "latest" ))
+
   default:
     valkey_tags:
     - blacksmith
@@ -49,7 +56,7 @@ instance_groups:
       bosh_env: (( grab meta.bosh_env ))
 
       stemcell_os:      (( grab params.stemcell_os      || "ubuntu-noble" ))
-      stemcell_version: (( grab params.stemcell_version || "latest" ))
+      stemcell_version: (( concat "\"" meta.stemcell_version_pin "\"" ))
 
       plans: (( grab params.valkey_plans || meta.default.valkey_plans ))
       service:

@@ -2,6 +2,14 @@
 meta:
   environment: (( grab genesis.env || params.env ))
   bosh_env: (( grab genesis.bosh_env || params.bosh_env || params.env ))
+
+  # The rabbitmq-forge plan template renders `version: <%= p('service.stemcell') %>`
+  # (bare ERB), so a numeric-looking pin such as 1.460 gets YAML
+  # float-normalised to 1.46 when the broker re-merges the plan and BOSH
+  # then can't find the stemcell. Pre-quoting the value here makes the
+  # emitted scalar a quoted string end-to-end.
+  rabbitmq_stemcell_version_pin: (( grab params.rabbitmq_stemcell_version || "latest" ))
+
   default:
     rabbitmq_tags:
     - blacksmith
@@ -45,4 +53,4 @@ instance_groups:
         description: (( grab params.rabbitmq_service_description || "A dedicated RabbitMQ instance, deployed on-demand" ))
         tags:        (( grab params.rabbitmq_service_tags        || meta.default.rabbitmq_tags ))
         limit:       (( grab params.rabbitmq_service_limit       || 0 ))
-        stemcell:    (( grab params.rabbitmq_stemcell_version    || "latest" ))
+        stemcell:    (( concat "\"" meta.rabbitmq_stemcell_version_pin "\"" ))
