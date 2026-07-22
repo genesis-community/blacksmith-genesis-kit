@@ -23,14 +23,12 @@ exodus:
   bosh_cacert:     (( vault meta.vault "/tls/ca:certificate" ))
 
 
-# Credhub certificate to match OCFP reference for Redis.  This is different from the Vault blacksmith_services_ca
-variables:
-  - name: blacksmith_services_ca
-    type: certificate
-    options:
-      is_ca: true
-      common_name: (( concat genesis.env "-blacksmith-ca.bosh" ))
-
+# The services CA lives in vault at broker/ca and is seeded into credhub at
+# /<env>-bosh/<env>-blacksmith/blacksmith_services_ca by the post-deploy hook;
+# forge plan manifests reference that absolute credhub path. Do not also
+# declare it as a manifest variable — a same-named manifest secret collides
+# with the hook-seeded credhub entry and trips genesis fix-secrets on every
+# redeploy.
 instance_groups:
   - name:      blacksmith
     instances: 1
