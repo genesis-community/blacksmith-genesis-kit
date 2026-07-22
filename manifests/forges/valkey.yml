@@ -34,6 +34,11 @@ meta:
         vm_type: default
         masters: 3
         replicas: 1
+        # The cluster plan template defaults to azs [z1, z2], but the
+        # kit-generated valkey-service network only defines the bare z1 az
+        # (standalone uses z1 and works). Pin the cluster plan to z1 so it
+        # matches the network the broker actually provides.
+        azs: [z1]
 
 releases:
  - name: valkey-forge
