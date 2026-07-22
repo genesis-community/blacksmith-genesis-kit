@@ -3,13 +3,6 @@ meta:
   environment: (( grab genesis.env || params.env ))
   bosh_env: (( grab genesis.bosh_env || params.bosh_env || params.env ))
 
-  # The redis-forge plan template renders `version: <%= p('service.stemcell') %>`
-  # (bare ERB), so a numeric-looking pin such as 1.460 gets YAML
-  # float-normalised to 1.46 when the broker re-merges the plan and BOSH
-  # then can't find the stemcell. Pre-quoting the value here makes the
-  # emitted scalar a quoted string end-to-end.
-  redis_stemcell_version_pin: (( grab params.redis_stemcell_version || "latest" ))
-
   default:
     redis_tags:
     - blacksmith
@@ -38,9 +31,9 @@ meta:
 
 releases:
 - name: redis-forge
-  version: 1.4.2
-  url: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v1.4.2/redis-forge-1.4.2.tgz
-  sha1: sha256:5005dd6499f27e999e2716a3bd2a3147a127e425d1ec48b8a3a2eb3adbfc4948
+  version: 1.4.3
+  url: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v1.4.3/redis-forge-1.4.3.tgz
+  sha1: sha256:9a56253f12350b442377ec246333fac87fd53155d1c6088ea557de526a668b8c
 
 params:
   releases:
@@ -64,4 +57,4 @@ instance_groups:
         tags:        (( grab params.redis_service_tags        || meta.default.redis_tags ))
         limit:       (( grab params.redis_service_limit       || 0 ))
         type:        (( grab params.redis_service_type        || "standalone" ))
-        stemcell:    (( concat "\"" meta.redis_stemcell_version_pin "\"" ))
+        stemcell:    (( grab params.redis_stemcell_version    || "latest" ))
