@@ -10,12 +10,23 @@ meta:
     - valkey
     - redis
 
+    # The -classic plans deploy the same Valkey as their non-classic
+    # counterparts. They differ only in the credentials a bound app gets:
+    # a shared password (one-argument AUTH), instead of a per-binding ACL
+    # user (two-argument AUTH). Requires valkey-forge v1.1.1 or later.
     valkey_plans:
       standalone:
         name: standalone
         description: A dedicated Valkey server, with no redundancy or replication
         limit: 7
         type: standalone
+        version: 8
+        vm_type: default
+      standalone-classic:
+        name: standalone-classic
+        description: A dedicated Valkey server, with no redundancy or replication, using a shared password
+        limit: 7
+        type: standalone-classic
         version: 8
         vm_type: default
       cluster:
@@ -27,12 +38,21 @@ meta:
         vm_type: default
         masters: 3
         replicas: 1
+      cluster-classic:
+        name: cluster-classic
+        description: A Valkey cluster with 3 master nodes and 3 replica nodes, using a shared password
+        limit: 5
+        type: cluster-classic
+        version: 8
+        vm_type: default
+        masters: 3
+        replicas: 1
 
 releases:
  - name: valkey-forge
-   version: 1.1.0
-   url: https://github.com/blacksmith-community/valkey-forge-boshrelease/releases/download/v1.1.0/valkey-forge-1.1.0.tgz
-   sha1: sha256:b1110dfa9506ae26a655a137cc903d74fdad2b13166926b40aa62e8003ada484
+   version: 1.1.1
+   url: https://github.com/blacksmith-community/valkey-forge-boshrelease/releases/download/v1.1.1/valkey-forge-1.1.1.tgz
+   sha1: sha256:e56b321d77f4265b05783bca89c16450ff4794243abbaa1fcf1a944eb8fde3e8
 
 params:
   releases:

@@ -24,10 +24,14 @@ kit:
 
 ## Service Plans
 
-The forge provides two default plans. Both default to the LTS version (currently v8):
+The forge provides four default plans. All default to the LTS version (currently v8):
 
-- `standalone`: Single-node Valkey instance (default: v8)
-- `cluster`: Multi-node Valkey cluster with 3 masters + 3 replicas (default: v8)
+- `standalone`: Single-node Valkey instance
+- `cluster`: Multi-node Valkey cluster with 3 masters + 3 replicas
+- `standalone-classic`: as `standalone`, with shared-password credentials
+- `cluster-classic`: as `cluster`, with shared-password credentials
+
+The `-classic` plans deploy exactly the same Valkey as their counterparts. They differ only in the credentials a bound application receives (see [Credential Modes](#credential-modes)). They require valkey-forge v1.1.1 or later.
 
 The `version` parameter selects which Valkey major version to deploy (7, 8, or 9). Operators can define additional plans at different versions (e.g., a `standalone-edge` plan using version 9).
 
@@ -137,6 +141,31 @@ Cluster plans deploy a multi-node Valkey cluster with automatic sharding and rep
 - Production workloads requiring high availability
 - Large datasets that need horizontal scaling
 - Applications requiring fault tolerance
+
+## Credential Modes
+
+Each plan type comes in two flavours, which deploy the same Valkey and differ only in the credentials a bound application receives.
+
+**Per-binding ACL** (`standalone`, `cluster`)
+
+Each binding gets its own Valkey ACL user, so the application must authenticate with the two-argument `AUTH <username> <password>`. Unbinding removes that user. An application that sends only a password authenticates as the `default` user and is rejected with `WRONGPASS`.
+
+**Classic** (`standalone-classic`, `cluster-classic`)
+
+Every binding receives the same shared password, so the application authenticates with the single-argument `AUTH <password>`. Nothing is created or removed on the instance when an application binds or unbinds.
+
+Both flavours can be offered in the same catalog. When migrating an existing service, point the plan your applications already use at the `-classic` type and offer the ACL type as an opt-in, so no application has to change its client code before it is ready.
+
+```yaml
+params:
+  valkey_plans:
+    shared:                     # existing password-only applications
+      type: standalone-classic
+      version: 8
+    secure:                     # applications that can send a username
+      type: standalone
+      version: 8
+```
 
 ## Version Selection
 
