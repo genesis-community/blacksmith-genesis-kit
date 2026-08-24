@@ -19,10 +19,21 @@ sub init {
 sub perform {
   my ($self) = @_;
 
-  foreach my $feature (@{$self->{features}}) {
-    # Pass through all features
-    $self->add_feature($feature);
+  # Pass every declared feature through BEFORE deciding what else to add.
+  # The blocks below ask has_feature() about other entries in the same
+  # list, and has_feature() only knows what add_feature() has already been
+  # told - so while this ran inside the loop, the answers depended on the
+  # order the operator happened to write the features in.
+  #
+  # 'ocfp' first is the convention in every OCFP environment file, and it
+  # is the worst case: has_feature('redis'), ('valkey') and ('rabbitmq')
+  # were all false at that point, so redis-tls, valkey-tls, rabbitmq-tls
+  # and rabbitmq-dashboard-registration were silently dropped and the
+  # forges deployed without TLS. Nothing warned; the manifest simply had
+  # no tls block.
+  $self->add_feature($_) foreach @{$self->{features}};
 
+  foreach my $feature (@{$self->{features}}) {
     # For OCFP feature, add additional features
     if ($feature eq 'ocfp') {
       $self->add_feature('broker-tls');
