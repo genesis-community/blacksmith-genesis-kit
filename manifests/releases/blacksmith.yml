@@ -1,6 +1,5 @@
 ---
 releases:
-releases:
 - name:    blacksmith
   version: 2.3.0
   url:     https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v2.3.0/blacksmith-2.3.0.tgz
