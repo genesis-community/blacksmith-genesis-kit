@@ -48,28 +48,11 @@ sub ca_sync {
 	# Sync Blacksmith services CA (shared with post-deploy; see _util.pm)
 	return 0 unless $self->_sync_blacksmith_services_ca();
 
-	# Sync NATS client certificate if needed
-	my $exodus_path = $env->secrets_mount . '/exodus/' . $cf_env_name . '/cf';
-	my $cf_vault_path = $env->secrets_base =~ s/blacksmith/cf/r;
-
-	if ($self->env->vault->has("$exodus_path:nats_client_cert")) {
-		info("  Setting nats_client_cert in Credhub...\n");
-
-		my ($out, $rc, $err) = run(
-			{stderr => 0},
-			'genesis credhub $1 set -t certificate -n "/$1-bosh/$1-cf/nats_client_cert" '.
-			'-c <(safe get "$2:nats_client_cert") -p <(safe get "$2:nats_client_key") '.
-			'-r <(safe get "$3/nats_ca:certificate")',
-			$env->name, $exodus_path, $cf_vault_path
-		);
-
-		if ($rc != 0) {
-			warning("  Failed to set NATS client certificate: %s\n", $err || 'Unknown error');
-			warning("  This may not be critical - continuing.\n");
-		} else {
-			info("  ✓ NATS client certificate synchronized\n");
-		}
-	}
+	# The NATS client certificate is not seeded into CredHub here. The
+	# cf-route-registrar overlay reads it from the CF exodus record in vault,
+	# no forge references a CredHub copy, and a stray copy under the CF
+	# deployment's CredHub namespace makes Genesis refuse the next CF deploy
+	# ("manifest secrets still exist in credhub and would diverge").
 
 	return 1;
 }
