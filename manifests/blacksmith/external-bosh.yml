@@ -23,7 +23,7 @@ instance_groups:
             username: (( grab params.external_bosh.username || meta.external_bosh_username ))
             password: (( grab params.external_bosh.password || meta.external_bosh_password ))
             address:  (( grab params.external_bosh.address || meta.external_bosh_address ))
-            ca_cert:   (( grab params.external_bosh.address || meta.external_bosh_cacert ))
+            ca_cert:   (( grab params.external_bosh.cacert || meta.external_bosh_cacert ))
             stemcells: []
             releases: []
             cloud-config: []
