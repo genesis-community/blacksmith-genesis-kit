@@ -300,6 +300,18 @@ sub process_addon_feature {
 	}
   elsif ($feature eq 'cf-integration') {
 		$self->add_files("ocfp/cf-integration.yml");
+
+		# The cf kit's 'self-signed' feature signs haproxy with a CA that exists
+		# only in the CF deployment's CredHub, and its exodus record says so.
+		# Point the broker at that CA so it can verify the CF API; a provided
+		# (publicly trusted) certificate needs no CA.
+		my $env = $self->env;
+		my $cf_exodus = $env->exodus_mount.$env->name."/cf";
+		if ($env->vault->has($cf_exodus, "self-signed")) {
+			my $self_signed = $env->vault->get($cf_exodus, "self-signed") // '';
+			$self->add_files("ocfp/cf-integration-self-signed.yml")
+				if $self_signed =~ /^(true|1|yes)$/i;
+		}
 	}
 }
 

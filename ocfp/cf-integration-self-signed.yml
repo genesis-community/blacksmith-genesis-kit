@@ -1,0 +1,9 @@
+---
+# Added by blueprint.pm when the CF deployment's exodus record says its haproxy
+# certificate is self-signed (the cf kit's 'self-signed' feature). That CA is a
+# CredHub variable of the CF deployment, which lives on the same director as
+# this one, so hand the broker an absolute CredHub reference and let BOSH
+# resolve it at deploy time. Set params.cf_cacert in the environment file to
+# supply a PEM bundle instead.
+params:
+  cf_cacert: (( concat "((/" genesis.env "-bosh/" genesis.env "-cf/haproxy_ca.certificate))" ))

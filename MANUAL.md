@@ -96,7 +96,9 @@ new data services instances on behalf of end users.
 
 - `cf_skip_ssl_validation` - When `rabbitmq-autoscale` feature
   is selected, assuming that your are using self signed certificates,
-  you would like to set it to `true`.
+  you would like to set it to `true`. The same parameter tells the
+  broker itself to skip TLS verification of the CF API when the
+  `cf-integration` feature is active; prefer `cf_cacert` there.
 
 ## HTTP(S) Proxy Parameters
 
@@ -659,6 +661,25 @@ Blacksmith uses "forges" to deploy different types of services. You can activate
 
 - `cf-route-registrar` - Registers the Blacksmith broker with Cloud Foundry
   routes, for easier access from applications.
+
+- `cf-integration` - Points the broker at the Cloud Foundry API of the CF
+  deployment in the same environment, using the API domain and admin
+  credentials from that deployment's exodus data. The broker uses this
+  connection to reconcile service instances with Cloud Foundry.
+
+  Activating this feature also activates the following parameters:
+
+  - `cf_cacert` - The PEM encoded CA certificate that signs the CF haproxy
+    (or router) certificate, so the broker can verify the CF API. It defaults
+    to empty, which is right when the certificate is publicly trusted. When
+    the CF deployment uses the cf kit's `self-signed` feature, the kit fills
+    this in for you with a CredHub reference to that deployment's
+    `haproxy_ca`, since both deployments sit on the same director. Set it
+    explicitly when your CA lives somewhere else.
+
+  - `cf_skip_ssl_validation` - Set to `true` to have the broker skip TLS
+    verification of the CF API. Prefer `cf_cacert`; this is for development
+    only. Defaults to `false`.
 
 ## Cloud Configuration
 
