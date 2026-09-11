@@ -2,7 +2,8 @@
 # The broker's connection to the CF API. The CA defaults to empty, which is
 # right when haproxy presents a publicly trusted certificate. Set
 # params.cf_cacert to a PEM bundle for a private CA, or enable the
-# cf-haproxy-ca feature to reference the cf kit's self-signed haproxy CA.
+# cf-haproxy-ca feature to read the cf kit's self-signed haproxy CA from
+# that deployment's vault path.
 instance_groups:
   - name: blacksmith
     jobs:

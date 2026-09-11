@@ -683,11 +683,15 @@ Blacksmith uses "forges" to deploy different types of services. You can activate
   CA, so it can verify the CF API that `cf-integration` points it at. Enable
   it only for environments whose CF terminates TLS on haproxy with the cf
   kit's `self-signed` feature; nothing is added to the manifest otherwise.
-  The CA is referenced as an absolute CredHub path into the CF deployment
-  (`/<env>-bosh/<env>-cf/haproxy_ca`), which BOSH resolves at deploy time,
-  so both deployments must share a director. Requires `cf-integration`, or
-  `ocfp`, which implies it. To supply a PEM bundle instead, leave this
-  feature off and set `cf_cacert`.
+  Genesis keeps that CA in vault, under the `vault_base` the CF deployment
+  records in its exodus data, as `haproxy_ca:certificate`, so the kit reads
+  `vault_base` from the exodus record of the `<env>-cf` deployment and
+  renders a vault reference to it; Genesis then entombs the value into this
+  deployment's CredHub at deploy time. The deploy stops with a clear message
+  when that exodus record or its `vault_base` is missing, which means the
+  Cloud Foundry has not been deployed yet. Requires `cf-integration`, or
+  `ocfp`, which implies it. To supply a PEM bundle instead, set `cf_cacert`;
+  it wins over the vault reference.
 
 ## Cloud Configuration
 

@@ -1,9 +1,0 @@
----
-# cf-haproxy-ca feature. The cf kit's 'self-signed' feature signs the haproxy
-# certificate with a CA that lives only in the CF deployment's CredHub, as the
-# haproxy_ca variable. That deployment sits on the same director as this one,
-# so hand the broker an absolute CredHub reference and let BOSH resolve it at
-# deploy time. An environment file may still set params.cf_cacert to a PEM
-# bundle, which wins over this default.
-params:
-  cf_cacert: (( concat "((/" genesis.env "-bosh/" genesis.env "-cf/haproxy_ca.certificate))" ))
