@@ -673,6 +673,23 @@ params:
   vm_type:   blacksmith
 ```
 
+When the `valkey` forge is enabled and the kit generates this deployment's
+cloud config (the `ocfp` feature), it also emits a bare `z1` availability
+zone. The forge plans default their instance groups to `z1`, while the
+director only defines `<env>-z1`, `<env>-z2`, and so on, so without this
+zone the default plans could not deploy. That zone mirrors the cloud
+properties of one of the director's own zones. On Proxmox the forge VMs
+therefore inherit that zone's `target_node` pin instead of landing wherever
+the CPI's placement scorer picks, and on vSphere they inherit its datacenter
+and cluster. By default the kit mirrors `<env>-z1`. Set `params.forge_az` to
+mirror another zone, naming it in the short form (`z2`), by its full name
+(`<env>-z2`), or by its key in the OCFP configuration (`pveb`):
+
+```
+params:
+  forge_az: z2
+```
+
 ## Available Addons
 
 - `visit` - Opens the Blacksmith Web Management Console in your

@@ -16,7 +16,8 @@ use JSON::PP;
 sub init {
   my $class = shift;
   my $obj = $class->SUPER::init(@_);
-  $obj->check_minimum_genesis_version('3.1.0');
+  # 3.2.0 carries az_cloud_properties, which the forge zone below relies on.
+  $obj->check_minimum_genesis_version('3.2.0');
   return $obj;
 }
 
@@ -37,11 +38,19 @@ sub perform {
         # BOSH's cloud-config merge applies to whichever named configs are
         # attached to the deployment - this entry is not deduplicated
         # against other named configs, so watch for a collision there.
+        #
+        # The zone mirrors the cloud properties of one of the director's own
+        # zones (params.forge_az, default z1) rather than carrying none. On
+        # Proxmox that is the target_node pin the ocfp CLI wrote into the
+        # zone record, so forge VMs land on that zone's host instead of
+        # wherever the CPI's placement scorer picks; on vSphere it is the
+        # datacenter and cluster. Any IaaS whose zones carry no cloud
+        # properties still gets an empty hash, as before.
         ($self->want_feature('valkey') ?
           ({
             name => 'z1',
             ($self->cpi_enabled ? (cpi => $self->cpi_name) : ()),
-            cloud_properties => {},
+            cloud_properties => $self->az_cloud_properties($self->_forge_az),
           }) : ()
         ),
       ],
@@ -447,6 +456,20 @@ sub perform {
 }
 
 
+# _forge_az - the director zone whose cloud properties the bare forge z1 zone mirrors {{{
+sub _forge_az {
+	my ($self) = @_;
+	my $az = scalar($self->env->lookup('params.forge_az', 'z1'));
+	bail(
+		"#c{params.forge_az} in the %s environment file must name one of the ".
+		"director's availability zones (for example z2, %s-z2, or the zone's ".
+		"key in the OCFP configuration), got %s.",
+		$self->env->name, $self->env->name, defined($az) ? "'$az'" : 'nothing'
+	) unless defined($az) && !ref($az) && length($az);
+	return $az;
+}
+
+# }}}
 # _pve_cpi_setting - resolve a PVE CPI setting from the env file, then the OCFP vault config, then a default {{{
 sub _pve_cpi_setting {
 	my ($self, $env_key, $vault_key, $default) = @_;
