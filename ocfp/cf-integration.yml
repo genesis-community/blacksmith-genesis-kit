@@ -1,14 +1,8 @@
 ---
 # The broker's connection to the CF API. The CA defaults to empty, which is
-# right when haproxy presents a publicly trusted certificate. When the CF
-# deployment uses the cf kit's 'self-signed' feature, blueprint.pm also adds
-# ocfp/cf-integration-self-signed.yml, which points params.cf_cacert at the
-# haproxy CA in that deployment's CredHub. Either value can be overridden from
-# the environment file.
-params:
-  cf_cacert: ""
-  cf_skip_ssl_validation: false
-
+# right when haproxy presents a publicly trusted certificate. Set
+# params.cf_cacert to a PEM bundle for a private CA, or enable the
+# cf-haproxy-ca feature to reference the cf kit's self-signed haproxy CA.
 instance_groups:
   - name: blacksmith
     jobs:
@@ -22,5 +16,5 @@ instance_groups:
                 endpoint: (( vault meta.cf.exodus_path ":api_domain" ))
                 username: (( vault meta.cf.exodus_path ":admin_username" ))
                 password: (( vault meta.cf.exodus_path ":admin_password" ))
-                ca_cert:  (( grab params.cf_cacert ))
-                skip_ssl_validation: (( grab params.cf_skip_ssl_validation ))
+                ca_cert:  (( grab params.cf_cacert || "" ))
+                skip_ssl_validation: (( grab params.cf_skip_ssl_validation || false ))

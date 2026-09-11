@@ -78,7 +78,7 @@ genesis check my-blacksmith-env
 
 3. **TLS Certificate Issues**
    - If using `broker-tls`, ensure CF trusts the certificate
-   - If the broker logs `CF endpoint marked unhealthy ... tls: failed to verify`, it does not trust the CF haproxy certificate. With the `cf-integration` feature, set `cf_cacert` to the CA that signs it, or rely on the automatic CredHub reference when CF uses the `self-signed` feature. `cf_skip_ssl_validation` turns verification off for development.
+   - If the broker logs `CF endpoint marked unhealthy ... tls: failed to verify`, it does not trust the CF haproxy certificate. With the `cf-integration` feature, set `cf_cacert` to the CA that signs it, or enable the `cf-haproxy-ca` feature when CF uses the cf kit's `self-signed` feature. `cf_skip_ssl_validation` turns verification off for development.
 
 4. **Service Already Registered**
    - If the broker is already registered, try updating it instead

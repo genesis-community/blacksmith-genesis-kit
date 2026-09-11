@@ -21,7 +21,8 @@ use Genesis qw/bail info warning error in_array/;
 ## - IaaS: aws, azure, google, openstack, vsphere, stackit
 ## - BOSH: external-bosh, ocfp (implies external-bosh)
 ## - Forges: rabbitmq, redis, postgresql, mariadb, kubernetes
-## - Addons: broker-tls, shield-*, redis-*, rabbitmq-*, cf-route-registrar
+## - Addons: broker-tls, shield-*, redis-*, rabbitmq-*, cf-route-registrar,
+##   cf-integration, cf-haproxy-ca
 ##
 
 # init - Initialize the hook {{{1
@@ -97,6 +98,7 @@ sub validate_blacksmith_features {
 		rabbitmq-autoscale
 		cf-route-registrar
 		cf-integration
+		cf-haproxy-ca
 	);
 
 	# Pre-validation custom checks
@@ -107,6 +109,16 @@ sub validate_blacksmith_features {
 	if ($self->want_feature('cf-route-registrar') && !$self->want_feature('ocfp')) {
 		push @errors, "Feature 'cf-route-registrar' requires params.cf_domain to be defined"
 			unless $self->env->lookup('params.cf_domain');
+	}
+
+	# cf-haproxy-ca hands the broker the CF deployment's self-signed haproxy
+	# CA for the API connection that cf-integration sets up, so it is
+	# meaningless without that connection.
+	if ($self->want_feature('cf-haproxy-ca')
+	    && !$self->want_feature('cf-integration') && !$self->want_feature('ocfp')) {
+		push @errors, "Feature 'cf-haproxy-ca' requires the 'cf-integration' feature ".
+			"(or 'ocfp', which implies it): it hands the broker the CF deployment's ".
+			"self-signed haproxy CA for the CF API connection that cf-integration configures";
 	}
 
 	# IaaS-specific parameter validation
@@ -213,7 +225,7 @@ sub is_forge_feature {
 # is_addon_feature - Check if feature is addon-related {{{2
 sub is_addon_feature {
 	my ($self, $feature) = @_;
-	return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|valkey-tls|valkey-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar|cf-integration)$/;
+	return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|valkey-tls|valkey-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar|cf-integration|cf-haproxy-ca)$/;
 }
 # }}}
 
@@ -298,20 +310,12 @@ sub process_addon_feature {
 	elsif ($feature eq 'cf-route-registrar') {
 		$self->add_files("manifests/blacksmith/cf-route-registrar.yml");
 	}
-  elsif ($feature eq 'cf-integration') {
+	elsif ($feature eq 'cf-integration') {
 		$self->add_files("ocfp/cf-integration.yml");
-
-		# The cf kit's 'self-signed' feature signs haproxy with a CA that exists
-		# only in the CF deployment's CredHub, and its exodus record says so.
-		# Point the broker at that CA so it can verify the CF API; a provided
-		# (publicly trusted) certificate needs no CA.
-		my $env = $self->env;
-		my $cf_exodus = $env->exodus_mount.$env->name."/cf";
-		if ($env->vault->has($cf_exodus, "self-signed")) {
-			my $self_signed = $env->vault->get($cf_exodus, "self-signed") // '';
-			$self->add_files("ocfp/cf-integration-self-signed.yml")
-				if $self_signed =~ /^(true|1|yes)$/i;
-		}
+	}
+	elsif ($feature eq 'cf-haproxy-ca') {
+		# Added in apply_post_processing so that it always merges after
+		# ocfp/cf-integration.yml, whatever order the features were listed in.
 	}
 }
 
@@ -354,6 +358,14 @@ sub apply_post_processing {
 			$self->add_files("ocfp/shield-agent.yml");
 		}
 
+	}
+
+	# Hand the broker the CF deployment's self-signed haproxy CA. Only
+	# environments that name the feature get it, since it references a
+	# CredHub variable that exists only when CF terminates TLS on haproxy
+	# with the cf kit's self-signed CA.
+	if ($self->want_feature("cf-haproxy-ca")) {
+		$self->add_files("ocfp/cf-haproxy-ca.yml");
 	}
 }
 

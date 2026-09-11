@@ -672,14 +672,22 @@ Blacksmith uses "forges" to deploy different types of services. You can activate
   - `cf_cacert` - The PEM encoded CA certificate that signs the CF haproxy
     (or router) certificate, so the broker can verify the CF API. It defaults
     to empty, which is right when the certificate is publicly trusted. When
-    the CF deployment uses the cf kit's `self-signed` feature, the kit fills
-    this in for you with a CredHub reference to that deployment's
-    `haproxy_ca`, since both deployments sit on the same director. Set it
-    explicitly when your CA lives somewhere else.
+    the CF deployment uses the cf kit's `self-signed` feature, enable the
+    `cf-haproxy-ca` feature below instead of pasting the CA here.
 
   - `cf_skip_ssl_validation` - Set to `true` to have the broker skip TLS
     verification of the CF API. Prefer `cf_cacert`; this is for development
     only. Defaults to `false`.
+
+- `cf-haproxy-ca` - Hands the broker the CF deployment's self-signed haproxy
+  CA, so it can verify the CF API that `cf-integration` points it at. Enable
+  it only for environments whose CF terminates TLS on haproxy with the cf
+  kit's `self-signed` feature; nothing is added to the manifest otherwise.
+  The CA is referenced as an absolute CredHub path into the CF deployment
+  (`/<env>-bosh/<env>-cf/haproxy_ca`), which BOSH resolves at deploy time,
+  so both deployments must share a director. Requires `cf-integration`, or
+  `ocfp`, which implies it. To supply a PEM bundle instead, leave this
+  feature off and set `cf_cacert`.
 
 ## Cloud Configuration
 
