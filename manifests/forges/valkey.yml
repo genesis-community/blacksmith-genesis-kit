@@ -56,3 +56,5 @@ instance_groups:
         tags:        (( grab params.valkey_service_tags        || meta.default.valkey_tags ))
         limit:       (( grab params.valkey_service_limit       || 0 ))
         type:        (( grab params.valkey_service_type        || "standalone" ))
+        stemcell:    (( grab params.valkey_stemcell_version    || "latest" ))
+        stemcell_os: (( grab params.valkey_stemcell_os         || "ubuntu-jammy" ))

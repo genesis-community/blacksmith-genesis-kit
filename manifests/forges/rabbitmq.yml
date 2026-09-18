@@ -46,3 +46,4 @@ instance_groups:
         tags:        (( grab params.rabbitmq_service_tags        || meta.default.rabbitmq_tags ))
         limit:       (( grab params.rabbitmq_service_limit       || 0 ))
         stemcell:    (( grab params.rabbitmq_stemcell_version    || "latest" ))
+        stemcell_os: (( grab params.rabbitmq_stemcell_os         || "ubuntu-jammy" ))

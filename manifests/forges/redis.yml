@@ -58,3 +58,4 @@ instance_groups:
         limit:       (( grab params.redis_service_limit       || 0 ))
         type:        (( grab params.redis_service_type        || "standalone" ))
         stemcell:    (( grab params.redis_stemcell_version    || "latest" ))
+        stemcell_os: (( grab params.redis_stemcell_os         || "ubuntu-jammy" ))
