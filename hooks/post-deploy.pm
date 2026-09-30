@@ -72,7 +72,7 @@ sub sync_blacksmith_services_ca {
     warning("\n#Y{Warning:} Failed to synchronize blacksmith_services_ca.\n");
     warning("Service instance provisioning will fail with a credhub\n");
     warning("404 for blacksmith_services_ca until this is resolved.\n");
-    warning("Run '#G{%s do register}' to retry synchronization.\n", $self->env->get_call_path_with_env());
+    warning("Run '#G{%s do register}' to retry synchronization.\n", scalar($self->env->get_call_path_with_env()));
     return 0;
   }
 
