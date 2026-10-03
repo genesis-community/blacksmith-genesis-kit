@@ -95,6 +95,9 @@ credentials:
   shield-backups:
     shield:             {password: random 64}
 
+  credhub-cleanup:
+    users/credhub-cleanup: {password: random 64}
+
 provided:
   shield-backups:
     shield:

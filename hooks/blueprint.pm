@@ -23,7 +23,7 @@ use File::Basename qw/dirname/;
 ## - BOSH: external-bosh, ocfp (implies external-bosh)
 ## - Forges: rabbitmq, redis, postgresql, mariadb, kubernetes
 ## - Addons: broker-tls, shield-*, redis-*, rabbitmq-*, cf-route-registrar,
-##   cf-integration, cf-haproxy-ca
+##   cf-integration, cf-haproxy-ca, credhub-cleanup
 ##
 
 # init - Initialize the hook {{{1
@@ -100,6 +100,7 @@ sub validate_blacksmith_features {
 		cf-route-registrar
 		cf-integration
 		cf-haproxy-ca
+		credhub-cleanup
 	);
 
 	# Pre-validation custom checks
@@ -120,6 +121,17 @@ sub validate_blacksmith_features {
 		push @errors, "Feature 'cf-haproxy-ca' requires the 'cf-integration' feature ".
 			"(or 'ocfp', which implies it): it hands the broker the CF deployment's ".
 			"self-signed haproxy CA for the CF API connection that cf-integration configures";
+	}
+
+	# credhub-cleanup deletes a deprovisioned instance's variables from the
+	# external director's CredHub. The internal director this kit deploys
+	# has no such CredHub target, so the feature has nothing to point at.
+	if ($self->want_feature('credhub-cleanup')
+	    && !$self->want_feature('external-bosh') && !$self->want_feature('ocfp')) {
+		push @errors, "Feature 'credhub-cleanup' requires the 'external-bosh' feature ".
+			"(or 'ocfp', which implies it): it deletes service instance variables from ".
+			"the external director's CredHub, and the internal director has no CredHub ".
+			"cleanup target";
 	}
 
 	# IaaS-specific parameter validation
@@ -226,7 +238,7 @@ sub is_forge_feature {
 # is_addon_feature - Check if feature is addon-related {{{2
 sub is_addon_feature {
 	my ($self, $feature) = @_;
-	return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|valkey-tls|valkey-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar|cf-integration|cf-haproxy-ca)$/;
+	return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|valkey-tls|valkey-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar|cf-integration|cf-haproxy-ca|credhub-cleanup)$/;
 }
 # }}}
 
@@ -317,6 +329,9 @@ sub process_addon_feature {
 	elsif ($feature eq 'cf-haproxy-ca') {
 		# Generated in apply_post_processing so that it always merges after
 		# ocfp/cf-integration.yml, whatever order the features were listed in.
+	}
+	elsif ($feature eq 'credhub-cleanup') {
+		$self->add_files("manifests/addons/credhub-cleanup.yml");
 	}
 }
 

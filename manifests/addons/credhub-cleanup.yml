@@ -1,0 +1,21 @@
+---
+meta:
+  credhub_cleanup:
+    bosh_env: (( grab genesis.bosh_env || params.bosh_env || genesis.env ))
+    url:      (( vault meta.bosh.exodus ":credhub_url" ))
+    ca_cert:  (( vault meta.bosh.exodus ":credhub_ca_cert" ))
+
+instance_groups:
+- name: blacksmith
+  jobs:
+  - name: blacksmith
+    properties:
+      credhub:
+        url:           (( grab params.credhub_cleanup.url     || meta.credhub_cleanup.url ))
+        ca_cert:       (( grab params.credhub_cleanup.ca_cert || meta.credhub_cleanup.ca_cert ))
+        client_id:     (( grab params.credhub_cleanup.client_id || "blacksmith_credhub" ))
+        client_secret: (( vault meta.vault "/users/credhub-cleanup:password" ))
+        director_name: (( concat meta.credhub_cleanup.bosh_env "-bosh" ))
+        cleanup:
+          enabled: true
+          sweep:   (( grab params.credhub_cleanup.sweep || "off" ))

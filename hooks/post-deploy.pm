@@ -37,6 +37,10 @@ sub perform {
     # operator to have run the "register" addon first.
     $self->sync_blacksmith_services_ca();
 
+    # Warn, without ever failing the deploy, when the UAA client that the
+    # credhub-cleanup feature depends on can't get a token.
+    $self->check_credhub_cleanup_client();
+
     # Provide helpful post-deployment information
     $self->display_deployment_summary();
 
@@ -77,6 +81,71 @@ sub sync_blacksmith_services_ca {
   }
 
   return 1;
+}
+
+# }}}
+
+# check_credhub_cleanup_client - Confirm the blacksmith_credhub UAA client can authenticate {{{
+#
+# Requests a client-credentials token from the director's UAA, which is the
+# director address from the bosh exodus record on port 8443, trusted through
+# the exodus ca_cert. The client ID and secret reach curl through "-K -" on
+# standard input, so the secret never appears in a process's arguments, and
+# the response body goes to /dev/null so no token is printed. This check only
+# warns, because a deploy that already succeeded shouldn't be reported as
+# failed over an optional cleanup feature.
+sub check_credhub_cleanup_client {
+  my ($self) = @_;
+  return 1 unless $self->want_feature('credhub-cleanup');
+
+  my $env = $self->env;
+  my $cmd_with_env = $env->get_call_path_with_env();
+  my $client_id = $env->lookup('params.credhub_cleanup.client_id', 'blacksmith_credhub');
+  my $repair = "the repair command in the CredHub cleanup section of the kit manual";
+
+  info("\n#Bu{CredHub Cleanup Client}\n\n");
+
+  my $bosh_slug = $env->name.'/bosh';
+  my $url = $env->exodus_lookup('url', undef, $bosh_slug);
+  my $ca  = $env->exodus_lookup('ca_cert', undef, $bosh_slug);
+  my $secret = eval { $env->vault->get($env->secrets_base.'users/credhub-cleanup', 'password') };
+
+  unless (defined($url) && $url =~ m{^https://([^/:]+)} && defined($ca) && $ca =~ /\S/ && defined($secret) && $secret =~ /\S/) {
+    warning("#Y{Warning:} Could not check the %s UAA client, because the bosh exodus record %s%s lacks a usable url or ca_cert, or the secret users/credhub-cleanup is not in vault.\n",
+      $client_id, $env->exodus_mount, $bosh_slug);
+    return 0;
+  }
+  my $host = $1;
+  my $uaa = "https://$host:8443/oauth/token";
+
+  require File::Temp;
+  my $ca_file = File::Temp->new(SUFFIX => '.pem');
+  print {$ca_file} $ca;
+  close($ca_file);
+
+  (my $safe_id = $client_id) =~ s/[^A-Za-z0-9_.\-]//g;
+  (my $safe_secret = $secret) =~ s/(["\\])/\\$1/g;
+  my $curl_cfg = sprintf(qq{user = "%s:%s"\n}, $safe_id, $safe_secret);
+
+  my ($status, $rc) = run(
+    {stdin => $curl_cfg, stderr => 0},
+    'curl -s -o /dev/null -w "%{http_code}" --connect-timeout 10 --max-time 20 '.
+    '--cacert "$1" -K - -d grant_type=client_credentials "$2"',
+    $ca_file->filename, $uaa
+  );
+  $status //= '';
+  $status =~ s/\s+//g;
+
+  if ($rc == 0 && $status eq '200') {
+    info("  #G{✓} CredHub cleanup client %s can authenticate\n", $client_id);
+    return 1;
+  }
+
+  warning("#Y{Warning:} CredHub cleanup client %s could not get a token from %s (status %s).\n", $client_id, $uaa, ($status || "none, curl exit $rc"));
+  warning("  Likely cause: the client is missing from the director's UAA, or its secret does not match users/credhub-cleanup in vault.\n");
+  warning("  Repair: %s\n", $repair);
+  warning("  The deploy itself succeeded, and service instances are not cleaned up from CredHub until this is fixed.\n");
+  return 0;
 }
 
 # }}}
