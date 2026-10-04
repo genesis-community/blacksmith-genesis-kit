@@ -725,23 +725,44 @@ The broker needs a UAA client on the director's UAA with the `credhub.read` and 
 We create the client with the bosh kit's UAA addon, using the secret the kit stored in vault. The addon talks to UAA without TLS verification, as every bosh kit UAA addon does today, so we should run it only from a trusted workstation or bastion.
 
 ```bash
-S=$(safe get secret/<blacksmith env vault path>/users/credhub-cleanup:password)
-genesis @<bosh env>:bosh do -- uaa login
-genesis @<bosh env>:bosh do -- uaa clients add blacksmith_credhub \
-  --grant-types client_credentials \
-  --authorities credhub.read,credhub.write \
-  --scopes uaa.none --access-validity 300 --secret "$S"
+OK='✓|\[ERROR\]|FATAL|failed|already exists|does not exist|client_id|authorities|authorized_grant_types|access_token_validity|scope'
+( set -o pipefail
+  V() { awk 'tolower($0) ~ /token|secret/ && $0 !~ /^[[:space:]]*"?access_token_validity"?[ :=]+[0-9]+,?[[:space:]]*$/ {next} {print}'; }
+  S=$(safe get secret/<blacksmith env vault path>/users/credhub-cleanup:password) && [ -n "$S" ] || { echo "STOP: no password in vault at users/credhub-cleanup"; exit 1; }
+  GENESIS_OUTPUT_COLUMNS=100000 genesis @<bosh env>:bosh do -- uaa login 2>&1 | grep -E "$OK" | V | grep -vF -- "$S"; [ "${PIPESTATUS[0]}" = 0 ] || { echo "STOP: uaa login failed"; exit 1; }
+  GENESIS_OUTPUT_COLUMNS=100000 genesis @<bosh env>:bosh do -- uaa clients add blacksmith_credhub \
+    --grant-types client_credentials \
+    --authorities credhub.read,credhub.write \
+    --scopes uaa.none --access-validity 300 --secret "$S" 2>&1 | grep -E "$OK" | V | grep -vF -- "$S"
+  echo "clients add rc=${PIPESTATUS[0]}"
+)
 ```
 
-The addon prints the admin client's token when it logs in, so we keep that output out of logs and chat. To check the client, we run `genesis @<bosh env>:bosh do -- uaa clients get blacksmith_credhub`. At the end of a deploy, the kit also requests a token for this client, and it prints a warning without failing the deploy when it cannot get one.
+The block runs in a subshell, and it protects us in three ways. It stops before it sends anything when `safe get` returns an empty value, because an empty `--secret` would make the addon generate and print a secret of its own that is not in vault. It stops when `uaa login` fails, because a stale saved context could otherwise point at another director's UAA, and the client would be created there. It also cuts every addon output down to an allowlist of success and failure lines, drops any line that mentions a token or a secret, and drops any line that holds the client secret's value. The login prints the admin client's token, so that filter keeps it out of logs and chat, and `GENESIS_OUTPUT_COLUMNS=100000` stops Genesis from rewrapping a message so that the secret lands on a line the filters miss. We expect `clients add rc=0`, and a rerun reports that the client already exists.
+
+To check the client, we run the same filter over `uaa clients get`. At the end of a deploy, the kit also requests a token for this client, and it prints a warning without failing the deploy when it cannot get one.
+
+```bash
+OK='✓|\[ERROR\]|FATAL|failed|does not exist|client_id|authorities|authorized_grant_types|access_token_validity|scope'
+( V() { awk 'tolower($0) ~ /token|secret/ && $0 !~ /^[[:space:]]*"?access_token_validity"?[ :=]+[0-9]+,?[[:space:]]*$/ {next} {print}'; }
+  GENESIS_OUTPUT_COLUMNS=100000 genesis @<bosh env>:bosh do -- uaa clients get blacksmith_credhub 2>&1 | grep -E "$OK" | V
+)
+```
 
 If the client already exists with a different secret, we repair it by setting its secret to the value in vault.
 
 ```bash
-S=$(safe get secret/<blacksmith env vault path>/users/credhub-cleanup:password)
-genesis @<bosh env>:bosh do -- uaa login
-printf 'y\n' | genesis @<bosh env>:bosh do -- uaa clients set-secret blacksmith_credhub "$S"
+OK='✓|\[ERROR\]|FATAL|failed|already exists|does not exist|client_id|authorities|authorized_grant_types|access_token_validity|scope'
+( set -o pipefail
+  V() { awk 'tolower($0) ~ /token|secret/ && $0 !~ /^[[:space:]]*"?access_token_validity"?[ :=]+[0-9]+,?[[:space:]]*$/ {next} {print}'; }
+  S=$(safe get secret/<blacksmith env vault path>/users/credhub-cleanup:password) && [ -n "$S" ] || { echo "STOP: no password in vault at users/credhub-cleanup"; exit 1; }
+  GENESIS_OUTPUT_COLUMNS=100000 genesis @<bosh env>:bosh do -- uaa login 2>&1 | grep -E "$OK" | V | grep -vF -- "$S"; [ "${PIPESTATUS[0]}" = 0 ] || { echo "STOP: uaa login failed"; exit 1; }
+  printf 'y\n' | GENESIS_OUTPUT_COLUMNS=100000 genesis @<bosh env>:bosh do -- uaa clients set-secret blacksmith_credhub "$S" 2>&1 | grep -E '✓|\[ERROR\]|FATAL|failed|does not exist' | grep -viE 'token|secret:' | grep -vF -- "$S"
+  echo "set-secret rc=${PIPESTATUS[1]}"
+)
 ```
+
+The repair block has the same guards as the create block, so `set-secret` never runs with an empty secret or against a stale context. The addon asks for confirmation on standard input and has no flag to skip it, which is why the `y` is piped in. We expect a success line and `set-secret rc=0`.
 
 #### Reading the failure lines
 
