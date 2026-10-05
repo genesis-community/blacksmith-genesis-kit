@@ -116,4 +116,26 @@ subtest 'feature without external-bosh or ocfp' => sub {
 		'the message says why the internal director cannot be used');
 };
 
+# --- sweep parameter ---------------------------------------------------------
+
+sub sweep_self {
+	my ($sweep) = @_;
+	my $self = build_self(features => [qw/ocfp valkey credhub-cleanup/]);
+	$self->{env_obj}{lookups}{'params.credhub_cleanup.sweep'} = $sweep;
+	return $self;
+}
+
+subtest 'sweep parameter' => sub {
+	for my $ok ('off', 'dry-run', 'delete', 0, '') {
+		my $self = sweep_self($ok);
+		eval { $self->validate_blacksmith_features };
+		is($@, '', "validation accepts sweep '$ok'");
+	}
+	my $self = sweep_self('dryrun');
+	eval { $self->validate_blacksmith_features };
+	like($@, qr/params\.credhub_cleanup\.sweep/, 'the message names the parameter');
+	like($@, qr/'dryrun'/, 'the message shows the bad value');
+	like($@, qr/off,\s+dry-run,\s+or\s+delete/, 'the message lists the accepted values');
+};
+
 done_testing;

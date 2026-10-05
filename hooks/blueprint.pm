@@ -134,6 +134,16 @@ sub validate_blacksmith_features {
 			"cleanup target";
 	}
 
+	# The broker accepts only these sweep modes, and refuses to start on
+	# anything else. A YAML false (an unquoted "off") counts as off.
+	if ($self->want_feature('credhub-cleanup')) {
+		my $sweep = $self->env->lookup('params.credhub_cleanup.sweep');
+		if (defined($sweep) && $sweep ne '' && $sweep ne '0' && $sweep !~ /^(off|dry-run|delete)$/) {
+			push @errors, "params.credhub_cleanup.sweep is '$sweep', but it must be one of ".
+				"off, dry-run, or delete";
+		}
+	}
+
 	# IaaS-specific parameter validation
 	# Skip param validations for ocfp as it provides these via its reference architecture
 	if ($self->want_feature('external-bosh') && !$self->want_feature('ocfp')) {
