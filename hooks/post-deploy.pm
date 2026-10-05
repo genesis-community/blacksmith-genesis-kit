@@ -110,12 +110,12 @@ sub check_credhub_cleanup_client {
   my $ca  = $env->exodus_lookup('ca_cert', undef, $bosh_slug);
   my $secret = eval { $env->vault->get($env->secrets_base.'users/credhub-cleanup', 'password') };
 
-  unless (defined($url) && $url =~ m{^https://([^/:]+)} && defined($ca) && $ca =~ /\S/ && defined($secret) && $secret =~ /\S/) {
+  my ($host) = defined($url) ? $url =~ m{^https://([^/:]+)} : ();
+  unless (defined($host) && defined($ca) && $ca =~ /\S/ && defined($secret) && $secret =~ /\S/) {
     warning("#Y{Warning:} Could not check the %s UAA client, because the bosh exodus record %s%s lacks a usable url or ca_cert, or the secret users/credhub-cleanup is not in vault.\n",
       $client_id, $env->exodus_mount, $bosh_slug);
     return 0;
   }
-  my $host = $1;
   my $uaa = "https://$host:8443/oauth/token";
 
   require File::Temp;
