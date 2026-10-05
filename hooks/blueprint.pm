@@ -23,8 +23,23 @@ use File::Basename qw/dirname/;
 ## - BOSH: external-bosh, ocfp (implies external-bosh)
 ## - Forges: rabbitmq, redis, postgresql, mariadb, kubernetes
 ## - Addons: broker-tls, shield-*, redis-*, rabbitmq-*, cf-route-registrar,
-##   cf-integration, cf-haproxy-ca, credhub-cleanup
+##   cf-integration, cf-haproxy-ca, skip-credhub-cleanup
 ##
+## CredHub cleanup of deprovisioned service instances is on by default for an
+## external director, wired from that director's exodus record. The
+## skip-credhub-cleanup feature turns it off.
+##
+
+# The exodus keys the BOSH kit publishes for the cleanup connection. The
+# wiring file reads each one, and a merge fails on any that is missing, so the
+# blueprint checks the whole list before it includes that file.
+our @CREDHUB_EXODUS_KEYS = qw(
+	credhub_url
+	blacksmith_credhub_client_id
+	blacksmith_credhub_client_secret
+	blacksmith_credhub_ca_cert
+	blacksmith_credhub_director_name
+);
 
 # init - Initialize the hook {{{1
 sub init {
@@ -100,7 +115,7 @@ sub validate_blacksmith_features {
 		cf-route-registrar
 		cf-integration
 		cf-haproxy-ca
-		credhub-cleanup
+		skip-credhub-cleanup
 	);
 
 	# Pre-validation custom checks
@@ -123,20 +138,16 @@ sub validate_blacksmith_features {
 			"self-signed haproxy CA for the CF API connection that cf-integration configures";
 	}
 
-	# credhub-cleanup deletes a deprovisioned instance's variables from the
-	# external director's CredHub. The internal director this kit deploys
-	# has no such CredHub target, so the feature has nothing to point at.
-	if ($self->want_feature('credhub-cleanup')
-	    && !$self->want_feature('external-bosh') && !$self->want_feature('ocfp')) {
-		push @errors, "Feature 'credhub-cleanup' requires the 'external-bosh' feature ".
-			"(or 'ocfp', which implies it): it deletes service instance variables from ".
-			"the external director's CredHub, and the internal director has no CredHub ".
-			"cleanup target";
-	}
+	# Cleanup deletes a deprovisioned instance's variables from the external
+	# director's CredHub. When every exodus key is present the wiring file is
+	# included, and a director that published only some of them gets a warning
+	# that names the rest.
+	my $cleanup = $self->credhub_cleanup_state;
+	push @warnings, $cleanup->{warning} if $cleanup->{warning};
 
 	# The broker accepts only these sweep modes, and refuses to start on
 	# anything else. A YAML false (an unquoted "off") counts as off.
-	if ($self->want_feature('credhub-cleanup')) {
+	if ($cleanup->{file} && $cleanup->{file} eq 'manifests/addons/credhub-cleanup.yml') {
 		my $sweep = $self->env->lookup('params.credhub_cleanup.sweep');
 		if (defined($sweep) && $sweep ne '' && $sweep ne '0' && $sweep !~ /^(off|dry-run|delete)$/) {
 			push @errors, "params.credhub_cleanup.sweep is '$sweep', but it must be one of ".
@@ -163,6 +174,12 @@ sub validate_blacksmith_features {
 			# Features now default behavior
 			'basic-auth' => {
 				msg => '- basic authentication is now enabled by default',
+				replace => []
+			},
+			'credhub-cleanup' => {
+				msg => '- CredHub cleanup of deprovisioned service instances now runs by default '.
+					'for an external director, so the name can be removed from the env file. '.
+					'Use skip-credhub-cleanup to turn it off',
 				replace => []
 			},
 
@@ -248,7 +265,7 @@ sub is_forge_feature {
 # is_addon_feature - Check if feature is addon-related {{{2
 sub is_addon_feature {
 	my ($self, $feature) = @_;
-	return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|valkey-tls|valkey-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar|cf-integration|cf-haproxy-ca|credhub-cleanup)$/;
+	return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|valkey-tls|valkey-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar|cf-integration|cf-haproxy-ca|skip-credhub-cleanup)$/;
 }
 # }}}
 
@@ -340,8 +357,9 @@ sub process_addon_feature {
 		# Generated in apply_post_processing so that it always merges after
 		# ocfp/cf-integration.yml, whatever order the features were listed in.
 	}
-	elsif ($feature eq 'credhub-cleanup') {
-		$self->add_files("manifests/addons/credhub-cleanup.yml");
+	elsif ($feature eq 'skip-credhub-cleanup') {
+		# Generated in apply_post_processing, together with the other cases
+		# that leave cleanup off.
 	}
 }
 
@@ -386,11 +404,62 @@ sub apply_post_processing {
 
 	}
 
+	# Wire CredHub cleanup from the director's exodus record, or switch it off.
+	my $cleanup = $self->credhub_cleanup_state;
+	$self->add_files($cleanup->{file}) if $cleanup->{file};
+
 	# Hand the broker the CF deployment's self-signed haproxy CA. Only
 	# environments that name the feature get it.
 	if ($self->want_feature("cf-haproxy-ca")) {
 		$self->add_files($self->_generate_cf_haproxy_ca_overlay());
 	}
+}
+
+# }}}
+
+# credhub_cleanup_state - Decide how CredHub cleanup is wired {{{1
+#
+# Returns a hash ref with the overlay to include, if any, and a warning when
+# the director is missing exodus keys. The cases are these.
+#
+# - An internal director, or the skip-credhub-cleanup feature, gets the off
+#   overlay, because the internal director has no CredHub to clean and the
+#   feature asks for no cleanup.
+# - An external director whose exodus record at <env>/bosh holds every key in
+#   @CREDHUB_EXODUS_KEYS gets the wiring overlay.
+# - An external director missing any key gets no overlay and a warning that
+#   names each missing key. The release default then applies, which is a
+#   broker that warns at startup and deletes nothing.
+#
+# The result is kept on the hook, so validation and rendering agree and the
+# exodus record is read once.
+sub credhub_cleanup_state {
+	my ($self) = @_;
+	return $self->{credhub_cleanup_state} if $self->{credhub_cleanup_state};
+
+	my $external = $self->want_feature('external-bosh') || $self->want_feature('ocfp');
+	if (!$external || $self->want_feature('skip-credhub-cleanup')) {
+		return $self->{credhub_cleanup_state} = { file => 'manifests/addons/credhub-cleanup-off.yml' };
+	}
+
+	my $env = $self->env;
+	my $slug = $env->name.'/bosh';
+	my @missing = grep {
+		my $value = $env->exodus_lookup($_, undef, $slug);
+		!(defined($value) && !ref($value) && $value =~ /\S/);
+	} @CREDHUB_EXODUS_KEYS;
+
+	return $self->{credhub_cleanup_state} = { file => 'manifests/addons/credhub-cleanup.yml' }
+		unless @missing;
+
+	return $self->{credhub_cleanup_state} = { warning => sprintf(
+		"#Y{CredHub cleanup is on by default but unconfigured.} The exodus record #C{%s%s} ".
+		"is missing %s, so the kit wires no CredHub connection and the broker deletes nothing ".
+		"from CredHub until they exist. The director needs the BOSH kit release that creates ".
+		"the blacksmith_credhub client and a redeploy, and then this deployment needs a ".
+		"redeploy as well. Add skip-credhub-cleanup to the features to turn this warning off.",
+		$env->exodus_mount, $slug, join(', ', map {"#C{$_}"} @missing)
+	)};
 }
 
 # }}}

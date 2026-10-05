@@ -1,9 +1,15 @@
 ---
+# Wires the broker's CredHub cleanup from the BOSH director's exodus record.
+# The blueprint hook includes this file only when that record holds all five
+# keys, so every vault reference below resolves. The sweep runs in dry-run
+# mode unless params.credhub_cleanup.sweep says otherwise.
 meta:
   credhub_cleanup:
-    bosh_env: (( grab genesis.bosh_env || params.bosh_env || genesis.env ))
-    url:      (( vault meta.bosh.exodus ":credhub_url" ))
-    ca_cert:  (( vault meta.bosh.exodus ":credhub_ca_cert" ))
+    url:           (( vault meta.bosh.exodus ":credhub_url" ))
+    client_id:     (( vault meta.bosh.exodus ":blacksmith_credhub_client_id" ))
+    client_secret: (( vault meta.bosh.exodus ":blacksmith_credhub_client_secret" ))
+    ca_cert:       (( vault meta.bosh.exodus ":blacksmith_credhub_ca_cert" ))
+    director_name: (( vault meta.bosh.exodus ":blacksmith_credhub_director_name" ))
 
 instance_groups:
 - name: blacksmith
@@ -11,11 +17,11 @@ instance_groups:
   - name: blacksmith
     properties:
       credhub:
-        url:           (( grab params.credhub_cleanup.url     || meta.credhub_cleanup.url ))
-        ca_cert:       (( grab params.credhub_cleanup.ca_cert || meta.credhub_cleanup.ca_cert ))
-        client_id:     (( grab params.credhub_cleanup.client_id || "blacksmith_credhub" ))
-        client_secret: (( vault meta.vault "/users/credhub-cleanup:password" ))
-        director_name: (( concat meta.credhub_cleanup.bosh_env "-bosh" ))
+        url:           (( grab params.credhub_cleanup.url       || meta.credhub_cleanup.url ))
+        ca_cert:       (( grab params.credhub_cleanup.ca_cert   || meta.credhub_cleanup.ca_cert ))
+        client_id:     (( grab params.credhub_cleanup.client_id || meta.credhub_cleanup.client_id ))
+        client_secret: (( grab meta.credhub_cleanup.client_secret ))
+        director_name: (( grab meta.credhub_cleanup.director_name ))
         cleanup:
           enabled: true
-          sweep:   (( grab params.credhub_cleanup.sweep || "off" ))
+          sweep:   (( grab params.credhub_cleanup.sweep || "dry-run" ))

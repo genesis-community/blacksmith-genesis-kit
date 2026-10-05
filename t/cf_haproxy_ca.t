@@ -32,6 +32,7 @@ sub exodus_mount { '/secret/exodus/' }
 sub exodus_lookup {
 	my ($s, $key, $default, $for) = @_;
 	$s->{exodus_asked} = $for;
+	push @{$s->{exodus_asked_all}}, $for;
 	my $record = $s->{exodus}{$for} or return $default;
 	return $record->{$key} // $default;
 }
@@ -123,7 +124,8 @@ subtest 'feature off' => sub {
 	ok(index_of('ocfp/cf-integration.yml', @files) >= 0, 'cf-integration overlay is still added');
 	is(index_of($overlay, @files), -1, 'cf-haproxy-ca overlay is not added');
 	is(scalar(grep { /haproxy/ } @files), 0, 'nothing haproxy related reaches the manifest');
-	ok(!defined($self->env->{exodus_asked}), 'the cf exodus record is not consulted');
+	is(scalar(grep { $_ eq 'lab/cf' } @{ $self->env->{exodus_asked_all} // [] }), 0,
+		'the cf exodus record is not consulted');
 };
 
 # --- feature on, cf not deployed yet -----------------------------------------

@@ -1,0 +1,12 @@
+---
+# Leaves CredHub cleanup of deprovisioned service instances off, for an
+# environment that lists skip-credhub-cleanup and for an internal director
+# that has no CredHub to clean.
+instance_groups:
+- name: blacksmith
+  jobs:
+  - name: blacksmith
+    properties:
+      credhub:
+        cleanup:
+          enabled: false
