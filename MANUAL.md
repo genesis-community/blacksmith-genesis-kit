@@ -695,86 +695,52 @@ Blacksmith uses "forges" to deploy different types of services. You can activate
 
 ### CredHub cleanup on deprovision
 
-When Blacksmith deprovisions a service instance, the director deletes the instance's BOSH deployment, but it leaves behind the variables it generated for that deployment in its CredHub. For a Valkey instance that is the instance's TLS certificate and private key. Those variables stay in CredHub, and monitoring tools such as Doomsday keep tracking them until they expire. The `credhub-cleanup` feature has the broker delete them once the director confirms the deployment is gone.
+When Blacksmith deprovisions a service instance, the director deletes the instance's BOSH deployment, but it leaves behind the variables it generated for that deployment in its CredHub. For a Valkey instance that is the instance's TLS certificate and private key. Those variables stay in CredHub, and monitoring tools such as Doomsday keep tracking them until they expire. With cleanup on, the broker deletes them once the director confirms the deployment is gone.
 
-Blacksmith only deletes variables under the dead deployment's own path, which is `/<director name>/<deployment name>/`. It refuses to clean up unless the deployment name ends in the service instance GUID, starts with a plan from the current catalog, and is not the broker's own deployment. It never touches the broker's own variables, such as the services CA. A cleanup failure never fails or slows the deprovision. It only writes a log line that says what was left behind and what to check.
+Cleanup is on by default whenever the director is external, which means the environment uses `external-bosh` or `ocfp`. The internal director has no CredHub to clean, so the kit switches cleanup off for it. On an external director we can switch cleanup off ourselves with the `skip-credhub-cleanup` feature. The `credhub-cleanup` feature name is deprecated and does nothing now, so we can remove it from our env files.
 
-Blacksmith also only acts on instances that Cloud Foundry asked it to deprovision. If someone deleted a deployment by hand, its variables stay in CredHub, and the broker logs the names so we can decide what to do with them.
+Blacksmith deletes only variables under the dead deployment's own path, which is `/<director name>/<deployment name>/`. It refuses to clean up unless the deployment name ends in the service instance GUID, starts with a plan from the current catalog, and is not the broker's own deployment. It never touches the broker's own variables, such as the services CA. A cleanup failure never fails or slows the deprovision. It writes only a log line that says what was left behind and what to check.
 
-- `credhub-cleanup`
-  Turns the feature on. It requires `external-bosh`, or `ocfp`, which implies it, because the internal director has no CredHub to clean up. The kit generates a secret for the UAA client in vault at `users/credhub-cleanup`. Activating this feature also activates the following parameters.
+Blacksmith also acts only on instances that Cloud Foundry asked it to deprovision. If someone deleted a deployment by hand, its variables stay in CredHub, and the broker logs the names so we can decide what to do with them.
 
-  - `credhub_cleanup.sweep`
-    Controls the hourly sweep for older orphaned variables, and it must be `off`, `dry-run`, or `delete`. It defaults to `off`. In `dry-run` the broker logs what it would delete and deletes nothing, so we suggest reading a dry run before we switch to `delete`. A pass handles at most ten deployments, and it only considers instances whose deprovision request was recorded at least two hours ago.
+- `skip-credhub-cleanup`
+  Turns cleanup off for an external director. Nothing else needs to change in the env file.
 
-  - `credhub_cleanup.client_id`
-    The UAA client the broker uses. It defaults to `blacksmith_credhub`.
+- `credhub_cleanup.sweep`
+  Controls the hourly sweep for older orphaned variables. The value must be `off`, `dry-run`, or `delete`, and it defaults to `dry-run`, where the broker logs what it would delete and deletes nothing, so we suggest reading a dry run before we switch to `delete`. A pass handles at most ten deployments, and it considers only instances whose deprovision request was recorded at least two hours ago.
 
-  - `credhub_cleanup.url`
-    The CredHub URL. It defaults to the `credhub_url` in the director's exodus data.
+- `credhub_cleanup.client_id`
+  The UAA client the broker uses. It defaults to the `blacksmith_credhub_client_id` in the director's exodus data, which is `blacksmith_credhub`.
 
-  - `credhub_cleanup.ca_cert`
-    The CA, or pinned server certificate, for CredHub. It defaults to the `credhub_ca_cert` in the director's exodus data.
+- `credhub_cleanup.url`
+  The CredHub URL. It defaults to the `credhub_url` in the director's exodus data.
 
-The director name the broker uses is the BOSH environment name followed by `-bosh`. The broker checks that this matches the name the director reports before it builds any path.
+- `credhub_cleanup.ca_cert`
+  The CA, or pinned server certificate, for CredHub. It defaults to the `blacksmith_credhub_ca_cert` in the director's exodus data.
+
+The director name the broker uses comes from the `blacksmith_credhub_director_name` in the director's exodus data. The broker checks that it matches the name the director reports before it builds any path.
 
 #### The UAA client
 
-The broker needs a UAA client on the director's UAA with the `credhub.read` and `credhub.write` authorities, and the kit does not create it for us. The director's CredHub has access control off, so we should be clear about what that client can reach. It can read, write, and delete every credential on that CredHub, including those of other deployments. The broker's code guard is what limits it, because the broker's CredHub client can only find by path and delete by exact name. The client's tokens last 300 seconds.
+The BOSH kit creates the `blacksmith_credhub` UAA client when we deploy the director with its `blacksmith-integration` feature, and it publishes the client's connection details in the director's exodus record. The Blacksmith kit reads them from there, so we do not create the client or store its secret by hand. The record holds five keys. They are `credhub_url`, `blacksmith_credhub_client_id`, `blacksmith_credhub_client_secret`, `blacksmith_credhub_ca_cert`, and `blacksmith_credhub_director_name`.
 
-We create the client with the bosh kit's UAA addon, using the secret the kit stored in vault. The addon talks to UAA without TLS verification, as every bosh kit UAA addon does today, so we should run it only from a trusted workstation or bastion. The blocks below need bash, because they read `PIPESTATUS`, which is empty in zsh and would end the login check with a false "uaa login failed".
+If any of those keys is missing, the deploy warns and names each missing key. Cleanup stays unwired, so the broker deletes nothing from CredHub until the keys exist. The fix is to redeploy the director with a BOSH kit release that publishes them, and then redeploy Blacksmith.
 
-```bash
-OK='✓|\[ERROR\]|FATAL|failed|already exists|does not exist|client_id|authorities|authorized_grant_types|access_token_validity|scope'
-( set -o pipefail
-  V() { awk 'tolower($0) ~ /token|secret/ && $0 !~ /^[[:space:]]*"?access_token_validity"?[ :=]+[0-9]+,?[[:space:]]*$/ {next} {print}'; }
-  S=$(safe get secret/<blacksmith env vault path>/users/credhub-cleanup:password) && [ -n "$S" ] || { echo "STOP: no password in vault at users/credhub-cleanup"; exit 1; }
-  GENESIS_OUTPUT_COLUMNS=100000 genesis @<bosh env>:bosh do -- uaa login 2>&1 | grep -E "$OK" | V | grep -vF -- "$S"; [ "${PIPESTATUS[0]}" = 0 ] || { echo "STOP: uaa login failed"; exit 1; }
-  GENESIS_OUTPUT_COLUMNS=100000 genesis @<bosh env>:bosh do -- uaa clients add blacksmith_credhub \
-    --grant-types client_credentials \
-    --authorities credhub.read,credhub.write \
-    --scopes uaa.none --access-validity 300 --secret "$S" 2>&1 | grep -E "$OK" | V | grep -vF -- "$S"
-  echo "clients add rc=${PIPESTATUS[0]}"
-)
-```
+The client has the `credhub.read` and `credhub.write` authorities, and we should be clear about what that lets it reach. The director's CredHub has access control off, so the client can read, write, and delete every credential on that CredHub, including those of other deployments. What limits it is the broker's code guard, because the broker's CredHub client can only find by path and delete by exact name. The client's tokens last 300 seconds.
 
-The block runs in a subshell, and it protects us in three ways. It stops before it sends anything when `safe get` returns an empty value, because an empty `--secret` would make the addon generate and print a secret of its own that is not in vault. It stops when `uaa login` fails, because a stale saved context could otherwise point at another director's UAA, and the client would be created there. It also cuts every addon output down to an allowlist of success and failure lines, drops any line that mentions a token or a secret, and drops any line that holds the client secret's value. The login prints the admin client's token, so that filter keeps it out of logs and chat, and `GENESIS_OUTPUT_COLUMNS=100000` stops Genesis from rewrapping a message so that the secret lands on a line the filters miss. We expect `clients add rc=0`, and a rerun reports that the client already exists.
-
-To check the client, we run the same filter over `uaa clients get`. At the end of a deploy, the kit also requests a token for this client, and it prints a warning without failing the deploy when it cannot get one.
-
-```bash
-OK='✓|\[ERROR\]|FATAL|failed|does not exist|client_id|authorities|authorized_grant_types|access_token_validity|scope'
-( V() { awk 'tolower($0) ~ /token|secret/ && $0 !~ /^[[:space:]]*"?access_token_validity"?[ :=]+[0-9]+,?[[:space:]]*$/ {next} {print}'; }
-  GENESIS_OUTPUT_COLUMNS=100000 genesis @<bosh env>:bosh do -- uaa clients get blacksmith_credhub 2>&1 | grep -E "$OK" | V
-)
-```
-
-If the client already exists with a different secret, we repair it by setting its secret to the value in vault.
-
-```bash
-OK='✓|\[ERROR\]|FATAL|failed|already exists|does not exist|client_id|authorities|authorized_grant_types|access_token_validity|scope'
-( set -o pipefail
-  V() { awk 'tolower($0) ~ /token|secret/ && $0 !~ /^[[:space:]]*"?access_token_validity"?[ :=]+[0-9]+,?[[:space:]]*$/ {next} {print}'; }
-  S=$(safe get secret/<blacksmith env vault path>/users/credhub-cleanup:password) && [ -n "$S" ] || { echo "STOP: no password in vault at users/credhub-cleanup"; exit 1; }
-  GENESIS_OUTPUT_COLUMNS=100000 genesis @<bosh env>:bosh do -- uaa login 2>&1 | grep -E "$OK" | V | grep -vF -- "$S"; [ "${PIPESTATUS[0]}" = 0 ] || { echo "STOP: uaa login failed"; exit 1; }
-  printf 'y\n' | GENESIS_OUTPUT_COLUMNS=100000 genesis @<bosh env>:bosh do -- uaa clients set-secret blacksmith_credhub "$S" 2>&1 | grep -E '✓|\[ERROR\]|FATAL|failed|does not exist' | grep -viE 'token|secret:' | grep -vF -- "$S"
-  echo "set-secret rc=${PIPESTATUS[1]}"
-)
-```
-
-The repair block has the same guards as the create block, so `set-secret` never runs with an empty secret or against a stale context. The addon asks for confirmation on standard input and has no flag to skip it, which is why the `y` is piped in. We expect a success line and `set-secret rc=0`.
+At the end of a deploy that wired cleanup, the kit requests a token for this client with the secret from the exodus record, and it prints a warning without failing the deploy when it cannot get one.
 
 #### Reading the failure lines
 
 Every failure line names the deployment, the service instance, and the credential name or path involved. It also says that the deprovision itself succeeded, lists the likely causes, and gives the `credhub delete -n <name>` command that removes the variable by hand. These are the lines we are most likely to see.
 
-- A UAA 401 usually means the client is missing, or its secret does not match the one in vault.
+- A UAA 401 usually means the director's UAA has no `blacksmith_credhub` client, or its secret does not match the one in the exodus record, which happens when the director was deployed with a BOSH kit that predates the client. We redeploy the director with a current BOSH kit release.
 
 - A CredHub 401 after a token refresh usually means CredHub does not trust the UAA that issued the token.
 
 - A CredHub 403 means the client lacks `credhub.write`, or someone turned access control on without a permission for the client.
 
-- A TLS error that names x509 usually means `credhub.ca_cert` no longer matches the certificate CredHub presents, which happens after the director rotates its CredHub certificate.
+- A TLS error that names x509 usually means the CA in `credhub_cleanup.ca_cert` no longer matches the certificate CredHub presents, which happens after the director rotates its CredHub certificate. When we use the default from the director's exodus data, redeploying Blacksmith after the director picks up the new CA.
 
 - A refusal from the guard means nothing was deleted, and the line names the rule that failed, which usually means the guard did its job.
 
