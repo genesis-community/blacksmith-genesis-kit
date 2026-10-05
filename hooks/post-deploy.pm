@@ -258,25 +258,22 @@ sub display_next_steps {
   info("   #G{%s info}\n\n", $cmd_with_env);
 
   info("2. Access the Blacksmith Web UI:\n");
-  info("   #G{%s do visit}\n\n", $cmd_with_env);
+  info("   #G{%s do open}\n\n", $cmd_with_env);
 
   info("3. Register with Cloud Foundry (if applicable):\n");
   info("   #G{%s do register <cf-deployment>}\n\n", $cmd_with_env);
 
-  info("4. Access the internal BOSH director:\n");
-  info("   #G{%s do bosh}\n\n", $cmd_with_env);
-
-  info("5. View the service catalog:\n");
+  info("4. View the service catalog:\n");
   info("   #G{%s do boss catalog}\n\n", $cmd_with_env);
 
   if ($self->want_feature('shield-backups')) {
-    info("6. Configure Shield backup schedules:\n");
+    info("5. Configure Shield backup schedules:\n");
     info("   Access Shield UI and configure backup policies\n\n");
   }
 
   info("For troubleshooting service provisioning issues:\n");
-  info("  - Check BOSH tasks: #G{%s do bosh tasks}\n", $cmd_with_env);
-  info("  - View BOSH VMs: #G{%s do bosh vms}\n", $cmd_with_env);
+  info("  - Check BOSH tasks: #G{%s do -- curl /b/tasks}\n", $cmd_with_env);
+  info("  - View BOSH VMs: #G{%s do -- curl /b/blacksmith/vms}\n", $cmd_with_env);
   info("  - Check logs: #G{%s do boss logs}\n\n", $cmd_with_env);
 }
 
