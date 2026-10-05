@@ -82,8 +82,8 @@ genesis do my-blacksmith-env register my-cf-env
 ### Check the Broker Status
 
 ```bash
-# View the broker status in the web UI (macOS only)
-genesis do my-blacksmith-env visit
+# View the broker status in the web UI
+genesis do my-blacksmith-env open
 
 # Check service offerings in CF
 cf marketplace
@@ -116,14 +116,20 @@ cf delete-service SERVICE_NAME
 cf services
 ```
 
-### Accessing the BOSH Director
+### Checking the BOSH Deployments
 
 ```bash
-# Set up the BOSH alias and authenticate
-genesis do my-blacksmith-env bosh
+# Check the broker's status
+genesis do my-blacksmith-env -- curl /b/status
 
-# List service deployments
-bosh deployments
+# List the VMs of a service deployment, using its deployment_name from the status
+genesis do my-blacksmith-env -- curl /b/deployments/<deployment-name>/vms
+```
+
+When Blacksmith isn't answering, we can reach the internal BOSH director directly. The `bosh` addon prints the director's connection details as export lines and runs no command. Its output holds a secret, so we load it with `eval`.
+
+```bash
+eval "$(genesis do my-blacksmith-env bosh)"
 ```
 
 ### Using the boss CLI

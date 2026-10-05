@@ -59,7 +59,7 @@ To enable new RabbitMQ Instance deployments with configured plugins, you can eas
 
 7. After the the Blacksmith deployment is complete, verify that the plugins are enabled:
    - Create a new RabbitMQ service instance
-   - SSH into the newely created RabbitMQ instance
+   - SSH into the newly created RabbitMQ instance from the Blacksmith web UI, which `genesis do <env> open` opens for us
    - Run `source /var/vcap/jobs/rabbitmq/env` then `rabbitmq-plugins list` to see the enabled plugins or
    - `cat /var/vcap/sys/log/rabbitmq/rabbitmq.log` which will show the enablement of the plugins
 
@@ -67,7 +67,17 @@ Note: The `rabbitmq_management` plugin is typically enabled by default. If you n
 
 ## 5. Updating Existing RabbitMQ Instance Deployments
 
-To update plugin configurations for existing RabbitMQ instance deployments:
+To update plugin configurations for existing RabbitMQ instance deployments, we first make sure the director has the latest forge release. Blacksmith has no route for uploading a release, so that step goes to the director itself and sits under the heading below. The manifest steps after it use the broker's routes.
+
+### Working with the director directly
+
+We load the director's connection details into our shell first. The `bosh` addon prints four export lines and runs no command. Its output holds a secret, so we use `eval` and keep the output out of our terminal history and logs.
+
+```
+eval "$(genesis do <env> bosh)"
+```
+
+The `bosh` command below is our own tooling and not something the kit runs for us.
 
 1. Ensure that the latest BOSH release, which includes the new plugin configuration feature, has been uploaded to your BOSH director. If not, upload it using:
 
@@ -75,8 +85,10 @@ To update plugin configurations for existing RabbitMQ instance deployments:
    bosh upload-release path/to/latest-rabbitmq-forge-release.tgz
    ```
 
+### Updating the manifest through the broker
+
 2. Update your RabbitMQ deployment manifest:
-   - Download and save the manifest `bosh -d rabbitmq-single-node-fcab211b-dffd-478d-8537-5ba2b7c4d5bb manifest > single-plugins-manifest.yml`
+   - Download the manifest through the broker, which returns JSON whose `text` field holds the manifest YAML. We save that field with `genesis do <env> -- curl -s /b/deployments/rabbitmq-single-node-fcab211b-dffd-478d-8537-5ba2b7c4d5bb/manifest | jq -r .text > single-plugins-manifest.yml`
    - Add or modify the `plugins` property under the `properties` section of the `rabbitmq` job specification
 
    For example:
@@ -92,11 +104,14 @@ To update plugin configurations for existing RabbitMQ instance deployments:
          - rabbitmq_prometheus
    ```
 
-3. Redeploy your RabbitMQ instance using the updated manifest:
+3. Redeploy your RabbitMQ instance using the updated manifest. The broker's manifest route takes the manifest as a JSON body, so we convert the edited YAML to JSON first and then post it. The broker starts the deploy and stores the new manifest in its vault:
 
    ```
-   bosh -d rabbitmq-single-node-fcab211b-dffd-478d-8537-5ba2b7c4d5bb deploy single-plugins-manifest.yml
+   spruce json single-plugins-manifest.yml > single-plugins-manifest.json
+   genesis do <env> -- curl /b/deployments/rabbitmq-single-node-fcab211b-dffd-478d-8537-5ba2b7c4d5bb/manifest -X POST -H 'Content-Type: application/json' -d @single-plugins-manifest.json
    ```
+
+   The response carries the task ID, and `genesis do <env> -- curl /b/tasks` shows how the task is going.
 
 4. During the deployment process, confirm that:
    - The latest release version is being used. You should see something like:
@@ -138,9 +153,8 @@ For a complete list of available plugins, refer to the official RabbitMQ documen
 
 If you encounter issues with plugin configuration:
 
-1. Check the RabbitMQ logs for any error messages:
+1. Check the RabbitMQ logs for any error messages. We open the Blacksmith web UI with `genesis do <env> open`, select the service instance, and start an SSH session on the node from there. In that session we run:
    ```
-   bosh -d rabbitmq-three-node-9b28f536-7ff6-4616-accd-7512f93bb74c ssh node/59213905-82c4-46d4-988e-c572ddb6b9b3
    cat /var/vcap/sys/log/rabbitmq/rabbitmq.log
    ```
 

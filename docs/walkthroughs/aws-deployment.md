@@ -271,7 +271,7 @@ You can also use the Blacksmith Web UI to monitor the deployment:
 
 ```bash
 # Open the Web UI (macOS only)
-genesis do aws-blacksmith visit
+genesis do aws-blacksmith open
 ```
 
 ## Step 8: Bind to an Application
@@ -356,8 +356,8 @@ Be aware of AWS resource limits, such as:
 For AWS-specific debugging:
 
 ```bash
-# Check AWS CPI logs
-genesis do aws-blacksmith bosh logs --job aws_cpi
+# Check the broker's logs for CPI errors
+genesis do aws-blacksmith -- curl /b/blacksmith/logs
 
 # Verify AWS credentials
 aws configure list

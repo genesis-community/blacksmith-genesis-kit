@@ -76,17 +76,18 @@ cf create-service-key redis-test redis-test-key
 cf service-key redis-test redis-test-key
 ```
 
-## Get Valkey BOSH Deployment
+## Find the Valkey BOSH Deployment
+
+The `instances` section of the broker's status lists each service instance with its `deployment_name`, so we look there for the `valkey-standalone-8` deployment. We can then confirm its VM through the broker.
 
 ```bash
-export VALKEY_DEPLOYMENT=$(bosh deps | grep valkey-standalone-8 | awk '{print $1}')
+genesis do <env> -- curl /b/status
+genesis do <env> -- curl /b/deployments/<valkey-deployment-name>/vms
 ```
 
 ## SSH to the Valkey Instance
 
-```bash
-bosh -d $VALKEY_DEPLOYMENT ssh
-```
+We select the service instance in the Blacksmith web UI and start an SSH session on its VM from there.
 
 ## Disable CONFIG Command Restriction
 

@@ -13,6 +13,7 @@ This guide covers common issues you might encounter when deploying and using Bla
 - [Common Error Messages](#common-error-messages)
 - [Log Locations](#log-locations)
 - [Advanced Debugging Techniques](#advanced-debugging-techniques)
+- [When Blacksmith isn't answering](#when-blacksmith-isnt-answering)
 
 ## Deployment Issues
 
@@ -47,11 +48,12 @@ This guide covers common issues you might encounter when deploying and using Bla
 **Debugging Steps:**
 
 ```bash
-# Check BOSH deployment status
-genesis do my-blacksmith-env bosh deployments
+# Check the broker's status and its recent BOSH tasks
+genesis do my-blacksmith-env -- curl /b/status
+genesis do my-blacksmith-env -- curl /b/tasks
 
-# View BOSH deployment logs
-bosh -d my-blacksmith-env logs
+# View the broker's logs
+genesis do my-blacksmith-env -- curl /b/blacksmith/logs
 
 # Check for certificate issues
 genesis check my-blacksmith-env
@@ -70,7 +72,7 @@ genesis check my-blacksmith-env
 1. **Blacksmith Broker Not Accessible from CF**
    - Check network connectivity between CF and Blacksmith
    - Ensure the `ip` or `fqdn` is reachable from CF
-   - Try using `curl` to verify the broker is running: `genesis do my-blacksmith-env curl /v2/catalog`
+   - Try using `curl` to verify the broker is running: `genesis do my-blacksmith-env -- curl /v2/catalog`
 
 2. **Authentication Failure**
    - Verify broker credentials are correct
@@ -88,10 +90,10 @@ genesis check my-blacksmith-env
 
 ```bash
 # Check if broker is running
-genesis do my-blacksmith-env curl /b/status
+genesis do my-blacksmith-env -- curl /b/status
 
 # Check broker credential access
-genesis do my-blacksmith-env curl /v2/catalog
+genesis do my-blacksmith-env -- curl /v2/catalog
 
 # List existing service brokers
 cf service-brokers
@@ -111,7 +113,7 @@ cf create-service-broker <broker-name> <username> <password> <url>
 **Possible Causes and Solutions:**
 
 1. **BOSH Deployment Failures**
-   - Check the BOSH tasks for errors: `genesis do my-blacksmith-env bosh tasks --recent`
+   - Check the BOSH tasks for errors: `genesis do my-blacksmith-env -- curl /b/tasks`
    - Look for BOSH deployment error messages
    - Check for IaaS resource constraints or quotas
 
@@ -132,19 +134,18 @@ cf create-service-broker <broker-name> <username> <password> <url>
 
 ```bash
 # Check broker status and catalog
-genesis do my-blacksmith-env curl /b/status
-genesis do my-blacksmith-env curl /v2/catalog
+genesis do my-blacksmith-env -- curl /b/status
+genesis do my-blacksmith-env -- curl /v2/catalog
 
 # Check BOSH tasks for errors
-genesis do my-blacksmith-env bosh tasks --recent
+genesis do my-blacksmith-env -- curl /b/tasks
 
-# Check internal BOSH director stemcells and releases
-genesis do my-blacksmith-env bosh stemcells
-genesis do my-blacksmith-env bosh releases
+# Check the stemcells on the internal BOSH director
+genesis do my-blacksmith-env -- curl /b/bosh/stemcells
 
 # View detailed service instance status
 cf service <service-instance-name>
-genesis do my-blacksmith-env visit  # Check Web UI
+genesis do my-blacksmith-env open  # Check Web UI
 ```
 
 ## Service Binding Issues
@@ -185,7 +186,7 @@ cf create-service-key <service-instance-name> test-key
 cf service-key <service-instance-name> test-key
 
 # Check Blacksmith logs
-genesis do my-blacksmith-env bosh logs --job blacksmith
+genesis do my-blacksmith-env -- curl /b/blacksmith/logs
 
 # Test network connectivity (from a test app)
 cf ssh <app-name> -c "nc -zv <service-host> <service-port>"
@@ -316,36 +317,38 @@ To diagnose issues, check logs in these locations:
 
 **Blacksmith Broker Logs**:
 ```bash
-# Stream Blacksmith logs
-genesis do my-blacksmith-env bosh logs --job blacksmith --follow
+# Get the broker's logs
+genesis do my-blacksmith-env -- curl /b/blacksmith/logs
 
-# Get all logs
-genesis do my-blacksmith-env bosh logs --job blacksmith
+# Get the broker's recent events
+genesis do my-blacksmith-env -- curl /b/blacksmith/events
 ```
 
 **Internal BOSH Director Logs**:
-```bash
-# Stream BOSH Director logs 
-genesis do my-blacksmith-env bosh logs --job director --follow
-```
+
+Blacksmith has no route for the director's own job logs. When we need them, we follow the steps under [When Blacksmith isn't answering](#when-blacksmith-isnt-answering).
 
 **Service Instance Logs**:
-```bash
-# First, get the deployment name from Blacksmith UI or BOSH
-genesis do my-blacksmith-env bosh deployments
 
-# Then get logs from the specific service deployment
-genesis do my-blacksmith-env bosh -d <service-deployment> logs
+The `instances` section of the broker's status lists every service instance along with its `deployment_name`. We can then list the VMs of a deployment, or read its events, through the broker.
+
+```bash
+genesis do my-blacksmith-env -- curl /b/status
+genesis do my-blacksmith-env -- curl /b/deployments/<service-deployment>/vms
+genesis do my-blacksmith-env -- curl /b/deployments/<service-deployment>/events
 ```
+
+Blacksmith has no route for a deployment's job logs. To download those, we follow the steps under [When Blacksmith isn't answering](#when-blacksmith-isnt-answering).
 
 ## Advanced Debugging Techniques
 
-### Direct Access to Blacksmith VM
+### Working with the director directly
+
+The Blacksmith VM is deployed by the parent BOSH director, and not by Blacksmith's internal director, so the kit has no addon that opens a shell on it. We reach the VM through the parent director that deployed it, using our own `bosh` CLI and the connection details we already hold for that director. The kit does not run this step for us.
+
+Once we have a shell on the VM, the commands below run on the VM itself.
 
 ```bash
-# SSH to the Blacksmith VM
-genesis do my-blacksmith-env ssh
-
 # Check Blacksmith process
 ps -ef | grep blacksmith
 
@@ -359,15 +362,18 @@ tail -f /var/vcap/sys/log/blacksmith/blacksmith.log
 ### Inspecting Service Deployments
 
 ```bash
-# Get details of service deployments
-genesis do my-blacksmith-env bosh deployments
+# Find the deployment name of a service instance
+genesis do my-blacksmith-env -- curl /b/status
 
-# Examine a specific service deployment
-genesis do my-blacksmith-env bosh -d <service-deployment-name> instances --ps
+# Examine the VMs and the instances of a specific service deployment
+genesis do my-blacksmith-env -- curl /b/deployments/<service-deployment-name>/vms
+genesis do my-blacksmith-env -- curl /b/deployments/<service-deployment-name>/instances
 
-# SSH to a service VM
-genesis do my-blacksmith-env bosh -d <service-deployment-name> ssh <instance>
+# Read the deployment's manifest
+genesis do my-blacksmith-env -- curl /b/deployments/<service-deployment-name>/manifest
 ```
+
+To get a shell on a service VM, we open the Blacksmith web UI with `genesis do my-blacksmith-env open`, select the service instance, and start an SSH session from there.
 
 ### Using the boss CLI
 
@@ -398,14 +404,43 @@ If all else fails, you might need to recreate the service:
 # Steps for recreation
 cf unbind-service <app-name> <service-name>
 cf delete-service <service-name>
-# Check if BOSH deployment was properly cleaned up
-genesis do my-blacksmith-env bosh deployments
-# If orphaned, delete manually:
-genesis do my-blacksmith-env bosh -d <orphaned-deployment> delete-deployment
+# Check the broker's view of its service instances and tasks
+genesis do my-blacksmith-env -- curl /b/status
+genesis do my-blacksmith-env -- curl /b/tasks
+# If a deployment was left behind, delete it through the broker
+genesis do my-blacksmith-env -- curl /b/deployments/<orphaned-deployment> -X DELETE
 # Then recreate
 cf create-service <service> <plan> <service-name>
 cf bind-service <app-name> <service-name>
 ```
+
+## When Blacksmith isn't answering
+
+The `/b/` routes all go through the broker, so they stop working when the broker is down. A few jobs also have no broker route at all. These are the director's own job logs, a consistency check with `cck`, an SSH session to the director's VM, and the upload of a release. When the broker is down, deleting an orphaned deployment also has to go this way. For those, we talk to the internal BOSH director directly, using our own `bosh` CLI.
+
+The `bosh` addon prints the director's connection details as shell export lines and runs no command. The output holds a secret, so we load it into our shell with `eval` rather than copying it around.
+
+```bash
+eval "$(genesis do my-blacksmith-env bosh)"
+```
+
+After that, `BOSH_ENVIRONMENT`, `BOSH_CA_CERT`, `BOSH_CLIENT`, and `BOSH_CLIENT_SECRET` are set in the current shell. The commands below are our own tooling and not something the kit runs for us.
+
+```bash
+# Director job logs
+bosh -d my-blacksmith-env logs
+
+# Check the director's consistency with the IaaS
+bosh -d <service-deployment-name> cck
+
+# Delete a deployment that was left behind, while the broker is down
+bosh -d <orphaned-deployment> delete-deployment
+
+# Releases uploaded to the director
+bosh releases
+```
+
+To SSH to the director's own VM, we use our own `bosh` CLI against the director's deployment in the same way. When we are done, we close the shell or run `unset BOSH_CLIENT_SECRET` so the secret does not linger.
 
 ## Getting Help
 

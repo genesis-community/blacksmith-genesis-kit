@@ -812,8 +812,8 @@ params:
 
 ## Available Addons
 
-- `visit` - Opens the Blacksmith Web Management Console in your
-  browser. This only works on macOS.
+- `open` - Opens the Blacksmith Web Management Console in your
+  browser.
 
   This web interface provides an at-a-glance summary of all the
   salient bits of the Blacksmith broker deployment, the service
@@ -829,13 +829,15 @@ params:
   If the service broker is already registered, this will run
   update-service-broker instead.
 
-- `bosh` - Sets up a local alias for the Blacksmith (Internal)
-  BOSH director, retrieves the X.509 CA Certificate and BOSH admin
-  credentials, and authenticates to it.
+- `bosh` - Prints shell export lines for the Blacksmith (Internal)
+  BOSH director, namely BOSH_ENVIRONMENT, BOSH_CA_CERT, BOSH_CLIENT,
+  and BOSH_CLIENT_SECRET. It runs no command. The output holds a
+  secret, so the usual way to use it is
+  `eval "$(genesis do <env> bosh)"`.
 
-  After this runs, you will be able to use the BOSH CLI, unaided,
-  to interact with the Blacksmith BOSH director, for
-  troubleshooting and diagnostics.
+  This is for the times when the broker isn't answering, or when
+  you need something the broker has no `/b/` route for. After the
+  eval, your own BOSH CLI can talk to the director.
 
 - `boss` - Runs `boss`, a command-line utility for interacting
   directly with Blacksmith via the Open Service Broker API,
@@ -845,9 +847,10 @@ params:
   get `boss` from https://github.com/jhunt/boss/releases
 
 - `curl` - Run arbitrary HTTP requests against the Blacksmith
-  Broker and its API. This is very useful for troubleshooting
-  weird Blacksmith issues. The `/b/status` and `/b/catalog`
-  endpoints are useful.
+  Broker and its API, as in `genesis do <env> -- curl <path>`.
+  This is very useful for troubleshooting weird Blacksmith
+  issues. The `/b/status` and `/v2/catalog` endpoints are
+  useful.
 
 ## Examples
 

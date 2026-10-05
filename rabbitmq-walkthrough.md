@@ -509,9 +509,13 @@ With everything working we know that we have enough privileges to reach out to t
 
 `cd blacksmith-deployments` # or to any genesis deployment directory
 
-get a listing of the available vms
+get a listing of the available vms. We find the deployment name in the `deployment_name` field of each entry under `instances` in the broker's status, and then ask the broker for that deployment's VMs:
 
-`genesis -A bosh dev vms` # replace with your environment name file
+`genesis do dev -- curl /b/status`
+
+`genesis do dev -- curl /b/deployments/<deployment-name>/vms` # replace dev with your environment name file
+
+The broker answers with JSON that carries the same details as the table below, namely the instance, process state, AZ, IPs, and VM type.
 
 ```
 Deployment 'rabbitmq-single-node-0de041e6-91ba-4f55-b50f-d575ce91e2a5'
@@ -520,9 +524,8 @@ Instance                                         Process State  AZ  IPs         
 standalone/6271104d-30d9-4175-9222-cc9f12c2432d  running        z1  10.7.16.17  i-0a90c9519bad73d9b  blacksmith-rabbitmq-medium  true    bosh-aws-xen-hvm-ubuntu-bionic-go_agent/1.61  
 ```
 
-ssh using the deployment and instance name
+To ssh in, we use the Blacksmith web UI. We select the service instance (here `rabbitmq-single-node-0de041e6-91ba-4f55-b50f-d575ce91e2a5`) and start an SSH session on the instance `standalone/6271104d-30d9-4175-9222-cc9f12c2432d`. The session opens a shell like this:
 
-`genesis -A bosh dev -d rabbitmq-single-node-0de041e6-91ba-4f55-b50f-d575ce91e2a5 ssh standalone/6271104d-30d9-4175-9222-cc9f12c2432d`
 
 ```
 ...
@@ -893,9 +896,13 @@ With `- rabbitmq-tls` feature enabled you also have the option to anable `- rabb
 
 `cd blacksmith-deployments` # or to any genesis deployment directory
 
-get a listing of the available vms
+get a listing of the available vms. For each deployment name in the `instances` section of the broker's status, we ask the broker for its VMs:
 
-`genesis -A bosh dev vms` # replace with your environment name file
+`genesis do dev -- curl /b/status`
+
+`genesis do dev -- curl /b/deployments/<deployment-name>/vms` # replace dev with your environment name file
+
+The broker answers with JSON that carries the same details as the tables below.
 
 ```
 ...

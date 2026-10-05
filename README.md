@@ -60,11 +60,11 @@ new environments.
 
 Blacksmith comes with several useful addons to simplify management:
 
-- **visit** - Opens the Blacksmith Web Management Console in your browser (macOS only)
+- **open** - Opens the Blacksmith Web Management Console in your browser
 - **register** - Registers the Blacksmith Broker with a Cloud Foundry instance
-- **bosh** - Sets up a local alias for the Blacksmith's internal BOSH director
+- **bosh** - Prints shell export lines with the connection details for the Blacksmith's internal BOSH director, for use as `eval "$(genesis do <env> bosh)"`
 - **boss** - Runs the boss CLI to interact with Blacksmith directly
-- **curl** - Makes direct API calls to the Blacksmith Broker
+- **curl** - Makes direct API calls to the Blacksmith Broker, as in `genesis do <env> -- curl <path>`
 
 Run `genesis do <env> list` to see all available commands.
 
