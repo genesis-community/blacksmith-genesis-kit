@@ -1,7 +1,0 @@
-resources:
-  - name: github
-    type: github-release
-    source:
-      owner:        (( grab meta.github.owner ))
-      repository:   (( grab meta.github.repo ))
-      access_token: (( grab meta.github.access_token ))

@@ -1,6 +1,0 @@
----
-genesis:
-  env:   ci-gcp-baseline
-
-params:
-  auxiliary_vault: true
