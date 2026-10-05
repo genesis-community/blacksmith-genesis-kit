@@ -42,12 +42,6 @@ sub perform {
     warning("\nSome deployment information is missing. Please redeploy to generate the necessary data.\n");
   }
 
-  # Display BOSH environment information
-  #$self->display_bosh_environment();
-
-  # Display Blacksmith internal BOSH director info
-  #$self->display_blacksmith_bosh_info(\%info);
-
   # Display Blacksmith web UI information with connectivity check
   $self->display_blacksmith_ui_info(\%info);
 
@@ -142,52 +136,6 @@ sub validate_required_data {
   }
   
   return 1;
-}
-
-# }}}
-
-# display_bosh_environment - Show BOSH environment information {{{
-sub display_bosh_environment {
-  my ($self) = @_;
-  
-  info("\n#Bu{BOSH Environment}\n");
-  
-  # Check if bosh command is available
-  my ($bosh_check, $bosh_check_rc) = run({stderr => 0}, 'command -v bosh >/dev/null 2>&1');
-  if ($bosh_check_rc != 0) {
-    error("  The 'bosh' CLI is not installed or not in PATH.\n" .
-          "  Please install the BOSH CLI to interact with BOSH.\n");
-    return;
-  }
-  
-  my ($out, $rc, $err) = run({stderr => 0}, "bosh -A env --tty 2>&1 | sed -e 's/^/  /'");
-  if ($rc) {
-    error("  Failed to execute bosh env command.\n" .
-          "  This may indicate connectivity issues or authentication problems.\n" .
-          "  Error: %s\n", $err || 'Unknown error');
-  } else {
-    info($out);
-  }
-}
-
-# }}}
-
-# display_blacksmith_bosh_info - Show Blacksmith's internal BOSH director {{{
-sub display_blacksmith_bosh_info {
-  my ($self, $info) = @_;
-  
-  info("\n#Bu{Blacksmith Internal BOSH Director}\n");
-  info("  BOSH URL:  #C{%s}\n", $info->{bosh_address} || '#R{<unknown>}');
-  info("  Username:  #M{%s}\n", $info->{bosh_username} || '#R{<unknown>}');
-  info("  Password:  #G{%s}\n", $info->{bosh_password} || '#R{<unknown>}');
-  
-  if ($info->{bosh_cacert}) {
-    info("\n  CA Certificate:\n");
-    my @cert_lines = split /\n/, $info->{bosh_cacert};
-    for my $line (@cert_lines) {
-      info("  #c{%s}\n", $line);
-    }
-  }
 }
 
 # }}}
