@@ -8,7 +8,7 @@ BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/
 
 use parent qw(Genesis::Hook);
 
-use Genesis qw/bail info warning error run new_enough load_yaml_file/;
+use Genesis qw/bail info warning error run new_enough load_yaml_file mkfile_or_fail/;
 
 # init - Initialize the hook {{{
 sub init {
@@ -241,16 +241,31 @@ sub setup_shield_integration {
     return 0;
   }
   
+  # The merged document holds the SHIELD password, so it is written to a
+  # private file, handed to the import, and removed whatever the result.
+  my ($merged, $merge_rc, $merge_err) = $self->spruce_merge($shield_template);
+  if ($merge_rc != 0) {
+    error(
+      "  Failed to merge Shield import template %s: %s\n" .
+      "  Check that the template is valid YAML and that its (( grab ... )) references resolve.\n",
+      $shield_template, $merge_err || 'merge failed'
+    );
+    return 0;
+  }
+
+  my $import_file = $self->tempfile('shield-import.yml');
+  mkfile_or_fail($import_file, 0600, $merged);
   my ($import_out, $import_rc) = run(
     {stderr => 0},
-    'shield import -c blacksmith-shield <(spruce merge "$1")',
-    $shield_template
+    'shield import -c blacksmith-shield "$1"',
+    $import_file
   );
+  unlink $import_file;
   if ($import_rc != 0) {
     error("  Failed to import Shield configuration: %s\n", $import_out || 'Import failed');
     return 0;
   }
-  
+
   info("  Shield integration [#G{OK}]\n");
   return 1;
 }
