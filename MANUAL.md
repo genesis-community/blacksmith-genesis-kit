@@ -722,7 +722,7 @@ The director name the broker uses is the BOSH environment name followed by `-bos
 
 The broker needs a UAA client on the director's UAA with the `credhub.read` and `credhub.write` authorities, and the kit does not create it for us. The director's CredHub has access control off, so we should be clear about what that client can reach. It can read, write, and delete every credential on that CredHub, including those of other deployments. The broker's code guard is what limits it, because the broker's CredHub client can only find by path and delete by exact name. The client's tokens last 300 seconds.
 
-We create the client with the bosh kit's UAA addon, using the secret the kit stored in vault. The addon talks to UAA without TLS verification, as every bosh kit UAA addon does today, so we should run it only from a trusted workstation or bastion.
+We create the client with the bosh kit's UAA addon, using the secret the kit stored in vault. The addon talks to UAA without TLS verification, as every bosh kit UAA addon does today, so we should run it only from a trusted workstation or bastion. The blocks below need bash, because they read `PIPESTATUS`, which is empty in zsh and would end the login check with a false "uaa login failed".
 
 ```bash
 OK='✓|\[ERROR\]|FATAL|failed|already exists|does not exist|client_id|authorities|authorized_grant_types|access_token_validity|scope'
