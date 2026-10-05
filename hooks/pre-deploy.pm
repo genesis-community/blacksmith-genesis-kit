@@ -8,8 +8,7 @@ BEGIN {push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME}.'/.genesis/
 
 use parent qw(Genesis::Hook);
 
-use Genesis qw/bail info warning error run new_enough/;
-use JSON::PP;
+use Genesis qw/bail info warning error run new_enough load_yaml_file/;
 
 # init - Initialize the hook {{{
 sub init {
@@ -91,14 +90,8 @@ sub validate_cloud_config {
   }
   
   # Get the manifest to check resource requirements
-  my $manifest_json = $self->get_manifest_json();
-  return 0 unless $manifest_json;
-  
-  my $manifest = eval { decode_json($manifest_json) };
-  if ($@) {
-    error("  Failed to parse manifest: $@\n");
-    return 0;
-  }
+  my $manifest = $self->load_manifest();
+  return 0 unless $manifest;
   
   # Extract and validate required resources
   my @errors;
@@ -132,31 +125,35 @@ sub validate_cloud_config {
 
 # }}}
 
-# get_manifest_json - Get the deployment manifest as JSON {{{
-sub get_manifest_json {
+# load_manifest - Load the deployment manifest with Genesis's YAML loader {{{
+# The loader leaves ((var)) placeholders as plain strings and does not
+# interpolate them, which is enough here because callers read key names only.
+sub load_manifest {
   my ($self) = @_;
-  
+
   my $manifest_file = $ENV{GENESIS_MANIFEST_FILE};
-  my $vars_file = $ENV{GENESIS_BOSHVARS_FILE};
-  
+
   unless ($manifest_file && -f $manifest_file) {
-    error("  Manifest file not found\n");
+    error("  Manifest file not found: %s\n  Check that GENESIS_MANIFEST_FILE points at the generated manifest.\n",
+      $manifest_file || '(GENESIS_MANIFEST_FILE is not set)');
     return undef;
   }
-  
-  my ($output, $rc, $err) = run(
-    {stderr => 0},
-    'bosh int "$1" -l "$2" 2>/dev/null | spruce json',
-    $manifest_file,
-    $vars_file || '/dev/null'
-  );
-  
+
+  my ($manifest, $rc, $err) = load_yaml_file($manifest_file);
+
   if ($rc) {
-    error("  Failed to process manifest: %s\n", $err || 'Unknown error');
+    error("  Failed to load manifest %s: %s\n  The manifest is most likely not valid YAML; check the file for syntax errors.\n",
+      $manifest_file, $err || 'Unknown error');
     return undef;
   }
-  
-  return $output;
+
+  unless (ref $manifest eq 'HASH') {
+    error("  Manifest %s did not contain a YAML map at the top level.\n  Check that the file is a complete deployment manifest.\n",
+      $manifest_file);
+    return undef;
+  }
+
+  return $manifest;
 }
 
 # }}}

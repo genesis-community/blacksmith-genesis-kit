@@ -1,0 +1,16 @@
+---
+name: blacksmith
+instance_groups:
+  - name: blacksmith
+    azs: [z1]
+    instances: 1
+    networks:
+      - name: default
+        static_ips: [((blacksmith_ip))]
+    stemcell: default
+    jobs:
+      - name: blacksmith
+        release: blacksmith
+        properties:
+          broker:
+            password: ((broker_password))
