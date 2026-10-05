@@ -79,19 +79,33 @@ sub check_command_availability {
 	return 1;
 }
 
-# Common method to get Blacksmith BOSH environment info
+# Common method to get the internal BOSH director's connection details from
+# the environment's exodus data. The manifest exports these four keys, taken
+# from the internal director or from params.external_bosh when the
+# external-bosh or ocfp feature is on.
 sub get_blacksmith_bosh_info {
 	my ($self) = @_;
-	my $env = $self->env;
-	
-	# Get exodus data for BOSH connection
+	my $env_name = $self->env->name;
 	my $exodus = $self->exodus_data();
-	
+
+	my @missing = grep { !defined($exodus->{$_}) || $exodus->{$_} eq '' }
+		qw/bosh_address bosh_cacert bosh_username bosh_password/;
+	if (@missing) {
+		bail(
+			"The exodus data for #C{%s} is missing %s at #C{secret/exodus/%s/blacksmith}.\n".
+			"This usually means the environment has not been deployed yet, or was deployed ".
+			"by a kit version that did not export the director's connection details.\n".
+			"Check that #C{genesis deploy %s} has completed, then read that exodus path ".
+			"to confirm it holds bosh_address, bosh_cacert, bosh_username, and bosh_password.",
+			$env_name, join(', ', map { "#R{$_}" } @missing), $env_name, $env_name
+		);
+	}
+
 	return {
-		alias => "$ENV{GENESIS_ENVIRONMENT}-blacksmith",
-		environment => $exodus->{bosh_url} || $env->lookup('params.bosh_url'),
-		client => $exodus->{bosh_client} || 'blacksmith',
-		client_secret => $exodus->{bosh_client_secret}
+		environment => $exodus->{bosh_address},
+		ca_cert     => $exodus->{bosh_cacert},
+		client      => $exodus->{bosh_username},
+		client_secret => $exodus->{bosh_password},
 	};
 }
 

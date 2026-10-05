@@ -8,7 +8,7 @@ BEGIN { push @INC, $ENV{GENESIS_LIB} ? $ENV{GENESIS_LIB} : $ENV{HOME} . '/.genes
 
 use parent qw(Genesis::Hook::Addon);
 
-use Genesis qw/bail info warning error run/;
+use Genesis qw/bail info warning error/;
 
 # Include common methods from mixin
 BEGIN {
@@ -19,41 +19,34 @@ BEGIN {
 
 sub cmd_details {
 	return
-		"Sets up a local alias for the Blacksmith BOSH director and logs in.\n".
-		"This is useful for troubleshooting service provisioning.";
+		"Prints shell export lines (BOSH_ENVIRONMENT, BOSH_CA_CERT, BOSH_CLIENT,\n".
+		"and BOSH_CLIENT_SECRET) for the Blacksmith BOSH director, so that the\n".
+		"bosh CLI can reach it when the broker is not answering. The output\n".
+		"holds a secret. Use it as: eval \"\$(genesis do <env> bosh)\"";
+}
+
+# Quote a value for the shell, escaping any embedded single quote.
+sub _shell_quote {
+	my ($value) = @_;
+	$value =~ s/'/'\\''/g;
+	return "'$value'";
 }
 
 sub perform {
 	my ($self) = @_;
-	my $env = $self->env;
-
-	# Get BOSH connection details using mixin method
+	my $env_name = $self->env->name;
 	my $bosh_info = $self->get_blacksmith_bosh_info();
-	
-	# Set up connection details
-	my $alias = $bosh_info->{alias};
 
-	# Check if we already have the alias
-	my ($has_alias, $alias_rc) = run('bosh envs | grep -q "^${BOSH_ENVIRONMENT}\t${alias}\t"');
-	if ($alias_rc != 0) {
-		# Set up alias if needed
-		info("Setting up BOSH alias #C{%s}...\n", $alias);
-		my ($setup_out, $setup_rc) = run('bosh alias-env --tty $1 | grep -v \'^User\'', $alias);
-		bail("Failed to set up BOSH alias: %s", $setup_out) if $setup_rc != 0;
-	}
+	print STDOUT join("\n",
+		"export BOSH_ENVIRONMENT="   . _shell_quote($bosh_info->{environment}),
+		"export BOSH_CA_CERT="       . _shell_quote($bosh_info->{ca_cert}),
+		"export BOSH_CLIENT="        . _shell_quote($bosh_info->{client}),
+		"export BOSH_CLIENT_SECRET=" . _shell_quote($bosh_info->{client_secret}),
+	), "\n";
 
-	# Log in to BOSH
-	info("Logging in to BOSH director...\n");
-	my ($login_out, $login_rc) = run(
-		'bosh logout >/dev/null 2>&1 && printf "%s\\n%s\\n" "$1" "$2" | BOSH_CLIENT="" BOSH_CLIENT_SECRET="" bosh login',
-		$bosh_info->{client}, $bosh_info->{client_secret}
-	);
-	bail("Failed to log in to BOSH: %s", $login_out) if $login_rc != 0;
+	print STDERR "Note: the output above holds a secret. The usual use is: ".
+		"eval \"\$(genesis do $env_name bosh)\"\n";
 
-	info("\n#G{✓} Successfully connected to Blacksmith BOSH director.\n");
-	info("Alias: #C{%s}\n", $alias);
-	info("\nYou can now use standard BOSH commands with this director.\n");
-	
 	return $self->done();
 }
 
