@@ -14,6 +14,10 @@ use File::Basename qw/dirname/;
 # Include common utilities
 do(dirname(__FILE__) . '/_util.pm');
 
+# The blueprint decides how CredHub cleanup is wired, and the check below
+# follows that same decision through credhub_cleanup_state.
+require(dirname(__FILE__) . '/blueprint.pm');
+
 # init - Initialize the hook and check minimum Genesis version {{{
 sub init {
   my ($class, %ops) = @_;
@@ -87,32 +91,46 @@ sub sync_blacksmith_services_ca {
 
 # check_credhub_cleanup_client - Confirm the blacksmith_credhub UAA client can authenticate {{{
 #
+# Runs when the blueprint wired CredHub cleanup, or would have wired it had
+# the director's exodus record been complete. That is an external director
+# without the skip-credhub-cleanup feature, and the decision comes from the
+# blueprint's credhub_cleanup_state so the two never disagree. When the
+# record lacks a key the blueprint warned about at deploy time, this repeats
+# that warning and requests no token.
+#
 # Requests a client-credentials token from the director's UAA, which is the
 # director address from the bosh exodus record on port 8443, trusted through
-# the exodus ca_cert. The client ID and secret reach curl through "-K -" on
-# standard input, so the secret never appears in a process's arguments, and
-# the response body goes to /dev/null so no token is printed. This check only
-# warns, because a deploy that already succeeded shouldn't be reported as
-# failed over an optional cleanup feature.
+# the exodus ca_cert. The client ID and secret come from the same record, and
+# reach curl through "-K -" on standard input, so the secret never appears in
+# a process's arguments, and the response body goes to /dev/null so no token
+# is printed. This check only warns, because a deploy that already succeeded
+# shouldn't be reported as failed over an optional cleanup feature.
 sub check_credhub_cleanup_client {
   my ($self) = @_;
-  return 1 unless $self->want_feature('credhub-cleanup');
+
+  my $state = Genesis::Hook::Blueprint::Blacksmith::credhub_cleanup_state($self);
+  return 1 unless $state->{warning} || ($state->{file} // '') eq 'manifests/addons/credhub-cleanup.yml';
 
   my $env = $self->env;
-  my $cmd_with_env = $env->get_call_path_with_env();
-  my $client_id = $env->lookup('params.credhub_cleanup.client_id', 'blacksmith_credhub');
-  my $repair = "the repair command in the CredHub cleanup section of the kit manual";
 
   info("\n#Bu{CredHub Cleanup Client}\n\n");
 
+  if ($state->{warning}) {
+    warning("%s\n", $state->{warning});
+    return 0;
+  }
+
   my $bosh_slug = $env->name.'/bosh';
+  my $client_id = $env->lookup('params.credhub_cleanup.client_id');
+  $client_id = $env->exodus_lookup('blacksmith_credhub_client_id', undef, $bosh_slug)
+    unless defined($client_id) && $client_id =~ /\S/;
+  my $secret = $env->exodus_lookup('blacksmith_credhub_client_secret', undef, $bosh_slug);
   my $url = $env->exodus_lookup('url', undef, $bosh_slug);
   my $ca  = $env->exodus_lookup('ca_cert', undef, $bosh_slug);
-  my $secret = eval { $env->vault->get($env->secrets_base.'users/credhub-cleanup', 'password') };
 
   my ($host) = defined($url) ? $url =~ m{^https://([^/:]+)} : ();
-  unless (defined($host) && defined($ca) && $ca =~ /\S/ && defined($secret) && $secret =~ /\S/) {
-    warning("#Y{Warning:} Could not check the %s UAA client, because the bosh exodus record %s%s lacks a usable url or ca_cert, or the secret users/credhub-cleanup is not in vault.\n",
+  unless (defined($host) && defined($ca) && $ca =~ /\S/) {
+    warning("#Y{Warning:} Could not check the %s UAA client, because the bosh exodus record %s%s lacks a usable url or ca_cert.\n",
       $client_id, $env->exodus_mount, $bosh_slug);
     return 0;
   }
@@ -142,8 +160,8 @@ sub check_credhub_cleanup_client {
   }
 
   warning("#Y{Warning:} CredHub cleanup client %s could not get a token from %s (status %s).\n", $client_id, $uaa, ($status || "none, curl exit $rc"));
-  warning("  Likely cause: the client is missing from the director's UAA, or its secret does not match users/credhub-cleanup in vault.\n");
-  warning("  Repair: %s\n", $repair);
+  warning("  Likely cause: the client is missing from the director's UAA, or the director's exodus record holds a secret that does not match the client.\n");
+  warning("  Repair: redeploy the director with the current BOSH kit release, which creates the client and publishes its secret.\n");
   warning("  The deploy itself succeeded, and service instances are not cleaned up from CredHub until this is fixed.\n");
   return 0;
 }
