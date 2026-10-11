@@ -11,6 +11,7 @@ use parent qw(Genesis::Hook::Check);
 
 # Import required functions
 use Genesis qw/bail info warning error run in_array new_enough/;
+use Genesis::Term ();
 use File::Basename qw/dirname/;
 
 # Include common utilities
@@ -97,8 +98,13 @@ sub check_cloud_config {
 	# Check for required networks
 	$self->has_entry('cloud-config', 'network', 'default');
 
-	# Check for compilation configuration
-	$self->has_entry('cloud-config', 'compilation');
+	# Check for compilation configuration.  The compilation block is a single
+	# mapping with no name, so it cannot go through has_entry, which looks
+	# names up in a list.
+	my $compilation = $self->env->config_contents(type => 'cloud')->{compilation};
+	my $has_compilation = (ref($compilation) eq 'HASH' && %$compilation) ? 1 : 0;
+	$self->{__entry_checks}{'cloud-config'}{compilation}{compilation} = $has_compilation;
+	info("[[    %s>>#Y{compilation} configured", Genesis::Term::bullet($has_compilation ? 'good' : 'bad', '', box => 1));
 
 	return $self->check_result('cloud-config');
 }
