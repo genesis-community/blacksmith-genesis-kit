@@ -1,0 +1,26 @@
+---
+kit:
+  name:    dev
+  version: latest
+  features:
+  - aws
+  - redis
+  - broker-tls
+  - shield-agent
+  - resolute
+
+genesis:
+  env: resoluteagent
+  entomb: false
+
+params:
+  env: resoluteagent
+  ip: 10.0.0.16
+  fqdn: blacksmith.testing.example
+  cloud_config: {}
+  aws_region: us-east-1
+  aws_default_sgs: [default]
+  blacksmith_services_network: services
+  stemcell_version: "0.184"
+  shield:
+    deployment_env: resoluteagent

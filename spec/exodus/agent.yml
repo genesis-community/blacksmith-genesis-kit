@@ -1,0 +1,4 @@
+secret/exodus/resoluteagent/shield:
+  api_url: https://10.0.0.30
+  ca_cert: test-shield-ca
+  pubkey: test-shield-pubkey

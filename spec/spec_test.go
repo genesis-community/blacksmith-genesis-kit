@@ -36,6 +36,17 @@ var _ = Describe("Blacksmith Kit", func() {
 			CPI:         "aws",
 		})
 		Test(Environment{
+			Name:        "resoluteagent",
+			CloudConfig: "aws",
+			Exodus:      "agent",
+			CPI:         "aws",
+		})
+		Test(Environment{
+			Name:        "resolutevalkey",
+			CloudConfig: "aws",
+			CPI:         "aws",
+		})
+		Test(Environment{
 			Name:        "resolute-wrong-stemcell-os",
 			CloudConfig: "aws",
 			CPI:         "aws",

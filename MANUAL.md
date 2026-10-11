@@ -770,6 +770,10 @@ The feature is experimental, so we recommend trying it on a canary environment f
 
 The feature also pins the bpm release to 1.4.41. Older bpm releases bundle a tini package that fails to compile on resolute, so the default bpm pin cannot be used there. Environments that leave the feature off keep the current bpm pin.
 
+When the `shield-agent` feature is also on, the shield release it pins (8.8.4) calls `chpst`, so the feature pins shield 9.4.1 instead, which replaces `chpst` with `setpriv`. The environment file needs no extra parameters, and without `shield-agent` nothing changes.
+
+When the `valkey` feature is also on, valkey instances need valkey-forge 1.3.4 or later, because earlier releases call `chpst` or default to a bpm release that does not compile on resolute, so the feature pins valkey-forge 1.3.4 instead, and that release defaults the service instances to bpm 1.4.41. The environment file needs no extra parameters, and without `valkey` nothing changes.
+
 Before the first deploy we need to do two things on the director.
 
 - Upload the resolute stemcell to the director that deploys the broker, since both the compilation VMs and the broker VM need it.

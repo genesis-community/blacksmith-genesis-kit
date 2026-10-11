@@ -1,0 +1,23 @@
+---
+kit:
+  name:    dev
+  version: latest
+  features:
+  - aws
+  - valkey
+  - broker-tls
+  - resolute
+
+genesis:
+  env: resolutevalkey
+  entomb: false
+
+params:
+  env: resolutevalkey
+  ip: 10.0.0.16
+  fqdn: blacksmith.testing.example
+  cloud_config: {}
+  aws_region: us-east-1
+  aws_default_sgs: [default]
+  blacksmith_services_network: services
+  stemcell_version: "0.184"

@@ -1,0 +1,13 @@
+---
+# Shield release for ubuntu-resolute.
+#
+# The shield release pinned in releases/shield-agent.yml calls chpst, which
+# resolute does not ship.  Shield 9.4.1 replaces chpst with setpriv, so the
+# blueprint hook loads this file when the resolute and shield-agent features
+# are both on, and spruce merges the entry over the pin by name.
+
+releases:
+- name:    shield
+  version: 9.4.1
+  url:     https://github.com/shieldproject/shield-boshrelease/releases/download/v9.4.1/shield-boshrelease-9.4.1.tgz
+  sha1:    d49459b1773f598049806ff8c3dbd99eb6bec754
