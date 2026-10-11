@@ -1,0 +1,204 @@
+addons:
+- include:
+    jobs:
+    - name: route_registrar
+      release: routing
+  jobs:
+  - name: bosh-dns-aliases
+    properties:
+      aliases:
+      - domain: nats.service.cf.internal
+        targets:
+        - deployment: resolute-ocf-cf
+          domain: bosh
+          instance_group: nats
+          network: resolute-ocf-core
+          query: '*'
+      - domain: _.nats.service.cf.internal
+        targets:
+        - deployment: resolute-ocf-cf
+          domain: bosh
+          instance_group: nats
+          network: resolute-ocf-core
+          query: _
+    release: bosh-dns-aliases
+  name: bosh-dns-aliases
+exodus:
+  blacksmith_ca: <!{meta.vault}/broker/ca:certificate!>
+  bosh: resolute-ocf
+  bosh_address: https://10.0.1.6:25555
+  bosh_cacert: test-bosh-ca
+  bosh_password: test-bosh-password
+  bosh_username: blacksmith
+  broker_password: <!{meta.vault}/broker:password!>
+  broker_url: https://blacksmith.sys.testing.example
+  broker_username: blacksmith
+  features: ocfp,redis,resolute
+  iaas: aws
+  is_director: false
+  scale: null
+  services: null
+  use_create_env: false
+instance_groups:
+- azs:
+  - resolute-ocf-z2
+  instances: 1
+  jobs:
+  - name: blacksmith
+    properties:
+      blacksmith_services_ca:
+        tls:
+          ca_cert: <!{meta.vault}/broker/ca:certificate!>
+      bosh:
+        address: https://10.0.1.6:25555
+        ca_cert: test-bosh-ca
+        cloud-config: {}
+        network: resolute-ocf-ocf
+        password: test-bosh-password
+        releases:
+        - name: redis-forge
+          sha1: sha256:4095483fdb904ee55b1b9c1a782218cb7f727bf25a61c7d0bca37568a353eb6b
+          url: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v1.4.4/redis-forge-1.4.4.tgz
+          version: 1.4.4
+        stemcells: []
+        username: blacksmith
+      broker:
+        cf:
+          apis:
+            ocf:
+              ca_cert: ""
+              endpoint: api.sys.testing.example
+              name: resolute-ocf-cf
+              password: test-cf-password
+              skip_ssl_validation: false
+              username: admin
+        password: <!{meta.vault}/broker:password!>
+        port: 80
+        tls:
+          certificate: <!{meta.vault}/broker/server:certificate!>
+          enabled: true
+          key: <!{meta.vault}/broker/server:key!>
+          port: 443
+        username: blacksmith
+      credhub:
+        ca_cert: test-credhub-ca
+        cleanup:
+          enabled: true
+          sweep: dry-run
+        client_id: blacksmith_credhub
+        client_secret: test-credhub-secret
+        director_name: resolute-ocf-bosh
+        url: https://10.0.1.6:8844
+      debug: false
+      env: resolute-ocf
+      shareable: false
+    release: blacksmith
+  - name: redis-blacksmith-plans
+    properties:
+      bosh_env: resolute-ocf
+      environment: resolute-ocf
+      plans:
+        standalone:
+          description: A dedicated Redis server, with no redundancy or replication
+          limit: 7
+          name: standalone
+          type: standalone
+          vm_type: default
+        standalone-6:
+          description: A dedicated Redis 6 server, with no redundancy or replication
+          limit: 7
+          name: standalone-6
+          type: standalone-6
+          vm_type: default
+        standalone-7:
+          description: A dedicated Redis 7 server, with no redundancy or replication
+          limit: 7
+          name: standalone-7
+          type: standalone-7
+          vm_type: default
+      redis:
+        tls:
+          ca: <!{meta.vault}/tls/ca:combined!>
+          ca_cert: <!{meta.vault}/tls/ca:certificate!>
+          ca_key: <!{meta.vault}/tls/ca:key!>
+          enabled: true
+      service:
+        description: A dedicated Redis instance, deployed on-demand
+        id: redis
+        limit: 0
+        name: redis
+        stemcell: latest
+        tags:
+        - blacksmith
+        - dedicated
+        - redis
+        type: standalone
+    release: redis-forge
+  - consumes:
+      nats-tls:
+        deployment: resolute-ocf-cf
+        from: nats-tls
+    name: route_registrar
+    properties:
+      nats:
+        tls:
+          client_cert: test-nats-cert
+          client_key: test-nats-key
+          enabled: true
+      route_registrar:
+        host: sys.testing.example
+        routes:
+        - name: blacksmith
+          port: 80
+          registration_interval: 10s
+          server_cert_domain_san: blacksmith.sys.testing.example
+          tls_port: 443
+          uris:
+          - blacksmith.sys.testing.example
+    release: routing
+  - name: bpm
+    release: bpm
+  name: blacksmith
+  networks:
+  - name: resolute-ocf.blacksmith.net-blacksmith
+    static_ips: 10.0.2.16
+  persistent_disk_type: resolute-ocf.blacksmith.disk-blacksmith
+  stemcell: default
+  vm_type: resolute-ocf.blacksmith.vm-blacksmith
+name: resolute-ocf-blacksmith
+releases:
+- name: blacksmith
+  sha1: sha256:b0eac550853f3bbc9f4de7beee081c36996741177f223d9fa19a47b922bafaae
+  url: https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v2.4.0/blacksmith-2.4.0.tgz
+  version: 2.4.0
+- name: bosh
+  sha1: sha256:9287abbd9d5bad40d26b9b6a4a611c18bc17768ee3090d54192f70e69b0e42db
+  url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=282.0.7
+  version: 282.0.7
+- name: bpm
+  sha1: sha256:7b445508d63d2171d892ba33f836087e1e519b9782f44c5fa5290323616ca8e6
+  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.4.41
+  version: 1.4.41
+- name: routing
+  sha1: sha256:1409f3a0e56d89683f50c2d6c0fcb38d1a297c3710b3c067fb75182e7a7df356
+  url: https://bosh.io/d/github.com/cloudfoundry/routing-release?v=0.343.0
+  version: 0.343.0
+- name: bosh-dns-aliases
+  sha1: sha256:27ef8965dc4f1633479613743e782566e3b7fba5d28dad3d50488c2919eac0da
+  url: https://bosh.io/d/github.com/cloudfoundry/bosh-dns-aliases-release?v=0.0.4
+  version: 0.0.4
+- name: redis-forge
+  sha1: sha256:4095483fdb904ee55b1b9c1a782218cb7f727bf25a61c7d0bca37568a353eb6b
+  url: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v1.4.4/redis-forge-1.4.4.tgz
+  version: 1.4.4
+stemcells:
+- alias: default
+  os: ubuntu-resolute
+  version: "0.184"
+update:
+  canaries: 1
+  canary_watch_time: 30000-600000
+  max_errors: 1
+  max_in_flight: 1
+  serial: false
+  update_watch_time: 5000-600000

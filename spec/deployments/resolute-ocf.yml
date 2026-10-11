@@ -1,0 +1,17 @@
+---
+kit:
+  name:    dev
+  version: latest
+  iaas:    aws
+  features:
+  - ocfp
+  - redis
+  - resolute
+
+genesis:
+  env:      resolute-ocf
+  bosh_env: resolute-ocf
+  entomb:   false
+
+params:
+  stemcell_version: "0.184"

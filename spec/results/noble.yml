@@ -1,0 +1,365 @@
+exodus:
+  blacksmith_ca: <!{meta.vault}/broker/ca:certificate!>
+  bosh: noble
+  bosh_address: https://10.0.0.16:25555
+  bosh_cacert: <!{meta.vault}/tls/ca:certificate!>
+  bosh_password: <!{meta.vault}/users/blacksmith:password!>
+  bosh_username: blacksmith
+  broker_password: <!{meta.vault}/broker:password!>
+  broker_url: http://blacksmith.testing.example:3000
+  broker_username: blacksmith
+  features: aws,redis,broker-tls
+  iaas: aws
+  is_director: false
+  scale: null
+  services: null
+  use_create_env: false
+instance_groups:
+- azs:
+  - us-east-1a
+  instances: 1
+  jobs:
+  - name: blacksmith
+    properties:
+      blacksmith_services_ca:
+        tls:
+          ca_cert: <!{meta.vault}/broker/ca:certificate!>
+      bosh:
+        address: https://10.0.0.16:25555
+        cloud-config: {}
+        network: services
+        password: <!{meta.vault}/users/blacksmith:password!>
+        releases:
+        - name: redis-forge
+          sha1: sha256:4095483fdb904ee55b1b9c1a782218cb7f727bf25a61c7d0bca37568a353eb6b
+          url: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v1.4.4/redis-forge-1.4.4.tgz
+          version: 1.4.4
+        stemcells:
+        - name: bosh-aws-xen-hvm-ubuntu-jammy-go_agent
+          sha1: 2e113e50c47df57bfe9fe31a0d2bee3fab20af37
+          url: https://storage.googleapis.com/bosh-aws-light-stemcells/1.181/light-bosh-stemcell-1.181-aws-xen-hvm-ubuntu-jammy-go_agent.tgz
+          version: "1.181"
+        username: blacksmith
+      broker:
+        password: <!{meta.vault}/broker:password!>
+        port: 80
+        tls:
+          certificate: <!{meta.vault}/broker/server:certificate!>
+          enabled: true
+          key: <!{meta.vault}/broker/server:key!>
+          port: 443
+        username: blacksmith
+      credhub:
+        cleanup:
+          enabled: false
+      debug: false
+      env: noble
+      shareable: false
+    release: blacksmith
+  - name: redis-blacksmith-plans
+    properties:
+      bosh_env: noble
+      environment: noble
+      plans:
+        standalone:
+          description: A dedicated Redis server, with no redundancy or replication
+          limit: 7
+          name: standalone
+          type: standalone
+          vm_type: default
+        standalone-6:
+          description: A dedicated Redis 6 server, with no redundancy or replication
+          limit: 7
+          name: standalone-6
+          type: standalone-6
+          vm_type: default
+        standalone-7:
+          description: A dedicated Redis 7 server, with no redundancy or replication
+          limit: 7
+          name: standalone-7
+          type: standalone-7
+          vm_type: default
+      service:
+        description: A dedicated Redis instance, deployed on-demand
+        id: redis
+        limit: 0
+        name: redis
+        stemcell: latest
+        tags:
+        - blacksmith
+        - dedicated
+        - redis
+        type: standalone
+    release: redis-forge
+  - name: bpm
+    release: bpm
+  - name: nats
+    release: bosh
+  - name: postgres-9.4
+    release: bosh
+  - name: blobstore
+    release: bosh
+  - name: director
+    release: bosh
+  - name: health_monitor
+    release: bosh
+  - name: aws_cpi
+    release: bosh-aws-cpi
+  - name: registry
+    release: bosh
+  name: blacksmith
+  networks:
+  - name: blacksmith
+    static_ips:
+    - 10.0.0.16
+  persistent_disk: 20480
+  properties:
+    agent:
+      env:
+        bosh:
+          blobstores:
+          - options:
+              endpoint: http://10.0.0.16:25250
+              password: <!{meta.vault}/blobstore/agent:password!>
+              user: agent
+            provider: dav
+      mbus: nats://nats:<!{meta.vault}/nats:password!>@10.0.0.16:4222
+    aws:
+      access_key_id: test-access-key
+      default_key_name: vcap@noble
+      default_security_groups:
+      - default
+      region: us-east-1
+      secret_access_key: test-secret-key
+    blobstore:
+      address: 10.0.0.16
+      agent:
+        password: <!{meta.vault}/blobstore/agent:password!>
+        user: agent
+      director:
+        password: <!{meta.vault}/blobstore/director:password!>
+        user: director
+      port: 25250
+      provider: dav
+      tls:
+        cert:
+          ca: <!{meta.vault}/tls/ca:certificate!>
+          certificate: <!{meta.vault}/tls/blobstore:certificate!>
+          private_key: <!{meta.vault}/tls/blobstore:key!>
+    director:
+      address: 10.0.0.16
+      cpi_job: aws_cpi
+      db:
+        adapter: postgres
+        database: bosh
+        host: 127.0.0.1
+        listen_address: 127.0.0.1
+        password: <!{meta.vault}/db:password!>
+        user: postgres
+      enable_dedicated_status_worker: true
+      enable_nats_delivered_templates: true
+      enable_post_deploy: true
+      events:
+        record_events: true
+      flush_arp: true
+      generate_vm_passwords: true
+      local_dns:
+        enabled: true
+      name: noble-blacksmith
+      ssl:
+        cert: |
+          -----BEGIN CERTIFICATE-----
+          MIIC8zCCAdugAwIBAgIBATANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAkxMC4w
+          LjAuMTYwHhcNMjYxMDExMTgzNjM2WhcNMzYxMDA4MTgzNjM2WjAUMRIwEAYDVQQD
+          DAkxMC4wLjAuMTYwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCnEIij
+          ROPxsC3u/5xL3WY2M0f7zwMNQAJVZ5NttiM4MNEfhZqRBQ5ovVmGgAkdIzTDWiIF
+          kQ8Fx7hCEC81qdiLVXrsK2Vd5NjrcEmgiCClTSg7Ei3JX340tg2FNKdaoUwh8L5I
+          H0oLLBNcQR4laOVdYGSmLy7HFCFaByFPqWbcw540//n9dsLN7cavaq4W+9Atx/Xz
+          nAutrGQpDmqItfDY/9Uq+4o2ldw6U/HLqGZeysUhM3PZJJG4tVUNpn5SK0paGEjj
+          waj5hnTOrqBzuctoXDY/adLU5jH7PAeWDv9JQzEqeM0l0kWX5nUbHwGldWD+3hVJ
+          AzC0WD2fs2QhdwFrAgMBAAGjUDBOMA8GA1UdEQQIMAaHBAoAABAwDwYDVR0TAQH/
+          BAUwAwEB/zALBgNVHQ8EBAMCAaYwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUF
+          BwMCMA0GCSqGSIb3DQEBCwUAA4IBAQAIA8QzP2Yr2bf7bK0O12PwiCcLzJ1zlfrF
+          kMKwcW02OFpoFfTjddT6o8aWZFtko/7kgSakATE9s8r3Aw37Y7gMWk158NxDSKPQ
+          eTT8qKQANgEl2IYc09/kK868Cfz8wl/O49qHb1UMOdMc9qXMDNw9hsmAUJyTk6aC
+          /idM6cz0RT7XRrHcs1OXOdmxyBpbII1gRPNWaWUybpSFNVLkMaqQDHq2rnRZNM8F
+          lglnjtIhAk1ih9ppn7tK5sV/jCuMddE2XLyz3HCduN/TIxOR3Wj0WvlHOemdoRAl
+          9W+M88WqvoVGi9mk+fUBW+1k86HA5S6Yi7sO22YxcJrdDW1cDRkz
+          -----END CERTIFICATE-----
+        key: |
+          -----BEGIN PRIVATE KEY-----
+          MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCnEIijROPxsC3u
+          /5xL3WY2M0f7zwMNQAJVZ5NttiM4MNEfhZqRBQ5ovVmGgAkdIzTDWiIFkQ8Fx7hC
+          EC81qdiLVXrsK2Vd5NjrcEmgiCClTSg7Ei3JX340tg2FNKdaoUwh8L5IH0oLLBNc
+          QR4laOVdYGSmLy7HFCFaByFPqWbcw540//n9dsLN7cavaq4W+9Atx/XznAutrGQp
+          DmqItfDY/9Uq+4o2ldw6U/HLqGZeysUhM3PZJJG4tVUNpn5SK0paGEjjwaj5hnTO
+          rqBzuctoXDY/adLU5jH7PAeWDv9JQzEqeM0l0kWX5nUbHwGldWD+3hVJAzC0WD2f
+          s2QhdwFrAgMBAAECggEACiWClvVH1Cr7bzOOaOZ7ybjtm0k5tI6kVaQ3xlxfNo9z
+          HrNSQufdYIEiNH1cOwJ4tuX81lJhaNwgwGppOPIlg7jfrAOqtrwqbIo3qTdQpu7R
+          DbK58ywIkeeorzlrx0uv6wkgar2eap/1AQ+3ZqrrRfOPyVlo7DsNwiutW0A8+MAT
+          oQdg7GCl5q8uhQgWqsNs6bYz/MhldwrMRfsWd4f64Uimj0lB0NAturUvsw3mV1jv
+          70vWvyRAILLCGy71GJ2U3Sq97yUcLSug4jCZWxTdT8jJ5djIX5a/A8GmDMfbYjV2
+          lXAopOi7VDuqoGYz2g4yEDK+SIT8RtdXRy5NmNeBGQKBgQDSJhNdHlOSWQVnF2i9
+          bXzdWi4WLqiTHIKPV0WEvufI8JW9K1e6ejzUiCmox7sCg+ZCcef9GoPnS/2zSsZy
+          WwUN7Gy/ucHdHjdABGk5TJmthPmypmCkRVNVvj+4ld9w9bw9h70xsIJnOs+0TC8S
+          ik8s/8Prx/5I4hl7uc4j73OX3QKBgQDLg/qze9be8lcn3FuovqDoKaYSFkPUMIAq
+          kTWgpsRf9AWDY6nURra5sAxUnqIzTUWWoRLy1VTXTJwCihnvTs/JICbH1ja5H2PT
+          qbIw3noR4jh+PXhZWaBI9vIHy+cVG38C4o0UdEI9XGczSXh7jlukatgkiOQuhBUo
+          mVJjY3HN5wKBgQCJZ5HzqdeU8hYBQSIf8Y3aIZPOtzVL8zE+zh5LXJOrI/uUU9mp
+          uTE6+cjbbbTOQTX2Lgo0yPiD7ID2kSbOMMtOPk8g0TF8Bby0Y+31JCu7dB3b/MNl
+          xVpmzt1VMNGHR3WMectvyOyK2L5kMgf5RGvejWEqMnsGZqeo6WVqw68+FQKBgQCY
+          WUA/RCFh3EBqUoc7FxkVMrhjKc+09Gm9c96VWMIAoofOB7mGczkuYB+a6PW7Ocky
+          LXol1pUgZvUS4ZbwkiryAOOHDVEB3AG63XnLI4B2CscHmbSSDonylQox0+402tSF
+          sFq0SSOdE6MdvY430CXCO0l6cA+A0teUANKwHC2BWQKBgERMM72n39DaR4c9DNxk
+          TpgbUqIoG4XRhzjKPSQLc9M3qSDNyj/KP6Jmsqm+cYjAZHl9L6/65m8iam5BVeiZ
+          jC56aHt/6gBiELyN0QhTmjmcVoFR8aM1CaInOf6lofLlQ5Uno6RZFcZr0QTEm7hk
+          TyYvKwrtqwU7z2yR3gMxs6Xh
+          -----END PRIVATE KEY-----
+      user_management:
+        local:
+          users:
+          - name: admin
+            password: <!{meta.vault}/users/admin:password!>
+          - name: hm
+            password: <!{meta.vault}/users/hm:password!>
+          - name: blacksmith
+            password: <!{meta.vault}/users/blacksmith:password!>
+        provider: local
+      workers: 4
+    env:
+      http_proxy: ""
+      https_proxy: ""
+      no_proxy: ""
+    hm:
+      director_account:
+        ca_cert: <!{meta.vault}/tls/ca:certificate!>
+        password: <!{meta.vault}/users/hm:password!>
+        user: hm
+      resurrector_enabled: true
+    nats:
+      address: 10.0.0.16
+      password: <!{meta.vault}/nats:password!>
+      tls:
+        ca: <!{meta.vault}/tls/nats/ca:certificate!>
+        client_ca:
+          certificate: <!{meta.vault}/tls/nats/ca:certificate!>
+          private_key: <!{meta.vault}/tls/nats/ca:key!>
+        director:
+          certificate: <!{meta.vault}/tls/nats/director:certificate!>
+          private_key: <!{meta.vault}/tls/nats/director:key!>
+        health_monitor:
+          certificate: <!{meta.vault}/tls/nats/hm:certificate!>
+          private_key: <!{meta.vault}/tls/nats/hm:key!>
+        server:
+          certificate: |
+            -----BEGIN CERTIFICATE-----
+            MIIC8zCCAdugAwIBAgIBATANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAkxMC4w
+            LjAuMTYwHhcNMjYxMDExMTgzNjM2WhcNMzYxMDA4MTgzNjM2WjAUMRIwEAYDVQQD
+            DAkxMC4wLjAuMTYwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCnEIij
+            ROPxsC3u/5xL3WY2M0f7zwMNQAJVZ5NttiM4MNEfhZqRBQ5ovVmGgAkdIzTDWiIF
+            kQ8Fx7hCEC81qdiLVXrsK2Vd5NjrcEmgiCClTSg7Ei3JX340tg2FNKdaoUwh8L5I
+            H0oLLBNcQR4laOVdYGSmLy7HFCFaByFPqWbcw540//n9dsLN7cavaq4W+9Atx/Xz
+            nAutrGQpDmqItfDY/9Uq+4o2ldw6U/HLqGZeysUhM3PZJJG4tVUNpn5SK0paGEjj
+            waj5hnTOrqBzuctoXDY/adLU5jH7PAeWDv9JQzEqeM0l0kWX5nUbHwGldWD+3hVJ
+            AzC0WD2fs2QhdwFrAgMBAAGjUDBOMA8GA1UdEQQIMAaHBAoAABAwDwYDVR0TAQH/
+            BAUwAwEB/zALBgNVHQ8EBAMCAaYwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUF
+            BwMCMA0GCSqGSIb3DQEBCwUAA4IBAQAIA8QzP2Yr2bf7bK0O12PwiCcLzJ1zlfrF
+            kMKwcW02OFpoFfTjddT6o8aWZFtko/7kgSakATE9s8r3Aw37Y7gMWk158NxDSKPQ
+            eTT8qKQANgEl2IYc09/kK868Cfz8wl/O49qHb1UMOdMc9qXMDNw9hsmAUJyTk6aC
+            /idM6cz0RT7XRrHcs1OXOdmxyBpbII1gRPNWaWUybpSFNVLkMaqQDHq2rnRZNM8F
+            lglnjtIhAk1ih9ppn7tK5sV/jCuMddE2XLyz3HCduN/TIxOR3Wj0WvlHOemdoRAl
+            9W+M88WqvoVGi9mk+fUBW+1k86HA5S6Yi7sO22YxcJrdDW1cDRkz
+            -----END CERTIFICATE-----
+          private_key: |
+            -----BEGIN PRIVATE KEY-----
+            MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCnEIijROPxsC3u
+            /5xL3WY2M0f7zwMNQAJVZ5NttiM4MNEfhZqRBQ5ovVmGgAkdIzTDWiIFkQ8Fx7hC
+            EC81qdiLVXrsK2Vd5NjrcEmgiCClTSg7Ei3JX340tg2FNKdaoUwh8L5IH0oLLBNc
+            QR4laOVdYGSmLy7HFCFaByFPqWbcw540//n9dsLN7cavaq4W+9Atx/XznAutrGQp
+            DmqItfDY/9Uq+4o2ldw6U/HLqGZeysUhM3PZJJG4tVUNpn5SK0paGEjjwaj5hnTO
+            rqBzuctoXDY/adLU5jH7PAeWDv9JQzEqeM0l0kWX5nUbHwGldWD+3hVJAzC0WD2f
+            s2QhdwFrAgMBAAECggEACiWClvVH1Cr7bzOOaOZ7ybjtm0k5tI6kVaQ3xlxfNo9z
+            HrNSQufdYIEiNH1cOwJ4tuX81lJhaNwgwGppOPIlg7jfrAOqtrwqbIo3qTdQpu7R
+            DbK58ywIkeeorzlrx0uv6wkgar2eap/1AQ+3ZqrrRfOPyVlo7DsNwiutW0A8+MAT
+            oQdg7GCl5q8uhQgWqsNs6bYz/MhldwrMRfsWd4f64Uimj0lB0NAturUvsw3mV1jv
+            70vWvyRAILLCGy71GJ2U3Sq97yUcLSug4jCZWxTdT8jJ5djIX5a/A8GmDMfbYjV2
+            lXAopOi7VDuqoGYz2g4yEDK+SIT8RtdXRy5NmNeBGQKBgQDSJhNdHlOSWQVnF2i9
+            bXzdWi4WLqiTHIKPV0WEvufI8JW9K1e6ejzUiCmox7sCg+ZCcef9GoPnS/2zSsZy
+            WwUN7Gy/ucHdHjdABGk5TJmthPmypmCkRVNVvj+4ld9w9bw9h70xsIJnOs+0TC8S
+            ik8s/8Prx/5I4hl7uc4j73OX3QKBgQDLg/qze9be8lcn3FuovqDoKaYSFkPUMIAq
+            kTWgpsRf9AWDY6nURra5sAxUnqIzTUWWoRLy1VTXTJwCihnvTs/JICbH1ja5H2PT
+            qbIw3noR4jh+PXhZWaBI9vIHy+cVG38C4o0UdEI9XGczSXh7jlukatgkiOQuhBUo
+            mVJjY3HN5wKBgQCJZ5HzqdeU8hYBQSIf8Y3aIZPOtzVL8zE+zh5LXJOrI/uUU9mp
+            uTE6+cjbbbTOQTX2Lgo0yPiD7ID2kSbOMMtOPk8g0TF8Bby0Y+31JCu7dB3b/MNl
+            xVpmzt1VMNGHR3WMectvyOyK2L5kMgf5RGvejWEqMnsGZqeo6WVqw68+FQKBgQCY
+            WUA/RCFh3EBqUoc7FxkVMrhjKc+09Gm9c96VWMIAoofOB7mGczkuYB+a6PW7Ocky
+            LXol1pUgZvUS4ZbwkiryAOOHDVEB3AG63XnLI4B2CscHmbSSDonylQox0+402tSF
+            sFq0SSOdE6MdvY430CXCO0l6cA+A0teUANKwHC2BWQKBgERMM72n39DaR4c9DNxk
+            TpgbUqIoG4XRhzjKPSQLc9M3qSDNyj/KP6Jmsqm+cYjAZHl9L6/65m8iam5BVeiZ
+            jC56aHt/6gBiELyN0QhTmjmcVoFR8aM1CaInOf6lofLlQ5Uno6RZFcZr0QTEm7hk
+            TyYvKwrtqwU7z2yR3gMxs6Xh
+            -----END PRIVATE KEY-----
+      user: nats
+    postgres:
+      adapter: postgres
+      database: bosh
+      host: 127.0.0.1
+      listen_address: 127.0.0.1
+      password: <!{meta.vault}/db:password!>
+      user: postgres
+    registry:
+      address: 10.0.0.16
+      db:
+        adapter: postgres
+        database: bosh
+        host: 127.0.0.1
+        listen_address: 127.0.0.1
+        password: <!{meta.vault}/db:password!>
+        user: postgres
+      host: 10.0.0.16
+      password: <!{meta.vault}/registry:password!>
+      port: 25777
+      username: registry-user
+  stemcell: default
+  vm_type: blacksmith
+name: noble-blacksmith
+releases:
+- name: blacksmith
+  sha1: sha256:b0eac550853f3bbc9f4de7beee081c36996741177f223d9fa19a47b922bafaae
+  url: https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v2.4.0/blacksmith-2.4.0.tgz
+  version: 2.4.0
+- name: bosh
+  sha1: sha256:9287abbd9d5bad40d26b9b6a4a611c18bc17768ee3090d54192f70e69b0e42db
+  url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=282.0.7
+  version: 282.0.7
+- name: bpm
+  sha1: sha256:40af85114d2a8a67812bf65212076581ea42cefcf67ee6b8d78d778ed1ca2b85
+  url: https://bosh.io/d/github.com/cloudfoundry/bpm-release?v=1.4.26
+  version: 1.4.26
+- name: routing
+  sha1: sha256:1409f3a0e56d89683f50c2d6c0fcb38d1a297c3710b3c067fb75182e7a7df356
+  url: https://bosh.io/d/github.com/cloudfoundry/routing-release?v=0.343.0
+  version: 0.343.0
+- name: bosh-dns-aliases
+  sha1: sha256:27ef8965dc4f1633479613743e782566e3b7fba5d28dad3d50488c2919eac0da
+  url: https://bosh.io/d/github.com/cloudfoundry/bosh-dns-aliases-release?v=0.0.4
+  version: 0.0.4
+- name: redis-forge
+  sha1: sha256:4095483fdb904ee55b1b9c1a782218cb7f727bf25a61c7d0bca37568a353eb6b
+  url: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v1.4.4/redis-forge-1.4.4.tgz
+  version: 1.4.4
+- name: bosh-aws-cpi
+  sha1: ffc4a06d6728d88eb108418f886f46428c2a1bf2
+  url: https://bosh.io/d/github.com/cloudfoundry/bosh-aws-cpi-release?v=99
+  version: 99
+stemcells:
+- alias: default
+  os: ubuntu-noble
+  version: latest
+update:
+  canaries: 1
+  canary_watch_time: 30000-600000
+  max_errors: 1
+  max_in_flight: 1
+  serial: false
+  update_watch_time: 5000-600000

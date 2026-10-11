@@ -1,0 +1,22 @@
+---
+kit:
+  name:    dev
+  version: latest
+  features:
+  - aws
+  - redis
+  - broker-tls
+
+genesis:
+  env: resolute-stemcell-without-feature
+  entomb: false
+
+params:
+  env: resolute-stemcell-without-feature
+  ip: 10.0.0.16
+  fqdn: blacksmith.testing.example
+  cloud_config: {}
+  aws_region: us-east-1
+  aws_default_sgs: [default]
+  blacksmith_services_network: services
+  stemcell_os: ubuntu-resolute

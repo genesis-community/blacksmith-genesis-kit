@@ -1,0 +1,24 @@
+secret/exodus/resolute-ocf/bosh:
+  url: https://10.0.1.6:25555
+  ca_cert: test-bosh-ca
+  blacksmith_user: blacksmith
+  blacksmith_password: test-bosh-password
+  credhub_url: https://10.0.1.6:8844
+  blacksmith_credhub_client_id: blacksmith_credhub
+  blacksmith_credhub_client_secret: test-credhub-secret
+  blacksmith_credhub_ca_cert: test-credhub-ca
+  blacksmith_credhub_director_name: resolute-ocf-bosh
+
+secret/exodus/resolute-ocf/cf:
+  api_domain: api.sys.testing.example
+  admin_username: admin
+  admin_password: test-cf-password
+  system_domain: sys.testing.example
+  core_network: resolute-ocf-core
+  nats_client_cert: test-nats-cert
+  nats_client_key: test-nats-key
+
+secret/config/resolute/ocf/fqdns:
+  blacksmith: blacksmith.sys.testing.example
+secret/config/resolute/ocf/net/subnets/ocfp-1/reserved-ips:
+  blacksmith_ip: 10.0.2.16
