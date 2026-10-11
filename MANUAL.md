@@ -14,10 +14,11 @@ new data services instances on behalf of end users.
    - [IaaS Providers](#iaas-providers)
    - [Service Forges](#service-forges)
    - [Additional Features](#additional-features)
-6. [Cloud Configuration](#cloud-configuration)
-7. [Available Addons](#available-addons)
-8. [Examples](#examples)
-9. [History](#history)
+6. [Ubuntu Resolute Stemcells](#ubuntu-resolute-stemcells)
+7. [Cloud Configuration](#cloud-configuration)
+8. [Available Addons](#available-addons)
+9. [Examples](#examples)
+10. [History](#history)
 
 ## Base Parameters
 
@@ -659,6 +660,10 @@ Blacksmith uses "forges" to deploy different types of services. You can activate
 
 - `broker-tls` - Enables TLS for the Blacksmith broker API and web UI.
 
+- `resolute` - **Experimental.** Deploys the Blacksmith broker VM on the
+  `ubuntu-resolute` stemcell instead of the default. See
+  [Ubuntu Resolute Stemcells](#ubuntu-resolute-stemcells).
+
 - `cf-route-registrar` - Registers the Blacksmith broker with Cloud Foundry
   routes, for easier access from applications.
 
@@ -745,6 +750,35 @@ Every failure line names the deployment, the service instance, and the credentia
 - A refusal from the guard means nothing was deleted, and the line names the rule that failed, which usually means the guard did its job.
 
 - A line that says no deprovision request is on record means the deployment was probably deleted by hand, so the listed names need a manual cleanup if the service instance is also gone from Cloud Foundry.
+
+## Ubuntu Resolute Stemcells
+
+The kit deploys the broker on its default stemcell, which is `ubuntu-noble` for `ocfp` environments, unless we ask for something else. Adding the `resolute` feature moves the broker VM onto `ubuntu-resolute`.
+
+```yaml
+kit:
+  features:
+  - ocfp
+  - redis
+  - resolute
+
+params:
+  stemcell_version: "0.184"
+```
+
+The feature is experimental, so we recommend trying it on a canary environment first. It sets the stemcell `os` to `ubuntu-resolute`, and `stemcell_version` still selects the version, which defaults to `latest`. We pin it to a resolute version such as `"0.184"`, so that a newer upload for another operating system is never picked up by accident. The feature works the same with or without `ocfp`. Because the feature owns the stemcell os, an environment that sets `params.stemcell_os` to anything else is refused, and so is an environment that sets `params.stemcell_os` to `ubuntu-resolute` without turning the feature on.
+
+The feature also pins the bpm release to 1.4.41. Older bpm releases bundle a tini package that fails to compile on resolute, so the default bpm pin cannot be used there. Environments that leave the feature off keep the current bpm pin.
+
+Before the first deploy we need to do two things on the director.
+
+- Upload the resolute stemcell to the director that deploys the broker, since both the compilation VMs and the broker VM need it.
+
+- Make sure the director's runtime config carries bosh-dns 1.39.31 or later. Earlier bosh-dns releases do not run on resolute.
+
+Resolute ships without runit, so the `chpst` command is missing. The Blacksmith release does not use runit, which is why the broker VM runs on resolute, but a release whose start script drops privileges with `chpst` hangs there. We should check any job we add to the broker deployment for `chpst` before we move it to resolute.
+
+The feature moves only the broker VM and the stemcell the kit itself names. Service instances are deployed by the Blacksmith broker through the director, using the stemcell that each forge asks for, and the kit does not set that for every forge. The valkey forge reads the same `stemcell_os` and `stemcell_version` parameters, so valkey instances follow the feature. The redis and rabbitmq forges receive only a stemcell version from the kit, so their instances use whichever operating system the forge release declares, and the same is true of the postgresql, mariadb, and kubernetes forges. For those forges we have to confirm that the forge release supports resolute and that a matching stemcell is on the director before we offer the plan. Without `ocfp`, the broker uploads the stemcells in `params.stemcells` to its internal director, and the IaaS defaults in the kit are jammy stemcells, so we also set `params.stemcells` to a resolute stemcell there.
 
 ## Cloud Configuration
 

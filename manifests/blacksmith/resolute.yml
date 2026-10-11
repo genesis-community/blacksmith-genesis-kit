@@ -1,0 +1,10 @@
+---
+# Ubuntu resolute stemcell.
+#
+# Loaded last by the resolute feature so that it wins over the ubuntu-noble
+# default.  The broker VM's stemcells block, the ocfp stemcell block, and the
+# valkey forge's stemcell_os property all read params.stemcell_os.  The
+# version still comes from params.stemcell_version.
+
+params:
+  stemcell_os: ubuntu-resolute

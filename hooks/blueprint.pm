@@ -116,6 +116,7 @@ sub validate_blacksmith_features {
 		cf-integration
 		cf-haproxy-ca
 		skip-credhub-cleanup
+		resolute
 	);
 
 	# Pre-validation custom checks
@@ -265,7 +266,7 @@ sub is_forge_feature {
 # is_addon_feature - Check if feature is addon-related {{{2
 sub is_addon_feature {
 	my ($self, $feature) = @_;
-	return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|valkey-tls|valkey-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar|cf-integration|cf-haproxy-ca|skip-credhub-cleanup)$/;
+	return $feature =~ /^(broker-tls|shield-backups|shield-agent|redis-tls|redis-dual-mode|valkey-tls|valkey-dual-mode|rabbitmq-tls|rabbitmq-dual-mode|rabbitmq-dashboard-registration|rabbitmq-autoscale|cf-route-registrar|cf-integration|cf-haproxy-ca|skip-credhub-cleanup|resolute)$/;
 }
 # }}}
 
@@ -361,6 +362,10 @@ sub process_addon_feature {
 		# Generated in apply_post_processing, together with the other cases
 		# that leave cleanup off.
 	}
+	elsif ($feature eq 'resolute') {
+		# Added last in apply_post_processing, so that it wins over every
+		# other stemcell default.
+	}
 }
 
 # }}}
@@ -412,6 +417,29 @@ sub apply_post_processing {
 	# environments that name the feature get it.
 	if ($self->want_feature("cf-haproxy-ca")) {
 		$self->add_files($self->_generate_cf_haproxy_ca_overlay());
+	}
+
+	# Ubuntu resolute stemcells (opt-in; the default stays ubuntu-noble).
+	# Added last so that it overrides every other stemcell default.
+	if ($self->want_feature('resolute')) {
+		my $stemcell_os = $self->env->lookup('params.stemcell_os', 'ubuntu-resolute');
+		bail(
+			"The #c{resolute} feature sets the stemcell os to ubuntu-resolute, but ".
+			"the environment sets #c{params.stemcell_os} to #R{%s}.  ".
+			"Remove that parameter.", $stemcell_os
+		) if $stemcell_os ne 'ubuntu-resolute';
+		# bpm releases before 1.4.41 bundle a tini package that does not
+		# compile on resolute.
+		$self->add_files(qw(
+			manifests/blacksmith/resolute.yml
+			manifests/blacksmith/resolute-bpm.yml
+		));
+	} elsif ($self->env->lookup('params.stemcell_os', 'ubuntu-noble') eq 'ubuntu-resolute') {
+		bail(
+			"The environment sets #c{params.stemcell_os} to ubuntu-resolute ".
+			"without the #c{resolute} feature.  Enable the feature and remove ".
+			"that parameter."
+		);
 	}
 }
 

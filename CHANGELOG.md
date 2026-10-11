@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+The new `resolute` feature deploys the broker VM on the `ubuntu-resolute` stemcell and pins the bpm release to 1.4.41, which is the first version that compiles on resolute. The default stemcell is unchanged. The feature refuses a `params.stemcell_os` other than `ubuntu-resolute`, and the kit refuses `ubuntu-resolute` when the feature is off. See the Ubuntu Resolute Stemcells section of the manual for what the feature does and does not move.
+
+The cloud config check now looks at the compilation block directly. It used to look the block up by name, so it failed on every environment that checked a cloud config.
+
 CredHub cleanup of deprovisioned service instances now runs by default whenever the director is external, which means the environment uses `external-bosh` or `ocfp`. The internal director has no CredHub, so the kit leaves cleanup off for it. The hourly sweep for older orphaned variables starts in `dry-run` mode, so the broker logs what it would delete and deletes nothing until we set `credhub_cleanup.sweep` to `delete`.
 
 The new `skip-credhub-cleanup` feature turns cleanup off for an external director.
