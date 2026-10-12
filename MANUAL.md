@@ -772,7 +772,7 @@ The feature also pins the bpm release to 1.4.41. Older bpm releases bundle a tin
 
 When the `shield-agent` feature is also on, the shield release it pins (8.8.4) calls `chpst`, so the feature pins shield 9.4.1 instead, which replaces `chpst` with `setpriv`. The environment file needs no extra parameters, and without `shield-agent` nothing changes.
 
-When the `valkey` feature is also on, valkey instances need valkey-forge 1.3.4 or later, because earlier releases call `chpst` or default to a bpm release that does not compile on resolute, so the feature pins valkey-forge 1.3.4 instead, and that release defaults the service instances to bpm 1.4.41. The environment file needs no extra parameters, and without `valkey` nothing changes.
+When the `valkey` feature is also on, valkey instances need valkey-forge 1.3.4 or later, because earlier releases call `chpst` or default to a bpm release that does not compile on resolute, so the feature pins valkey-forge 1.4.0 instead, and that release defaults the service instances to bpm 1.4.41. The environment file needs no extra parameters, and without `valkey` nothing changes.
 
 Before the first deploy we need to do two things on the director.
 

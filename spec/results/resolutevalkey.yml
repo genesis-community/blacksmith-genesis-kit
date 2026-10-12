@@ -31,9 +31,9 @@ instance_groups:
         password: <!{meta.vault}/users/blacksmith:password!>
         releases:
         - name: valkey-forge
-          sha1: 5d79766b5ac4d1c65814a133c9dabe5f08085ffa
-          url: https://github.com/blacksmith-community/valkey-forge-boshrelease/releases/download/v1.3.4/valkey-forge-1.3.4.tgz
-          version: 1.3.4
+          sha1: 945a23b81aa4921b0a2f2212283a78dcf24cd5ad
+          url: https://github.com/blacksmith-community/valkey-forge-boshrelease/releases/download/v1.4.0/valkey-forge-1.4.0.tgz
+          version: 1.4.0
         stemcells:
         - name: bosh-aws-xen-hvm-ubuntu-jammy-go_agent
           sha1: 2e113e50c47df57bfe9fe31a0d2bee3fab20af37
@@ -347,9 +347,9 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry/bosh-dns-aliases-release?v=0.0.4
   version: 0.0.4
 - name: valkey-forge
-  sha1: 5d79766b5ac4d1c65814a133c9dabe5f08085ffa
-  url: https://github.com/blacksmith-community/valkey-forge-boshrelease/releases/download/v1.3.4/valkey-forge-1.3.4.tgz
-  version: 1.3.4
+  sha1: 945a23b81aa4921b0a2f2212283a78dcf24cd5ad
+  url: https://github.com/blacksmith-community/valkey-forge-boshrelease/releases/download/v1.4.0/valkey-forge-1.4.0.tgz
+  version: 1.4.0
 - name: bosh-aws-cpi
   sha1: ffc4a06d6728d88eb108418f886f46428c2a1bf2
   url: https://bosh.io/d/github.com/cloudfoundry/bosh-aws-cpi-release?v=99

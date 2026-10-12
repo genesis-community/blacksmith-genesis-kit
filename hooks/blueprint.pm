@@ -443,7 +443,7 @@ sub apply_post_processing {
 
 		# Valkey forge releases up to 1.3.2 call chpst, and releases up to 1.3.3
 		# default to bpm 1.4.20, so valkey instances cannot deploy on resolute.
-		# Only the valkey feature loads the forge, and the kit pins 1.3.4 for it.
+		# Only the valkey feature loads the forge, and the kit pins 1.4.0 for it.
 		$self->add_files('manifests/forges/resolute-valkey.yml')
 			if $self->want_feature('valkey');
 	} elsif ($self->env->lookup('params.stemcell_os', 'ubuntu-noble') eq 'ubuntu-resolute') {
