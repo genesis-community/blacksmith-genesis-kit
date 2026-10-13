@@ -26,6 +26,7 @@ instance_groups:
           ca_cert: <!{meta.vault}/broker/ca:certificate!>
       bosh:
         address: https://10.0.0.16:25555
+        ca_cert: <!{meta.vault}/tls/ca:certificate!>
         cloud-config: {}
         network: services
         password: <!{meta.vault}/users/blacksmith:password!>

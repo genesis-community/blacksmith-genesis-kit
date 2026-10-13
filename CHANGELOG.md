@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+In the default internal-director mode, the kit now sets the broker's `bosh.ca_cert` to the director's CA, because the next Blacksmith release requires that property and refuses to render its config without it. External-director mode already set it and is unchanged.
+
 The new `resolute` feature deploys the broker VM on the `ubuntu-resolute` stemcell and pins the bpm release to 1.4.41, which is the first version that compiles on resolute. The default stemcell is unchanged. The feature refuses a `params.stemcell_os` other than `ubuntu-resolute`, and the kit refuses `ubuntu-resolute` when the feature is off. See the Ubuntu Resolute Stemcells section of the manual for what the feature does and does not move.
 
 The default pin for the `valkey` feature moves from valkey-forge 1.3.2 to 1.4.0 on the noble stemcell. That release adds a `ca_certificate` field to every TLS valkey binding, so a client can verify the server with the CA from the binding. It also moves the service instances to a newer bpm release. Existing binding fields are unchanged.

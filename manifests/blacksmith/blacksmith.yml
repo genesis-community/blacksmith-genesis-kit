@@ -56,6 +56,7 @@ instance_groups:
             username: blacksmith
             password: (( vault meta.vault "/users/blacksmith:password" ))
             address:  (( concat "https://" params.ip ":25555" ))
+            ca_cert:  (( vault meta.vault "/tls/ca:certificate" ))
             stemcells:    (( grab params.stemcells ))
             releases:     (( grab params.releases ))
             cloud-config: (( grab params.cloud_config ))
