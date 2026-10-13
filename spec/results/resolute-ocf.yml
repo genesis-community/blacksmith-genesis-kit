@@ -168,9 +168,9 @@ instance_groups:
 name: resolute-ocf-blacksmith
 releases:
 - name: blacksmith
-  sha1: sha256:b0eac550853f3bbc9f4de7beee081c36996741177f223d9fa19a47b922bafaae
-  url: https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v2.4.0/blacksmith-2.4.0.tgz
-  version: 2.4.0
+  sha1: sha256:7d04105d6069a93a27094392ee8eb001a99c524035f6bdfc02b8651aa7bac2e0
+  url: https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v2.5.0/blacksmith-2.5.0.tgz
+  version: 2.5.0
 - name: bosh
   sha1: sha256:9287abbd9d5bad40d26b9b6a4a611c18bc17768ee3090d54192f70e69b0e42db
   url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=282.0.7

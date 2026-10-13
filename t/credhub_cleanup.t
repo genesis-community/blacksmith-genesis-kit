@@ -306,4 +306,24 @@ subtest 'a bad sweep value is ignored when the wiring is not included' => sub {
 	}
 };
 
+subtest '2.5.0 is the first release whose broker reports a missing CredHub connection as one warning and accepts the director CA the kit now sets' => sub {
+	my $text = slurp("$FindBin::Bin/../manifests/releases/blacksmith.yml");
+	my ($entry) = $text =~ /^-\s+name:\s+blacksmith\s*\n((?:[ \t]+\S.*\n)+)/m;
+	ok(defined $entry, 'the blacksmith release entry is present') or return;
+	my ($version) = $entry =~ /^\s+version:\s+"?(\d+\.\d+\.\d+)"?\s*$/m;
+	my ($url)     = $entry =~ /^\s+url:\s+(\S+)\s*$/m;
+	my ($sha1)    = $entry =~ /^\s+sha1:\s+(\S+)\s*$/m;
+	ok(defined $version, 'the entry has a semver version') or return;
+	my @have = split /\./, $version;
+	my @want = (2, 5, 0);
+	my $cmp = 0;
+	for my $i (0 .. 2) {
+		$cmp = $have[$i] <=> $want[$i];
+		last if $cmp;
+	}
+	cmp_ok($cmp, '>=', 0, "release $version is at least 2.5.0");
+	like($url // '', qr{/releases/download/v\Q$version\E/blacksmith-\Q$version\E\.tgz$}, 'the url names the same version');
+	like($sha1 // '', qr/^sha256:[0-9a-f]{64}$/, 'the sha1 field holds a sha256 digest');
+};
+
 done_testing;
