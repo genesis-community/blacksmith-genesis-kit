@@ -1,4 +1,4 @@
-package Genesis::Hook::New::Blacksmith v1.3.0;
+package Genesis::Hook::New::Blacksmith v1.4.0;
 
 use strict;
 use warnings;
