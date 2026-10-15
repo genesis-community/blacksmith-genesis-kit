@@ -50,9 +50,9 @@ meta:
 
 releases:
  - name: valkey-forge
-   version: 1.2.0
-   url: https://github.com/blacksmith-community/valkey-forge-boshrelease/releases/download/v1.2.0/valkey-forge-1.2.0.tgz
-   sha1: sha256:92046d725b3abfdeea192586ab9b2328b6730ea371700fd8981d3da0085dd31c
+   version: 1.2.2
+   url: https://github.com/blacksmith-community/valkey-forge-boshrelease/releases/download/v1.2.2/valkey-forge-1.2.2.tgz
+   sha1: sha256:d68d0575231d179f7955e82d4a9f08ff3cc809b25d69f468fa0905cf654bbc0b
 
 params:
   releases:
