@@ -485,6 +485,12 @@ Blacksmith uses "forges" to deploy different types of services. You can activate
      Cloud Foundry Valkey service plans to offer. Supports both
      standalone and cluster deployment types.
 
+     Each type also has a `-classic` variant
+     (`standalone-classic`, `cluster-classic`) that deploys the
+     same Valkey but hands bound applications a shared password
+     instead of a per-binding ACL user, so password-only clients
+     keep working. Requires valkey-forge v1.1.1 (1.1.x line) or v1.2.1 or later.
+
   - `valkey_service_name` - The name of the service, to be
     shown in the services marketplace.
 
@@ -531,6 +537,14 @@ Blacksmith uses "forges" to deploy different types of services. You can activate
       version: 8
       vm_type: default
       limit: 5
+
+    shared:
+      name: shared
+      description: A dedicated Valkey server, shared-password credentials
+      type: standalone-classic
+      version: 8
+      vm_type: default
+      limit: 10
   ```
 
   Additional Valkey features:

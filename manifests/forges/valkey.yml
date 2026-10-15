@@ -10,6 +10,10 @@ meta:
     - valkey
     - redis
 
+    # The -classic plans deploy the same Valkey as their non-classic
+    # counterparts. They differ only in the credentials a bound app gets:
+    # a shared password (one-argument AUTH), instead of a per-binding ACL
+    # user (two-argument AUTH). Requires valkey-forge v1.1.1 (1.1.x line) or v1.2.1 or later.
     valkey_plans:
       standalone:
         name: standalone
@@ -18,11 +22,27 @@ meta:
         type: standalone
         version: 8
         vm_type: default
+      standalone-classic:
+        name: standalone-classic
+        description: A dedicated Valkey server, with no redundancy or replication, using a shared password
+        limit: 7
+        type: standalone-classic
+        version: 8
+        vm_type: default
       cluster:
         name: cluster
         description: A Valkey cluster with 3 master nodes and 3 replica nodes
         limit: 5
         type: cluster
+        version: 8
+        vm_type: default
+        masters: 3
+        replicas: 1
+      cluster-classic:
+        name: cluster-classic
+        description: A Valkey cluster with 3 master nodes and 3 replica nodes, using a shared password
+        limit: 5
+        type: cluster-classic
         version: 8
         vm_type: default
         masters: 3
