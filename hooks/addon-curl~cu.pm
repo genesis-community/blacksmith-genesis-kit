@@ -71,7 +71,7 @@ sub perform {
 	# Execute curl with authentication
 	my ($out, $rc, $err) = run(
 		{interactive => 1},
-		'curl -u "$1:$2" "$3$4" "$@"',
+		'u="$1:$2"; url="$3$4"; shift 4; curl -u "$u" "$url" "$@"',
 		$connection_info->{username}, 
 		$connection_info->{password}, 
 		$connection_info->{url}, 
