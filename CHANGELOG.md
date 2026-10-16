@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.4.1
+
+This release moves the Blacksmith BOSH release to 2.5.1 and fixes the `curl` addon.
+
+### Upgrading
+
+- **Blacksmith BOSH release 2.5.1**
+
+  The kit now pins blacksmith-boshrelease 2.5.1, which bumps the broker to v1.6.1. Against a director that answers over HTTP/1.1, the broker in 2.5.0 answered 500 to a restart, stop, start, or recreate even though the director ran it, and release 2.5.1 fixes that. No kit parameter changes.
+
+### Bug fixes
+
+- **The `curl` addon works again**
+
+  The addon passed the broker's username, password, URL, and path to curl a second time as extra URLs, so every `genesis do <env> -- curl <path>` failed with "URL rejected: No host part". It now passes curl only the options given after the path. The bug dates from v0.16.0.
+
 ## v1.4.0
 
 This release moves the Blacksmith BOSH release to 2.5.0, turns on CredHub cleanup of deprovisioned service instances by default for external directors, and takes the bosh CLI out of the kit's hooks. It also adds an opt-in `resolute` feature and a `cf-haproxy-ca` feature. In addition, it fixes several problems that left forge service instances unable to deploy or deploying without TLS.
