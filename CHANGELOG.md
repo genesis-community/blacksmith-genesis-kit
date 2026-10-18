@@ -1,5 +1,31 @@
 # Changelog
 
+## v1.5.0
+
+This release moves the Blacksmith BOSH release to 2.6.0, which lets the broker's upgrade feature move service instances to new release versions.
+
+### Upgrading
+
+- **Blacksmith BOSH release 2.6.0**
+
+  The kit now pins blacksmith-boshrelease 2.6.0, which bumps the broker to v1.7.0. The kit makes no parameter changes, so we don't have to touch an environment file when we move from v1.4.1. The full list is in the release notes at https://github.com/blacksmith-community/blacksmith-boshrelease/releases/tag/v2.6.0.
+
+### New features
+
+- **Upgrades can move service instances to new release versions**
+
+  An upgrade task used to move service instances only to a new stemcell. A task can now also name target versions of BOSH releases, such as a new valkey-forge or bpm, and the broker sets those versions in each instance's manifest before it redeploys that instance. The upgrade tab in the broker's UI offers the releases that each deployment runs. The broker never uploads a release, so we have to upload each target version to the director before we start the upgrade.
+
+### Bug fixes
+
+- **The broker names noble and resolute stemcells correctly**
+
+  The broker left the stemcell OS blank for a service instance on any stemcell newer than jammy, so the UI showed such a stemcell as "/<version>". Release 2.5.2 fixed this, and v1.5.0 is the first kit release to carry that fix.
+
+- **Overlapping upgrades of one instance are refused**
+
+  The broker now refuses to upgrade a service instance that another unfinished upgrade task already holds, because the later deploy would undo the earlier one's changes. It also answers an upgrade request it can't act on with a 400 instead of a 500.
+
 ## v1.4.1
 
 This release moves the Blacksmith BOSH release to 2.5.1 and fixes the `curl` addon.
