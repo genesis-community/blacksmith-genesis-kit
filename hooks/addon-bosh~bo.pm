@@ -1,4 +1,4 @@
-package Genesis::Hook::Addon::Blacksmith::BOSH v1.4.1;
+package Genesis::Hook::Addon::Blacksmith::BOSH v1.5.0;
 
 use v5.20;
 use warnings;
