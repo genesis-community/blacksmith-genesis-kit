@@ -49,6 +49,17 @@ new data services instances on behalf of end users.
 - `disk_size` - How big of a data disk to provide the Blacksmith
   broker, for persistent storage. Defaults to `20480` (20G).
 
+- `blacksmith_memory_limit` - The BPM memory limit for the
+  Blacksmith broker process. Defaults to `2G`.
+
+- `vault_memory_limit` - The BPM memory limit for the Vault
+  process that runs alongside Blacksmith and stores its service
+  instance state. A SHIELD backup of that Vault reads every
+  version of every secret, so raise this if the Vault process is
+  OOM-killed during backups. Make sure the VM (`vm_type`) has
+  enough memory for both limits plus the SHIELD agent. Defaults
+  to `1G`.
+
 ## Blacksmith Broker Parameters
 
 - `blacksmith_debug` - Whether or not to enable Blacksmith

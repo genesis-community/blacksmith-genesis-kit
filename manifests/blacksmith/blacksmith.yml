@@ -49,6 +49,11 @@ instance_groups:
           env:   (( grab params.blacksmith_env   || params.env || "blacksmith" ))
           shareable:  (( grab params.shareable || false ))
 
+          limits:
+            memory:
+              blacksmith: (( grab params.blacksmith_memory_limit || "2G" ))
+              vault:      (( grab params.vault_memory_limit      || "1G" ))
+
           broker:
             port:     (( grab params.blacksmith_port || 3000 ))
             username: blacksmith
