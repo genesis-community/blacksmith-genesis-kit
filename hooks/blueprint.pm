@@ -158,6 +158,16 @@ sub validate_blacksmith_features {
 			"skip-credhub-cleanup or an internal director leaves it out.";
 	}
 
+	# Patching in place is a way to apply a rotation, so it does nothing
+	# while rotation is off.
+	my $is_on = sub { my $v = shift; $v && $v ne '0' && $v !~ /^(false|no|off)$/i };
+	if ($is_on->($self->env->lookup('params.certificate_patch_in_place'))
+	    && !$is_on->($rotation)) {
+		push @warnings, "params.certificate_patch_in_place is true, but ".
+			"params.certificate_rotation is off, so patching in place stays ".
+			"unavailable until rotation is on.";
+	}
+
 	# The broker accepts only these sweep modes, and refuses to start on
 	# anything else. A YAML false (an unquoted "off") counts as off.
 	if ($cleanup->{file} && $cleanup->{file} eq 'manifests/addons/credhub-cleanup.yml') {

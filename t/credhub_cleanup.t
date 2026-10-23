@@ -346,4 +346,24 @@ subtest 'rotation warns when the broker has no CredHub connection' => sub {
 	ok(!$run->(1, qw/ocfp valkey/), 'rotation on with the connection wired does not warn');
 };
 
+# --- patch in place without rotation -------------------------------------------
+
+subtest 'patching in place warns when rotation is off' => sub {
+	my $run = sub {
+		my ($patch, $rotation) = @_;
+		reset_warnings();
+		my $self = build_self(features => [qw/ocfp valkey/]);
+		$self->{env_obj}{lookups}{'params.certificate_patch_in_place'} = $patch;
+		$self->{env_obj}{lookups}{'params.certificate_rotation'}       = $rotation;
+		eval { $self->validate_blacksmith_features };
+		is($@, '', 'validation does not fail');
+		return scalar grep { /params\.certificate_patch_in_place is true/ } @warnings;
+	};
+	ok($run->(1, 0), 'patch on with rotation off warns');
+	like(join("\n", @warnings), qr/patching in place stays unavailable/, 'the warning says what happens');
+	ok($run->(1, undef), 'patch on with rotation unset warns');
+	ok(!$run->(1, 1), 'patch on with rotation on is quiet');
+	ok(!$run->(0, 0), 'patch off is quiet');
+};
+
 done_testing;
