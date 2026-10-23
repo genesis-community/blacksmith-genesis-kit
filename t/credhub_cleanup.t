@@ -326,4 +326,24 @@ subtest '2.5.0 is the first release whose broker reports a missing CredHub conne
 	like($sha1 // '', qr/^sha256:[0-9a-f]{64}$/, 'the sha1 field holds a sha256 digest');
 };
 
+# --- rotation without a CredHub connection ------------------------------------
+
+subtest 'rotation warns when the broker has no CredHub connection' => sub {
+	my $has = sub { scalar grep { /params\.certificate_rotation is true/ } @warnings };
+	my $run = sub {
+		my ($rotation, @features) = @_;
+		reset_warnings();
+		my $self = build_self(features => [@features]);
+		$self->{env_obj}{lookups}{'params.certificate_rotation'} = $rotation;
+		eval { $self->validate_blacksmith_features };
+		is($@, '', 'validation does not fail');
+		return $has->();
+	};
+	ok($run->(1, qw/ocfp valkey skip-credhub-cleanup/), 'rotation on with skip-credhub-cleanup warns');
+	like(join("\n", @warnings), qr/no CredHub connection/, 'the warning says why');
+	ok(!$run->(0, qw/ocfp valkey skip-credhub-cleanup/), 'rotation off does not warn');
+	ok(!$run->('', qw/ocfp valkey skip-credhub-cleanup/), 'an empty rotation value does not warn');
+	ok(!$run->(1, qw/ocfp valkey/), 'rotation on with the connection wired does not warn');
+};
+
 done_testing;

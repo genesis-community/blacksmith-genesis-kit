@@ -146,6 +146,18 @@ sub validate_blacksmith_features {
 	my $cleanup = $self->credhub_cleanup_state;
 	push @warnings, $cleanup->{warning} if $cleanup->{warning};
 
+	# Rotation regenerates certificates through the CredHub connection that
+	# only the cleanup wiring provides. Without it inventory still works, so
+	# this is a warning. A YAML false, 0, or empty value counts as off.
+	my $rotation = $self->env->lookup('params.certificate_rotation');
+	if ($rotation && $rotation ne '0' && $rotation !~ /^(false|no|off)$/i
+	    && !($cleanup->{file} && $cleanup->{file} eq 'manifests/addons/credhub-cleanup.yml')) {
+		push @warnings, "params.certificate_rotation is true, but the broker has no ".
+			"CredHub connection, so rotation can't regenerate certificates. The ".
+			"connection comes from the director's exodus keys, and ".
+			"skip-credhub-cleanup or an internal director leaves it out.";
+	}
+
 	# The broker accepts only these sweep modes, and refuses to start on
 	# anything else. A YAML false (an unquoted "off") counts as off.
 	if ($cleanup->{file} && $cleanup->{file} eq 'manifests/addons/credhub-cleanup.yml') {
