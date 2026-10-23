@@ -80,6 +80,13 @@ instance_groups:
           key: <!{meta.vault}/broker/server:key!>
           port: 443
         username: blacksmith
+      certificates:
+        inventory:
+          enabled: true
+        patch_in_place:
+          enabled: false
+        rotation:
+          enabled: false
       credhub:
         ca_cert: test-credhub-ca
         cleanup:

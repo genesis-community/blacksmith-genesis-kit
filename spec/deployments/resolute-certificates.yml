@@ -1,0 +1,24 @@
+---
+kit:
+  name:    dev
+  version: latest
+  features:
+  - aws
+  - redis
+  - broker-tls
+  - resolute
+
+genesis:
+  env: resolute-certificates
+  entomb: false
+
+params:
+  env: resolute-certificates
+  ip: 10.0.0.16
+  fqdn: blacksmith.testing.example
+  cloud_config: {}
+  aws_region: us-east-1
+  aws_default_sgs: [default]
+  blacksmith_services_network: services
+  certificate_rotation: true
+  stemcell_version: "0.184"

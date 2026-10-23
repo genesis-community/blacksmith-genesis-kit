@@ -47,6 +47,14 @@ instance_groups:
           env:   (( grab params.blacksmith_env   || params.env || "blacksmith" ))
           shareable:  (( grab params.shareable || false ))
 
+          certificates:
+            inventory:
+              enabled:      (( grab params.certificate_inventory    || true ))
+            rotation:
+              enabled:      (( grab params.certificate_rotation     || false ))
+            patch_in_place:
+              enabled:      (( grab params.certificate_patch_in_place || false ))
+
           broker:
             port:     (( grab params.blacksmith_port || 3000 ))
             username: blacksmith

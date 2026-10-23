@@ -751,6 +751,26 @@ Every failure line names the deployment, the service instance, and the credentia
 
 - A line that says no deprovision request is on record means the deployment was probably deleted by hand, so the listed names need a manual cleanup if the service instance is also gone from Cloud Foundry.
 
+### Certificate management
+
+Blacksmith can track the TLS certificates of the service instances it manages, and it can rotate them. Three parameters switch these abilities on and off, and each one maps to a property of the `blacksmith` job.
+
+- `certificate_inventory`
+  Defaults to `true`. It turns on the certificate inventory, which scans the broker's director for the certificates that service instances use and shows when each one expires. Setting it to `false` stops the scans.
+
+- `certificate_rotation`
+  Defaults to `false`. It lets Blacksmith regenerate the leaf certificates of service instances in the director's CredHub and apply them by redeploying the instance, which is the normal way. Rotation reads the same `blacksmith_credhub` keys in the director's exodus data that CredHub cleanup uses, so the director must be deployed with a BOSH kit release that publishes them, as described under "The UAA client" above. Without those keys the broker cannot reach CredHub, and rotation cannot work.
+
+- `certificate_patch_in_place`
+  Defaults to `false`. It adds a second way to apply a rotation, which writes the new certificate and key straight onto each VM and restarts only the processes that use them. It requires `certificate_rotation` to be `true`, and it does nothing while rotation is off. Patching in place is a temporary repair, because BOSH can restore the old certificate until the instance converges. We should use it only when a redeploy is too slow or too risky right now, and we should converge the instance afterward.
+
+For example, to turn on rotation for one broker and leave patching off, we set this in the environment file.
+
+```yaml
+params:
+  certificate_rotation: true
+```
+
 ## Ubuntu Resolute Stemcells
 
 The kit deploys the broker on its default stemcell, which is `ubuntu-noble` for `ocfp` environments, unless we ask for something else. Adding the `resolute` feature moves the broker VM onto `ubuntu-resolute`.

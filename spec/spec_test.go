@@ -30,6 +30,11 @@ var _ = Describe("Blacksmith Kit", func() {
 			CPI:         "aws",
 		})
 		Test(Environment{
+			Name:        "resolute-certificates",
+			CloudConfig: "aws",
+			CPI:         "aws",
+		})
+		Test(Environment{
 			Name:        "resolute-ocf",
 			CloudConfig: "aws",
 			Exodus:      "ocf",
