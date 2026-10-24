@@ -46,7 +46,7 @@ sub perform {
         # wherever the CPI's placement scorer picks; on vSphere it is the
         # datacenter and cluster. Any IaaS whose zones carry no cloud
         # properties still gets an empty hash, as before.
-        ($self->want_feature('valkey') ?
+        (grep({ $self->want_feature($_) } qw(valkey redis rabbitmq)) ?
           ({
             name => 'z1',
             ($self->cpi_enabled ? (cpi => $self->cpi_name) : ()),
@@ -87,56 +87,13 @@ sub perform {
             }
 					}
         ),
-        # The valkey-forge release job hardcodes this bare network name as
-        # its default (see valkey-blacksmith-plans job's standalone/cluster
-        # plan templates: `meta.net || "valkey-service"`), so it must exist
-        # unprefixed for the default plan to resolve without a manually
-        # uploaded supplemental cloud config. name_prefix => '' opts out of
-        # the usual env-namespaced naming that network_definition applies.
-        ($self->want_feature('valkey') ?
-          (map {
-            my $net = $_;
-            # The subnet inherits an env-namespaced az (eg <env>-z2) from
-            # the ocfp subnet data, but the default plans deploy instance
-            # groups into the bare "z1" az defined above - BOSH requires
-            # the instance group az to match an az of its network's
-            # subnets, so realign the generated subnets to "z1".
-            $_->{az} = 'z1' for @{$net->{subnets} // []};
-            $net;
-          } $self->network_definition('valkey-service',
-            strategy => 'ocfp',
-            name_prefix => '',
-            dynamic_subnets => {
-              subnets => ['ocfp-1'],
-              allocation => {
-                size => 0,
-                statics => 0,
-              },
-              cloud_properties_for_iaas => {
-                openstack => {
-                  'net_id' => $self->network_reference('id'),
-                  'security_groups' => ['default']
-                },
-                aws => {
-                  'subnet' => $self->subnet_reference('id'),
-                  'security_groups' => $self->get_network_security_groups(),
-                },
-                azure => {
-                  'security_group' => scalar $self->env->lookup('azure_default_sg', 'default'),
-                },
-                google => {},
-                vsphere => {},
-                stackit => {
-                  'net_id' => $self->network_reference('id'),
-                  'security_groups' => scalar $self->env->lookup('stackit_default_security_groups', ['default'])
-                },
-                pve => {
-                  'bridge' => $self->_pve_cpi_setting('pve_network_bridge', 'network_bridge', 'vmbr0'),
-                }
-              }
-            }
-          )) : ()
-        ),
+        # The valkey, redis, and rabbitmq forge releases hardcode a bare
+        # <forge>-service network name as the default in their plan templates
+        # (eg `meta.net || "valkey-service"`), so each must exist unprefixed
+        # for the default plans to resolve without a manually uploaded
+        # supplemental cloud config.  See _forge_service_network.
+        (map { $self->want_feature($_) ? $self->_forge_service_network("$_-service") : () }
+          qw(valkey redis rabbitmq)),
       ],
       'vm_types' => [
         # The valkey/redis/rabbitmq/postgresql forge releases all hardcode
@@ -456,6 +413,56 @@ sub perform {
 }
 
 
+# _forge_service_network - the unprefixed network a forge's default plans deploy to {{{
+sub _forge_service_network {
+	my ($self, $name) = @_;
+	return map {
+		my $net = $_;
+		# The subnet inherits an env-namespaced az (eg <env>-z2) from
+		# the ocfp subnet data, but the default plans deploy instance
+		# groups into the bare "z1" az defined above - BOSH requires
+		# the instance group az to match an az of its network's
+		# subnets, so realign the generated subnets to "z1".
+		$_->{az} = 'z1' for @{$net->{subnets} // []};
+		$net;
+	} $self->network_definition($name,
+		strategy => 'ocfp',
+		# name_prefix => '' opts out of the usual env-namespaced naming
+		# that network_definition applies.
+		name_prefix => '',
+		dynamic_subnets => {
+			subnets => ['ocfp-1'],
+			allocation => {
+				size => 0,
+				statics => 0,
+			},
+			cloud_properties_for_iaas => {
+				openstack => {
+					'net_id' => $self->network_reference('id'),
+					'security_groups' => ['default']
+				},
+				aws => {
+					'subnet' => $self->subnet_reference('id'),
+					'security_groups' => $self->get_network_security_groups(),
+				},
+				azure => {
+					'security_group' => scalar $self->env->lookup('azure_default_sg', 'default'),
+				},
+				google => {},
+				vsphere => {},
+				stackit => {
+					'net_id' => $self->network_reference('id'),
+					'security_groups' => scalar $self->env->lookup('stackit_default_security_groups', ['default'])
+				},
+				pve => {
+					'bridge' => $self->_pve_cpi_setting('pve_network_bridge', 'network_bridge', 'vmbr0'),
+				}
+			}
+		}
+	);
+}
+
+# }}}
 # _forge_az - the director zone whose cloud properties the bare forge z1 zone mirrors {{{
 sub _forge_az {
 	my ($self) = @_;
