@@ -112,4 +112,32 @@ sub by_name { my ($list, $name) = @_; (grep { $_->{name} eq $name } @$list)[0] }
 	is_deeply([map { $_->{name} } @{$cc->{azs}}], ['z1'], 'rabbitmq alone defines the z1 az its network uses');
 }
 
+# The small vm_type sits beside default, with PVE defaults and overrides.
+{
+	%lookups = ();
+	my $cc = run_hook(valkey => 1);
+	my $small = by_name($cc->{vm_types}, 'small');
+	ok($small, 'the small vm_type is present') or BAIL_OUT('no small vm_type');
+	is($small->{cloud_properties}{cpu},  1,    'small defaults to 1 cpu');
+	is($small->{cloud_properties}{ram},  1024, 'small defaults to 1024 MB of ram');
+	is($small->{cloud_properties}{disk}, 8192, 'small defaults to 8192 MB of disk');
+	is($small->{cloud_properties}{network_bridge}, 'vmbr0', 'small uses the PVE network bridge');
+
+	my $default = by_name($cc->{vm_types}, 'default');
+	is($default->{cloud_properties}{cpu},  1,     'default is unchanged: 1 cpu');
+	is($default->{cloud_properties}{ram},  2048,  'default is unchanged: 2048 MB of ram');
+	is($default->{cloud_properties}{disk}, 16384, 'default is unchanged: 16384 MB of disk');
+
+	local %lookups = (
+		'bosh-configs.cpi.pve_service_small_cpu'  => 2,
+		'bosh-configs.cpi.pve_service_small_ram'  => 1536,
+		'bosh-configs.cpi.pve_service_small_disk' => 10240,
+	);
+	$small = by_name(run_hook(valkey => 1)->{vm_types}, 'small');
+	is_deeply([@{$small->{cloud_properties}}{qw(cpu ram disk)}], [2, 1536, 10240],
+		'small reads its size from the pve_service_small_* settings');
+	$default = by_name($built->{vm_types}, 'default');
+	is($default->{cloud_properties}{ram}, 2048, 'the small settings do not move default');
+}
+
 done_testing;

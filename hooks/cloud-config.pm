@@ -132,6 +132,40 @@ sub perform {
             },
           )),
         },
+        # A smaller forge size for small instances.  The default vm_type
+        # above is left alone, because BOSH recreates the VMs of a running
+        # instance when its vm_type changes.  Plans pick this one with
+        # `vm_type: small`.
+        {
+          name => 'small',
+          cloud_properties => scalar($self->_cloud_properties_for_iaas(
+            openstack => {
+              'instance_type' => 'g1a.1d',
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => { 'size' => 8 },
+            },
+            aws => {
+              'instance_type' => 't3.micro',
+              'ephemeral_disk' => {
+                'size' => 2048,
+                'type' => 'gp3',
+                'encrypted' => $self->TRUE,
+              },
+              'metadata_options' => { 'http_tokens' => 'required' },
+            },
+            stackit => {
+              'instance_type' => 'g1a.1d',
+              'boot_from_volume' => $self->TRUE,
+              'root_disk' => { 'size' => 8 },
+            },
+            pve => {
+              'cpu'            => scalar($self->env->lookup('bosh-configs.cpi.pve_service_small_cpu',  1)),
+              'ram'            => scalar($self->env->lookup('bosh-configs.cpi.pve_service_small_ram',  1024)),
+              'disk'           => scalar($self->env->lookup('bosh-configs.cpi.pve_service_small_disk', 8192)),
+              'network_bridge' => $self->_pve_cpi_setting('pve_network_bridge', 'network_bridge', 'vmbr0'),
+            },
+          )),
+        },
         $self->vm_type_definition('blacksmith',
           cloud_properties_for_iaas => {
             openstack => {
