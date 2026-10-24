@@ -35,6 +35,13 @@ instance_groups:
     properties:
       environment: (( grab meta.environment ))
       bosh_env: (( grab meta.bosh_env ))
+
+      # The forge deploys its service instances on the broker's stemcell.
+      # The version keeps the older rabbitmq_stemcell_version parameter ahead
+      # of the broker's own.
+      stemcell_os:      (( grab params.stemcell_os || "ubuntu-noble" ))
+      stemcell_version: (( grab params.rabbitmq_stemcell_version || params.stemcell_version || "latest" ))
+
       plans: (( grab params.rabbitmq_plans || meta.default.rabbitmq_plans ))
       plugins: (( grab params.rabbitmq_plugins || ~ ))
       cf:

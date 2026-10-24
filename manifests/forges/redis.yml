@@ -49,6 +49,12 @@ instance_groups:
       environment: (( grab meta.environment ))
       bosh_env: (( grab meta.bosh_env ))
 
+      # The forge deploys its service instances on the broker's stemcell.
+      # The version keeps the older redis_stemcell_version parameter ahead
+      # of the broker's own.
+      stemcell_os:      (( grab params.stemcell_os || "ubuntu-noble" ))
+      stemcell_version: (( grab params.redis_stemcell_version || params.stemcell_version || "latest" ))
+
       plans: (( grab params.redis_plans || meta.default.redis_plans ))
       service:
         id:          (( grab params.redis_service_id          || "redis" ))
