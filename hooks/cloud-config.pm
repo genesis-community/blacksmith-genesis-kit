@@ -46,7 +46,7 @@ sub perform {
         # wherever the CPI's placement scorer picks; on vSphere it is the
         # datacenter and cluster. Any IaaS whose zones carry no cloud
         # properties still gets an empty hash, as before.
-        (grep({ $self->want_feature($_) } qw(valkey redis rabbitmq)) ?
+        ($self->_forge_features ?
           ({
             name => 'z1',
             ($self->cpi_enabled ? (cpi => $self->cpi_name) : ()),
@@ -92,8 +92,7 @@ sub perform {
         # (eg `meta.net || "valkey-service"`), so each must exist unprefixed
         # for the default plans to resolve without a manually uploaded
         # supplemental cloud config.  See _forge_service_network.
-        (map { $self->want_feature($_) ? $self->_forge_service_network("$_-service") : () }
-          qw(valkey redis rabbitmq)),
+        $self->_forge_service_networks,
       ],
       'vm_types' => [
         # The valkey/redis/rabbitmq/postgresql forge releases all hardcode
@@ -460,6 +459,31 @@ sub perform {
 }
 
 
+# _forge_features - the forge features that are on {{{
+# Plain foreach with a lexical, never map or grep over a literal list: those
+# alias $_ to read-only constants, and Genesis code that assigns to $_ (as
+# network_definition does) would die with "Modification of a read-only value".
+sub _forge_features {
+	my ($self) = @_;
+	my @on;
+	foreach my $feature (qw(valkey redis rabbitmq)) {
+		push @on, $feature if $self->want_feature($feature);
+	}
+	return @on;
+}
+
+# }}}
+# _forge_service_networks - one network for each forge feature that is on {{{
+sub _forge_service_networks {
+	my ($self) = @_;
+	my @networks;
+	foreach my $feature ($self->_forge_features) {
+		push @networks, $self->_forge_service_network("$feature-service");
+	}
+	return @networks;
+}
+
+# }}}
 # _forge_service_network - the unprefixed network a forge's default plans deploy to {{{
 sub _forge_service_network {
 	my ($self, $name) = @_;

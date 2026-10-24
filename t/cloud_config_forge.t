@@ -37,6 +37,10 @@ my $iaas = 'pve';
 	*{"${pkg}::network_definition"}   = sub {
 		my ($s, $name, %args) = @_;
 		push @network_calls, { name => $name, %args };
+		# Genesis reads with while (<$fh>), which assigns to $_.  If the caller
+		# has $_ aliased to a constant, that dies as a read-only modification.
+		open my $iter, '<', \"line\n" or die $!;
+		while (<$iter>) { }
 		return +{ name => $name, subnets => [{ az => 'env-z2' }] };
 	};
 	*{"${pkg}::build_cloud_config"}   = sub { $built = $_[1]; $built };
