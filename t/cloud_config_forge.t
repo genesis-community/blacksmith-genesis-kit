@@ -17,6 +17,7 @@ require "$FindBin::Bin/../hooks/cloud-config.pm";
 my $pkg = 'Genesis::Hook::CloudConfig::Blacksmith';
 
 my (%features, %lookups, @network_calls, $built);
+my $iaas = 'pve';
 {
 	no strict 'refs';
 	no warnings 'redefine', 'once';
@@ -30,7 +31,7 @@ my (%features, %lookups, @network_calls, $built);
 	*{"${pkg}::get_network_security_groups"} = sub { ['default'] };
 	*{"${pkg}::TRUE"}          = sub { 1 };
 	*{"${pkg}::for_scale"}     = sub { $_[2] };
-	*{"${pkg}::_cloud_properties_for_iaas"} = sub { my ($s, %p) = @_; $p{pve} };
+	*{"${pkg}::iaas"}          = sub { $iaas };
 	*{"${pkg}::vm_type_definition"}   = sub { +{ name => $_[1] } };
 	*{"${pkg}::disk_type_definition"} = sub { +{ name => $_[1] } };
 	*{"${pkg}::network_definition"}   = sub {
@@ -140,5 +141,15 @@ sub by_name { my ($list, $name) = @_; (grep { $_->{name} eq $name } @$list)[0] }
 	is($default->{cloud_properties}{ram}, 2048, 'the small settings do not move default');
 	%lookups = ();
 }
+
+# The small vm_type carries cloud properties on every CPI, through the real
+# Genesis selector.
+for my $cpi (qw(openstack aws azure google vsphere stackit pve)) {
+	$iaas = $cpi;
+	my $small = by_name(run_hook(valkey => 1)->{vm_types}, 'small');
+	ok($small && ref $small->{cloud_properties} eq 'HASH' && %{$small->{cloud_properties}},
+		"small has cloud properties on $cpi");
+}
+$iaas = 'pve';
 
 done_testing;

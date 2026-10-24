@@ -153,6 +153,19 @@ sub perform {
               },
               'metadata_options' => { 'http_tokens' => 'required' },
             },
+            azure => {
+              'instance_type' => 'Standard_B1s',
+            },
+            google => {
+              'machine_type' => 'e2-micro',
+              'root_disk_size_gb' => 8,
+              'root_disk_type' => 'pd-ssd',
+            },
+            vsphere => {
+              'cpu' => 1,
+              'ram' => 1024,
+              'disk' => 8192,
+            },
             stackit => {
               'instance_type' => 'g1a.1d',
               'boot_from_volume' => $self->TRUE,
