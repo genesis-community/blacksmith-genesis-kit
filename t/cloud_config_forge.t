@@ -128,7 +128,7 @@ sub by_name { my ($list, $name) = @_; (grep { $_->{name} eq $name } @$list)[0] }
 	is($default->{cloud_properties}{ram},  2048,  'default is unchanged: 2048 MB of ram');
 	is($default->{cloud_properties}{disk}, 16384, 'default is unchanged: 16384 MB of disk');
 
-	local %lookups = (
+	%lookups = (
 		'bosh-configs.cpi.pve_service_small_cpu'  => 2,
 		'bosh-configs.cpi.pve_service_small_ram'  => 1536,
 		'bosh-configs.cpi.pve_service_small_disk' => 10240,
@@ -138,6 +138,7 @@ sub by_name { my ($list, $name) = @_; (grep { $_->{name} eq $name } @$list)[0] }
 		'small reads its size from the pve_service_small_* settings');
 	$default = by_name($built->{vm_types}, 'default');
 	is($default->{cloud_properties}{ram}, 2048, 'the small settings do not move default');
+	%lookups = ();
 }
 
 done_testing;
