@@ -23,11 +23,11 @@ sub cmd_details {
 		"Registers this Blacksmith Broker with a Genesis-deployed Cloud Foundry.\n".
 		"Synchronizes CA certificates and enables service access for all forges.\n".
 		"\n".
-		"Usage: register [cf-environment-name]\n".
+		"Usage: genesis <env> do register [cf-environment-name]\n".
 		"  If no CF environment name is provided, attempts to use the current\n".
 		"  environment name with '/cf' suffix.\n".
 		"\n".
-		"Example: genesis do blacksmith-dev -- register cf-dev";
+		"Example: genesis blacksmith-dev do register cf-dev";
 }
 
 # ca_sync - Helper method to sync CA certificates {{{1
@@ -146,8 +146,8 @@ sub _determine_cf_environment {
 			info("\nNo CF environment specified. Inferring: #C{%s}\n", $cf_env);
 		} else {
 			error("\n#R{Error:} No Cloud Foundry environment name provided.\n\n");
-			info("Usage: #G{genesis do %s -- register <cf-environment>}\n\n", $current_env);
-			info("Example: #G{genesis do %s -- register cf-dev}\n\n", $current_env);
+			info("Usage: #G{genesis %s do register <cf-environment>}\n\n", $current_env);
+			info("Example: #G{genesis %s do register cf-dev}\n\n", $current_env);
 			return undef;
 		}
 	}

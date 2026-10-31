@@ -47,7 +47,12 @@ $run_result = ['', 1, 'Missing jq'];
 my ($ok, $err) = attempt();
 ok(!$ok, 'a failed sync fails the deploy');
 like($err, qr/Missing jq/, 'message carries the child stderr');
+like($err, qr/BOSH deployment itself succeeded/, 'message says the BOSH deploy succeeded');
+like($err, qr/do not need to redeploy/, 'message tells the operator not to redeploy');
 like($err, qr/genesis lab do register/, 'message names the retry command');
+like($err, qr/re-registers or updates the service broker in Cloud Foundry/, 'message says what the retry does');
+like($err, qr/safe to repeat/, 'message says the retry is safe to repeat');
+unlike($err, qr/genesis lab do register\s+<|do register cf-/, 'retry command takes no argument');
 
 # child reports on stdout only
 $run_result = ["FATAL: vault is sealed\n", 1, ''];

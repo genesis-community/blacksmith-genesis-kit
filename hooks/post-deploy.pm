@@ -80,10 +80,15 @@ sub sync_blacksmith_services_ca {
     # Without the CA, every service instance provisioning fails with a
     # credhub 404, so a failed sync must fail the deploy.
     bail(
-      "Failed to synchronize blacksmith_services_ca into credhub:\n%s\n\n".
-      "Service instance provisioning will fail with a credhub 404 for\n".
-      "blacksmith_services_ca until this is resolved.  Once the cause is\n".
-      "fixed, retry the synchronization with '#G{%s do register}'.",
+      "The BOSH deployment itself succeeded, but the final step of the\n".
+      "deploy failed.  Synchronizing blacksmith_services_ca into credhub\n".
+      "did not complete:\n%s\n\n".
+      "You do not need to redeploy.  Service instance provisioning will\n".
+      "fail with a credhub 404 for blacksmith_services_ca until the\n".
+      "synchronization is repeated.  Once the cause is fixed, run\n".
+      "'#G{%s do register}', which needs no arguments.  It also\n".
+      "re-registers or updates the service broker in Cloud Foundry, and it\n".
+      "is safe to repeat.",
       $self->{blacksmith_ca_sync_error} // 'no error was reported',
       scalar($self->env->get_call_path_with_env())
     );
