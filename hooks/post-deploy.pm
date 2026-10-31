@@ -77,11 +77,16 @@ sub sync_blacksmith_services_ca {
   info("\n#Bu{Certificate Synchronization}\n\n");
 
   unless ($self->_sync_blacksmith_services_ca()) {
-    warning("\n#Y{Warning:} Failed to synchronize blacksmith_services_ca.\n");
-    warning("Service instance provisioning will fail with a credhub\n");
-    warning("404 for blacksmith_services_ca until this is resolved.\n");
-    warning("Run '#G{%s do register}' to retry synchronization.\n", scalar($self->env->get_call_path_with_env()));
-    return 0;
+    # Without the CA, every service instance provisioning fails with a
+    # credhub 404, so a failed sync must fail the deploy.
+    bail(
+      "Failed to synchronize blacksmith_services_ca into credhub:\n%s\n\n".
+      "Service instance provisioning will fail with a credhub 404 for\n".
+      "blacksmith_services_ca until this is resolved.  Once the cause is\n".
+      "fixed, retry the synchronization with '#G{%s do register}'.",
+      $self->{blacksmith_ca_sync_error} // 'no error was reported',
+      scalar($self->env->get_call_path_with_env())
+    );
   }
 
   return 1;

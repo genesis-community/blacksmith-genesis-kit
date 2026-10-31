@@ -71,7 +71,13 @@ sub _sync_blacksmith_services_ca {
   );
 
   if ($rc != 0) {
-    error("  Failed to set CA certificate in Credhub: %s\n", $err || 'Unknown error');
+    # The child genesis may report its failure on either stream, so show
+    # whichever one carries text, and fall back to the exit code.
+    my $reason = join("\n", grep {defined($_) && /\S/} ($err, $out));
+    $reason =~ s/\s+\z//;
+    $reason = "genesis credhub exited with status $rc and printed nothing" unless length($reason);
+    $self->{blacksmith_ca_sync_error} = $reason;
+    error("  Failed to set CA certificate in Credhub: %s\n", $reason);
     return 0;
   }
   info("  ✓ Blacksmith services CA synchronized\n");
