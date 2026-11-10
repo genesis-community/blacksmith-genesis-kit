@@ -53,7 +53,7 @@ instance_groups:
         address: https://10.0.1.6:25555
         ca_cert: test-bosh-ca
         cloud-config: {}
-        director_workers: 4
+        director_workers: null
         network: resolute-ocf-ocf
         password: test-bosh-password
         releases:

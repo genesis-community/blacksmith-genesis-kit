@@ -73,7 +73,7 @@ instance_groups:
             releases:     (( grab params.releases ))
             cloud-config: (( grab params.cloud_config ))
             network: (( grab params.blacksmith_services_network ))
-            director_workers: (( grab params.director_workers || 4 ))
+            director_workers: (( grab params.director_workers || ~ ))
 
           blacksmith_services_ca:
             tls:
