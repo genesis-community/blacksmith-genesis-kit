@@ -140,6 +140,8 @@ instance_groups:
         - dedicated
         - redis
         type: standalone
+      stemcell_os: ubuntu-resolute
+      stemcell_version: "0.184"
     release: redis-forge
   - consumes:
       nats-tls:

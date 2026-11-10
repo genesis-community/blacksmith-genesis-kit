@@ -98,6 +98,8 @@ instance_groups:
         - dedicated
         - redis
         type: standalone
+      stemcell_os: ubuntu-noble
+      stemcell_version: latest
     release: redis-forge
   - name: bpm
     release: bpm
