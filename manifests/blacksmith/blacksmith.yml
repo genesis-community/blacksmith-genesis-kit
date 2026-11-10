@@ -55,6 +55,10 @@ instance_groups:
             patch_in_place:
               enabled:      (( grab params.certificate_patch_in_place || false ))
 
+          commands:
+            enabled:      (( grab params.commands_enabled    || true ))
+            allow_root:   (( grab params.commands_allow_root || false ))
+
           broker:
             port:     (( grab params.blacksmith_port || 3000 ))
             username: blacksmith
@@ -69,6 +73,7 @@ instance_groups:
             releases:     (( grab params.releases ))
             cloud-config: (( grab params.cloud_config ))
             network: (( grab params.blacksmith_services_network ))
+            director_workers: (( grab params.director_workers || 4 ))
 
           blacksmith_services_ca:
             tls:

@@ -771,6 +771,28 @@ params:
   certificate_rotation: true
 ```
 
+### Running commands on service nodes
+
+Blacksmith can run a command on the nodes of a service deployment. Three parameters control that ability, and each one maps to a property of the `blacksmith` job.
+
+- `commands_enabled`
+  Defaults to `true`. Setting it to `false` turns the Run command feature off, so the broker refuses every command request.
+
+- `commands_allow_root`
+  Defaults to `false`, so a command that asks to run as root is refused. Setting it to `true` lets a command run as root. It has no effect while `commands_enabled` is `false`.
+
+- `director_workers`
+  Defaults to `4`, which is the worker count of the BOSH director the kit deploys. It must be a whole number of 2 or more. Blacksmith uses it to bound how many commands run at once, so we raise it only when the director has more workers.
+
+The release also has a `commands.credential.key` property, which adds a second secret credential to every command request. The kit does not set it yet, because it has no generated secret to fill it from.
+
+For example, to switch commands off for one broker, we set this in the environment file.
+
+```yaml
+params:
+  commands_enabled: false
+```
+
 ## Ubuntu Resolute Stemcells
 
 The kit deploys the broker on its default stemcell, which is `ubuntu-noble` for `ocfp` environments, unless we ask for something else. Adding the `resolute` feature moves the broker VM onto `ubuntu-resolute`.

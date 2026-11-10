@@ -53,6 +53,7 @@ instance_groups:
         address: https://10.0.1.6:25555
         ca_cert: test-bosh-ca
         cloud-config: {}
+        director_workers: 4
         network: resolute-ocf-ocf
         password: test-bosh-password
         releases:
@@ -87,6 +88,9 @@ instance_groups:
           enabled: false
         rotation:
           enabled: false
+      commands:
+        allow_root: false
+        enabled: true
       credhub:
         ca_cert: test-credhub-ca
         cleanup:

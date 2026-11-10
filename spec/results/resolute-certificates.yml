@@ -28,6 +28,7 @@ instance_groups:
         address: https://10.0.0.16:25555
         ca_cert: <!{meta.vault}/tls/ca:certificate!>
         cloud-config: {}
+        director_workers: 4
         network: services
         password: <!{meta.vault}/users/blacksmith:password!>
         releases:
@@ -57,6 +58,9 @@ instance_groups:
           enabled: false
         rotation:
           enabled: true
+      commands:
+        allow_root: false
+        enabled: true
       credhub:
         cleanup:
           enabled: false
