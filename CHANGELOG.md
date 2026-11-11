@@ -22,7 +22,7 @@ This release moves the kit's pins for the valkey, redis, and rabbitmq forges to 
 
 - **Classic credential plans for valkey**
 
-  Valkey forge 1.5.0 adds the standalone-classic and cluster-classic plans. They deploy the same Valkey as the standalone and cluster plans, but a binding receives only the shared password, for applications that cannot use per-binding ACL users.
+  Valkey forge 1.5.0 adds the standalone-classic and cluster-classic plans. They deploy the same Valkey as the standalone and cluster plans, but a binding receives only the shared password, for applications that cannot use per-binding ACL users. The kit doesn't offer these plans by default, so we opt in by adding them to `valkey_plans`, and since that parameter replaces the default list, we repeat the plans we already offer. The Valkey section of MANUAL.md has a complete example.
 
 ### Bug fixes
 

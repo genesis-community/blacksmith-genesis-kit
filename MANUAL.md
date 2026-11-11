@@ -536,6 +536,55 @@ Blacksmith uses "forges" to deploy different types of services. You can activate
       limit: 5
   ```
 
+  **Classic credential plans (opt-in)**
+
+  The valkey forge also offers two classic plan types, `standalone-classic` and `cluster-classic`. They deploy the same Valkey as `standalone` and `cluster`, but every binding receives the shared password and no per-binding ACL user is created. Choose them for applications that can only authenticate with a password and cannot send a username.
+
+  The kit doesn't offer the classic plans by default. The default `valkey_plans` holds only `standalone` and `cluster`, and setting `valkey_plans` replaces that list rather than adding to it. To offer the classic plans, we list them in `valkey_plans` and repeat any default plan we still want to offer. The plan's `type` selects the flavor, and the key we give the plan becomes its plan ID.
+
+  ```yaml
+  valkey_plans:
+    standalone:
+      name: standalone
+      description: A dedicated Valkey server, with no redundancy or replication
+      type: standalone
+      version: 8
+      vm_type: default
+      limit: 7
+
+    cluster:
+      name: cluster
+      description: A Valkey cluster with 3 master nodes and 3 replica nodes
+      type: cluster
+      version: 8
+      vm_type: default
+      limit: 5
+      masters: 3
+      replicas: 1
+      azs: [z1]
+
+    standalone-classic:
+      name: standalone-classic
+      description: A dedicated Valkey server with a shared password
+      type: standalone-classic
+      version: 8
+      vm_type: default
+      limit: 7
+
+    cluster-classic:
+      name: cluster-classic
+      description: A Valkey cluster with a shared password
+      type: cluster-classic
+      version: 8
+      vm_type: default
+      limit: 5
+      masters: 3
+      replicas: 1
+      azs: [z1]
+  ```
+
+  The cluster plans pin `azs` to `[z1]` because the network the kit provides for Valkey service instances defines only the `z1` zone. The classic plans take the same keys as the plans they mirror.
+
   Additional Valkey features:
 
   - `valkey-tls` - Enables TLS encryption for Valkey communications.
