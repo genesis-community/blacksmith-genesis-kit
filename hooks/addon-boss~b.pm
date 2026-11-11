@@ -1,4 +1,4 @@
-package Genesis::Hook::Addon::Blacksmith::Boss v1.5.0;
+package Genesis::Hook::Addon::Blacksmith::Boss v1.6.0;
 
 use v5.20;
 use warnings;
