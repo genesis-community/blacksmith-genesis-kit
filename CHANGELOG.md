@@ -1,5 +1,48 @@
 # Changelog
 
+## v1.6.1
+
+This release moves the kit's pins for the valkey, redis, and rabbitmq forges to current releases, and it passes the broker's stemcell OS to the rabbitmq forge. The previous pins lacked every forge change made since, so deployments received older plan templates than the forges now ship.
+
+### Upgrading
+
+- **Forge release pins**
+
+  The valkey forge moves from 1.4.0 to 1.5.0, the redis forge from 1.4.4 to 1.5.0, and the rabbitmq forge from 1.5.1 to 1.6.0. All three pins now use a sha256 checksum. The kit makes no parameter changes that we have to answer, so we don't have to touch an environment file. A forge pin only affects service instances we provision or update afterwards, so existing instances keep their manifests until then.
+
+- **RabbitMQ instances follow the broker's stemcell OS**
+
+  The kit now passes `stemcell_os` and `stemcell_version` to the rabbitmq forge, the same way it does for redis and valkey. The OS comes from the `stemcell_os` parameter, which defaults to ubuntu-noble, so rabbitmq instances we provision or update after this release follow the broker's stemcell OS. The older `rabbitmq_stemcell_version` parameter still takes precedence for the version.
+
+- **RabbitMQ route registration**
+
+  Rabbitmq forge 1.6.0 registers routes whenever `route_registrar` is on, so the route registrar job no longer depends on autoscaling being on. Plans that set the NATS client certificate and key keep the certificate-based NATS configuration, and plans without them use the CredHub paths for NATS.
+
+### New features
+
+- **Classic credential plans for valkey**
+
+  Valkey forge 1.5.0 adds the standalone-classic and cluster-classic plans. They deploy the same Valkey as the standalone and cluster plans, but a binding receives only the shared password, for applications that cannot use per-binding ACL users.
+
+- **Resolute stemcell support for redis and rabbitmq**
+
+  Redis forge 1.5.0 and rabbitmq forge 1.6.0 read the `stemcell_os` property, so their service instances can run on ubuntu-resolute as well as ubuntu-noble.
+
+### Bug fixes
+
+- **RabbitMQ plans start without autoscaling**
+
+  Rabbitmq forge 1.6.0 colocates bpm in every plan, so the default standalone plan starts. It also renders when route registration is on without autoscaling, closes the plaintext MQTT, STOMP, and web listeners when TLS is on, and gives bindings an api_url that Blacksmith can reach.
+
+- **Redis and rabbitmq plans render without a stemcell property**
+
+  Both forges now default the service.stemcell property to latest, where before rendering the plans failed when nothing set it.
+
+- **Redis pre-start scripts stop on failure**
+
+  The standalone-6 and standalone-7 pre-start scripts run under `set -eu`, so a failed certificate step no longer goes unnoticed.
+
+
 ## v1.6.0
 
 This release moves the Blacksmith BOSH release to 2.7.0, which brings the broker to v1.8.0. It adds switches for the broker's certificate features and for the Run command operation, gives the redis and rabbitmq forges their own service networks and the broker's stemcell, and makes a failed CA sync fail the deploy.
