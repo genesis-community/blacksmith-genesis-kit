@@ -33,9 +33,9 @@ instance_groups:
         password: <!{meta.vault}/users/blacksmith:password!>
         releases:
         - name: redis-forge
-          sha1: sha256:4095483fdb904ee55b1b9c1a782218cb7f727bf25a61c7d0bca37568a353eb6b
-          url: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v1.4.4/redis-forge-1.4.4.tgz
-          version: 1.4.4
+          sha1: sha256:7b6a69d4f09c21f5746ad379a546ff0ad332d5fecf2135b4fc4f78adfdaf933f
+          url: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v1.5.0/redis-forge-1.5.0.tgz
+          version: 1.5.0
         stemcells:
         - name: bosh-aws-xen-hvm-ubuntu-jammy-go_agent
           sha1: 2e113e50c47df57bfe9fe31a0d2bee3fab20af37
@@ -359,9 +359,9 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry/bosh-dns-aliases-release?v=0.0.4
   version: 0.0.4
 - name: redis-forge
-  sha1: sha256:4095483fdb904ee55b1b9c1a782218cb7f727bf25a61c7d0bca37568a353eb6b
-  url: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v1.4.4/redis-forge-1.4.4.tgz
-  version: 1.4.4
+  sha1: sha256:7b6a69d4f09c21f5746ad379a546ff0ad332d5fecf2135b4fc4f78adfdaf933f
+  url: https://github.com/blacksmith-community/redis-forge-boshrelease/releases/download/v1.5.0/redis-forge-1.5.0.tgz
+  version: 1.5.0
 - name: bosh-aws-cpi
   sha1: ffc4a06d6728d88eb108418f886f46428c2a1bf2
   url: https://bosh.io/d/github.com/cloudfoundry/bosh-aws-cpi-release?v=99

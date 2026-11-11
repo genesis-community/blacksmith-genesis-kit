@@ -3,13 +3,13 @@
 #
 # The valkey-forge release pinned in forges/valkey.yml calls chpst, which
 # resolute does not ship.  Valkey-forge 1.3.4 drops it, and also defaults its
-# bpm release to 1.4.41, which compiles on resolute.  Valkey-forge 1.4.0 keeps
+# bpm release to 1.4.41, which compiles on resolute.  Valkey-forge 1.5.0 keeps
 # both changes and adds the CA certificate to TLS bindings.  The
 # blueprint hook loads this file when the resolute and valkey features are both
 # on, and spruce merges the entry over the pin by name.
 
 releases:
 - name:    valkey-forge
-  version: 1.4.0
-  url:     https://github.com/blacksmith-community/valkey-forge-boshrelease/releases/download/v1.4.0/valkey-forge-1.4.0.tgz
-  sha1:    945a23b81aa4921b0a2f2212283a78dcf24cd5ad
+  version: 1.5.0
+  url:     https://github.com/blacksmith-community/valkey-forge-boshrelease/releases/download/v1.5.0/valkey-forge-1.5.0.tgz
+  sha1:    sha256:c77c7c5339c0343efeaeb43e40df824ef3b817efbbb590906bbdec22850cadf3
