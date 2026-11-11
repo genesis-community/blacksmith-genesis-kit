@@ -1,5 +1,51 @@
 # Changelog
 
+## v1.6.0
+
+This release moves the Blacksmith BOSH release to 2.7.0, which brings the broker to v1.8.0. It adds switches for the broker's certificate features and for the Run command operation, gives the redis and rabbitmq forges their own service networks and the broker's stemcell, and makes a failed CA sync fail the deploy.
+
+### Upgrading
+
+- **Blacksmith BOSH release 2.7.0**
+
+  The kit now pins blacksmith-boshrelease 2.7.0, which bumps the broker to v1.8.0. The release turns the certificate inventory on by default and keeps rotation off, and it accepts only a real true or false for its switches. The kit makes no parameter changes that we have to answer, so we don't have to touch an environment file when we move from v1.5.0. The full list is in the release notes at https://github.com/blacksmith-community/blacksmith-boshrelease/releases/tag/v2.7.0.
+
+- **A failed CA sync now fails the deploy**
+
+  A failed `blacksmith_services_ca` sync used to print a warning and let the deploy exit successfully, although service provisioning then failed with a CredHub 404. The deploy now stops with the child command's real error. The message says the BOSH deployment itself succeeded, so we don't redeploy, and it names the retry command, `genesis <env> do register`, which needs no arguments and is safe to repeat.
+
+### New features
+
+- **Certificate switches**
+
+  Three new parameters control the broker's certificate features. `certificate_inventory` defaults to true, and `certificate_rotation` and `certificate_patch_in_place` default to false. Rotation regenerates leaf certificates through the CredHub connection that the cleanup wiring provides, so the blueprint now warns when rotation is on and that connection is missing, which happens with `skip-credhub-cleanup`, an internal director, or missing exodus keys. It also warns when patching in place is on while rotation is off, because patching does nothing then. The manual describes each switch.
+
+- **Run command switches**
+
+  Three new parameters control the broker's Run command operation. `commands_enabled` defaults to true, and setting it to false makes the broker refuse every command request. `commands_allow_root` defaults to false, so a command that asks to run as root is refused, and it has no effect while commands are disabled. `director_workers` is unset by default, which leaves the broker on its own default of four, and when we set it, it must be a whole number of 2 or more. We set it only when the director has a different number of workers. The release also has a `commands.credential.key` property that adds a second credential to every command request, but the kit doesn't fill it, so we can set it only through the release itself. The manual describes each parameter.
+
+- **A small vm_type for forge instances**
+
+  Forge service plans can now pick `vm_type: small` for instances that need less than the default size. On PVE the size comes from the `pve_service_small_cpu`, `_ram`, and `_disk` settings, which default to one CPU, 1024 MB of memory, and 8192 MB of disk, and the other CPIs get their nearest small instance type. The default vm_type is unchanged.
+
+- **Service networks for the redis and rabbitmq forges**
+
+  The kit used to generate a service network only for the valkey forge, so the redis and rabbitmq forges had no network unless we uploaded a supplemental cloud config. The kit now generates one for each of the three forges and defines the bare z1 availability zone when any of them is on. A valkey-only deploy generates the same cloud config as before.
+
+### Bug fixes
+
+- **The redis and rabbitmq forges receive the broker's stemcell**
+
+  Only the valkey forge got the broker's stemcell OS and version, while the redis and rabbitmq jobs got just a version. Both now receive `stemcell_os` and `stemcell_version` the way valkey does, and the older `redis_stemcell_version` and `rabbitmq_stemcell_version` parameters still take precedence.
+
+- **The small vm_type renders on every CPI**
+
+  The small vm_type had cloud properties only for OpenStack, AWS, STACKIT, and PVE, so it rendered empty on Azure, Google, and vSphere. It now has a size on each of them, and a test runs the real selector for every CPI.
+
+- **A deploy with all three forges no longer dies**
+
+  A deploy with the valkey, redis, and rabbitmq features all on died with "Modification of a read-only value attempted", because the cloud-config hook looped over constants in a way that aliased `$_` to read-only values. The hook now walks the features with a lexical variable.
+
 ## v1.5.0
 
 This release moves the Blacksmith BOSH release to 2.6.0, which lets the broker's upgrade feature move service instances to new release versions.
