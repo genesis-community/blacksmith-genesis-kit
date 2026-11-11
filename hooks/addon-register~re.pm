@@ -1,4 +1,4 @@
-package Genesis::Hook::Addon::Blacksmith::Register v1.6.0;
+package Genesis::Hook::Addon::Blacksmith::Register v1.6.1;
 
 use v5.20;
 use warnings;
