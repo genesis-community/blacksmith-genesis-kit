@@ -2,17 +2,17 @@
 
 ## v1.6.1
 
-This release moves the kit's pins for the valkey, redis, and rabbitmq forges to current releases, and it passes the broker's stemcell OS to the rabbitmq forge. The previous pins lacked every forge change made since, so deployments received older plan templates than the forges now ship.
+This release moves the kit's pins for the valkey, redis, and rabbitmq forges to current releases. The kit already passed the broker's stemcell OS and version to the redis and rabbitmq forges in v1.6.0, but the forge releases it pinned never read them. The new pins do, and the old pins also lacked every other forge change made since, so deployments received older plan templates than the forges now ship.
 
 ### Upgrading
 
 - **Forge release pins**
 
-  The valkey forge moves from 1.4.0 to 1.5.0, the redis forge from 1.4.4 to 1.5.0, and the rabbitmq forge from 1.5.1 to 1.6.0. All three pins now use a sha256 checksum. The kit makes no parameter changes that we have to answer, so we don't have to touch an environment file. A forge pin only affects service instances we provision or update afterwards, so existing instances keep their manifests until then.
+  The valkey forge moves from 1.4.0 to 1.5.0, the redis forge from 1.4.4 to 1.5.0, and the rabbitmq forge from 1.5.1 to 1.6.0. All three pins now use a sha256 checksum. This release needs no parameter changes, so we don't have to touch an environment file. A forge pin only affects service instances we provision or update afterwards, so existing instances keep their manifests until then.
 
-- **RabbitMQ instances follow the broker's stemcell OS**
+- **Redis and RabbitMQ instances follow the broker's stemcell OS**
 
-  The kit now passes `stemcell_os` and `stemcell_version` to the rabbitmq forge, the same way it does for redis and valkey. The OS comes from the `stemcell_os` parameter, which defaults to ubuntu-noble, so rabbitmq instances we provision or update after this release follow the broker's stemcell OS. The older `rabbitmq_stemcell_version` parameter still takes precedence for the version.
+  Redis forge 1.5.0 and rabbitmq forge 1.6.0 read the `stemcell_os` and `stemcell_version` properties that the kit already passes, where the plans in the earlier forge releases hardcoded ubuntu-jammy. The OS comes from the `stemcell_os` parameter, which defaults to ubuntu-noble and can also be ubuntu-resolute. Redis and rabbitmq instances we provision or update after this release move from ubuntu-jammy to the broker's stemcell OS, so updating an existing instance replaces its VMs on the new stemcell. The older `rabbitmq_stemcell_version` parameter still takes precedence for the rabbitmq version.
 
 - **RabbitMQ route registration**
 
@@ -23,10 +23,6 @@ This release moves the kit's pins for the valkey, redis, and rabbitmq forges to 
 - **Classic credential plans for valkey**
 
   Valkey forge 1.5.0 adds the standalone-classic and cluster-classic plans. They deploy the same Valkey as the standalone and cluster plans, but a binding receives only the shared password, for applications that cannot use per-binding ACL users.
-
-- **Resolute stemcell support for redis and rabbitmq**
-
-  Redis forge 1.5.0 and rabbitmq forge 1.6.0 read the `stemcell_os` property, so their service instances can run on ubuntu-resolute as well as ubuntu-noble.
 
 ### Bug fixes
 
