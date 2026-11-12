@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.6.3
+
+This release moves the create-env stemcell pins to a newer ubuntu-jammy stemcell.
+
+### Upgrading
+
+- **Create-env stemcells on ubuntu-jammy 1.1517**
+
+  The create-env stemcell pins for AWS, Azure, Google, OpenStack, and STACKIT move from ubuntu-jammy 1.181 to 1.1517. The kit makes no parameter changes, so we don't have to touch an environment file when we move from v1.6.2.
+
 ## v1.6.2
 
 This release moves the Blacksmith BOSH release to 2.7.1, which brings the broker to v1.8.1. Operators get a status endpoint that reports real health, clearer Run command screens, and a more reliable console terminal.
