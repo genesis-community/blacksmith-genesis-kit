@@ -1,5 +1,33 @@
 # Changelog
 
+## v1.6.2
+
+This release moves the Blacksmith BOSH release to 2.7.1, which brings the broker to v1.8.1. Operators get a status endpoint that reports real health, clearer Run command screens, and a more reliable console terminal.
+
+### Upgrading
+
+- **Blacksmith BOSH release 2.7.1**
+
+  The kit now pins blacksmith-boshrelease 2.7.1, which bumps the broker to v1.8.1. The kit makes no parameter changes, so we don't have to touch an environment file when we move from v1.6.1. Anything that polls the broker's `/b/status` endpoint should expect an unhealthy director or Vault to show up there now, with the same 200 response as before. The full list is in the release notes at https://github.com/blacksmith-community/blacksmith-boshrelease/releases/tag/v2.7.1.
+
+### Bug fixes
+
+- **The status endpoint reports real health**
+
+  The broker's `/b/status` endpoint now returns the real build version and checks the director and Vault, so it no longer says everything is connected while one of them is down. A sealed Vault is reported as sealed.
+
+- **The Run command screens explain themselves**
+
+  Max in flight is now a choice that goes up to what the director allows. The Run button says why it is waiting, and the confirmation label shows the exact phrase to type, in quotes.
+
+- **The console terminal recovers from a failed start**
+
+  A terminal tab that fails to start offers Reconnect and stays marked as failed after a reload.
+
+- **Redis connections keep their earlier behavior**
+
+  The broker's Redis clients behave as they did before the move to go-redis v9. Older Redis nodes, connections that name a database in a `tls_uri`, and nodes that go silent all work as they did in v1.8.0.
+
 ## v1.6.1
 
 This release moves the kit's pins for the valkey, redis, and rabbitmq forges to current releases. The kit already passed the broker's stemcell OS and version to the redis and rabbitmq forges in v1.6.0, but the forge releases it pinned never read them. The new pins do, and the old pins also lacked every other forge change made since, so deployments received older plan templates than the forges now ship.
