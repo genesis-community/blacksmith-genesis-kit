@@ -11,9 +11,9 @@ params:
 
   stemcells:
     - name:    bosh-google-kvm-ubuntu-jammy-go_agent
-      version: '1.181'
-      url:     https://storage.googleapis.com/bosh-gce-light-stemcells/1.181/light-bosh-stemcell-1.181-google-kvm-ubuntu-jammy-go_agent.tgz
-      sha1:    aeeb0c3b54a0e1494835c71acd94d0f6cf8f6130
+      version: '1.1517'
+      url:     https://storage.googleapis.com/bosh-gce-light-stemcells/1.1517/light-bosh-stemcell-1.1517-google-kvm-ubuntu-jammy-go_agent.tgz
+      sha1:    3071eea8a422bf203177ae15ef24da52d48a2db0
 
 releases:
   - name:    bosh-google-cpi

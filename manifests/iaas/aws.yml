@@ -12,9 +12,9 @@ params:
 
   stemcells:
     - name:    bosh-aws-xen-hvm-ubuntu-jammy-go_agent
-      version: '1.181'
-      url:     https://storage.googleapis.com/bosh-aws-light-stemcells/1.181/light-bosh-stemcell-1.181-aws-xen-hvm-ubuntu-jammy-go_agent.tgz
-      sha1:    2e113e50c47df57bfe9fe31a0d2bee3fab20af37
+      version: '1.1517'
+      url:     https://storage.googleapis.com/bosh-aws-light-stemcells/1.1517/light-bosh-stemcell-1.1517-aws-xen-hvm-ubuntu-jammy-go_agent.tgz
+      sha1:    89db122218b385ad0148fd6ca6ed74fd61a05b40
 
 releases:
   - name:    bosh-aws-cpi
