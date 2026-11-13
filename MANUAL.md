@@ -828,7 +828,7 @@ Blacksmith can run a command on the nodes of a service deployment. Three paramet
   Defaults to `true`. Setting it to `false` turns the Run command feature off, so the broker refuses every command request.
 
 - `commands_allow_root`
-  Defaults to `false`, so a command that asks to run as root is refused. Setting it to `true` lets a command run as root. It has no effect while `commands_enabled` is `false`.
+  Defaults to `false`, so a command that asks to run as root is refused, and the root choice under "Run as" stays greyed out in the broker UI. Setting it to `true` lets a command run as root. It has no effect while `commands_enabled` is `false`.
 
 - `director_workers`
   Unset by default, which leaves the broker on its own default of 4, the worker count of the BOSH director the kit deploys. When we set it, it must be a whole number of 2 or more. Blacksmith uses it to bound how many commands run at once, so we set it only when the director has a different number of workers.
@@ -841,6 +841,25 @@ For example, to switch commands off for one broker, we set this in the environme
 params:
   commands_enabled: false
 ```
+
+#### Running a command as root
+
+A command that runs as `vcap` can't gain privileges. The broker starts it with the no-new-privileges flag set, so `sudo`, `su`, and every other setuid program fail inside it. The failure from `sudo` reads like this.
+
+```
+sudo: The "no new privileges" flag is set, which prevents sudo from running as root.
+```
+
+This differs from `bosh ssh`, where `sudo` works because the director creates a temporary `bosh_*` user with passwordless sudo. Run command deliberately steps down to `vcap` with no new privileges, so that `commands_allow_root: false` really keeps root off.
+
+When a command needs privileges, we choose root under "Run as" and leave `sudo` out of the command, because the command is already running as root. Root is off until we turn it on, so the choice stays greyed out and the broker refuses any request for it until we set `commands_allow_root` in the environment file and redeploy.
+
+```yaml
+params:
+  commands_allow_root: true
+```
+
+Root deserves care. A root command can change anything on the VM, and nothing the broker does can contain what it starts. We recommend `vcap` whenever it can do the job, and most service maintenance can, because the service tools under `/var/vcap/packages` work fine as `vcap`.
 
 ## Ubuntu Resolute Stemcells
 
