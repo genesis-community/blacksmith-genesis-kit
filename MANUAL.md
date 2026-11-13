@@ -844,15 +844,15 @@ params:
 
 #### Running a command as root
 
-A command that runs as `vcap` can't gain privileges. The broker starts it with the no-new-privileges flag set, so `sudo`, `su`, and every other setuid program fail inside it. The failure from `sudo` reads like this.
+A command that runs as `vcap` can't gain privileges. The broker starts it with the no-new-privileges flag set, so `sudo`, `su`, and every other setuid program fail inside it. The failure from `sudo` reads like this:
 
 ```
 sudo: The "no new privileges" flag is set, which prevents sudo from running as root.
 ```
 
-This differs from `bosh ssh`, where `sudo` works because the director creates a temporary `bosh_*` user with passwordless sudo. Run command deliberately steps down to `vcap` with no new privileges, so that `commands_allow_root: false` really keeps root off.
+This differs from `bosh ssh`, where `sudo` works because the director creates a temporary `bosh_*` user with passwordless sudo. Run command deliberately steps down to `vcap` with no new privileges, so that `commands_allow_root: false` keeps root off.
 
-When a command needs privileges, we choose root under "Run as" and leave `sudo` out of the command, because the command is already running as root. Root is off until we turn it on, so the choice stays greyed out and the broker refuses any request for it until we set `commands_allow_root` in the environment file and redeploy.
+When a command needs privileges, we choose root under "Run as" and leave `sudo` out of the command, because the command is already running as root. Root is off until we turn it on. Until we set `commands_allow_root` in the environment file and redeploy, the choice stays greyed out and the broker refuses any request for it.
 
 ```yaml
 params:
