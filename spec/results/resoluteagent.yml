@@ -352,9 +352,9 @@ instance_groups:
 name: resoluteagent-blacksmith
 releases:
 - name: blacksmith
-  sha1: sha256:b14cbc36e0463c1eed84155968a69edc6bbd2990937c024cb2b62122a8d44605
-  url: https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v2.7.1/blacksmith-2.7.1.tgz
-  version: 2.7.1
+  sha1: sha256:a6689844afaf72add1f47ef00620ca1a6955b8aa7f7587b8ba78ac3b07fe209c
+  url: https://github.com/blacksmith-community/blacksmith-boshrelease/releases/download/v2.7.2/blacksmith-2.7.2.tgz
+  version: 2.7.2
 - name: bosh
   sha1: sha256:9287abbd9d5bad40d26b9b6a4a611c18bc17768ee3090d54192f70e69b0e42db
   url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=282.0.7
