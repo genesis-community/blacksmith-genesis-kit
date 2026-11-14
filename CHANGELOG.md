@@ -1,5 +1,35 @@
 # Changelog
 
+## v1.6.4
+
+This release moves the Blacksmith BOSH release to 2.7.2, which brings the broker to v1.8.2. Operators get a navigation rail, phone layouts, a clearer Activity view, and a Run command screen that explains root and sudo. The manual also gains a section on running a command as root.
+
+### Upgrading
+
+- **Blacksmith BOSH release 2.7.2**
+
+  The kit now pins blacksmith-boshrelease 2.7.2, which bumps the broker to v1.8.2. The kit makes no parameter changes, so we don't have to touch an environment file when we move from v1.6.3. Root commands stay off until we set `commands_allow_root: true` in the environment file's `params:` section and redeploy, and a command that runs as vcap can't use `sudo`. The full list is in the release notes at https://github.com/blacksmith-community/blacksmith-boshrelease/releases/tag/v2.7.2.
+
+### Improvements
+
+- **A navigation rail and phone layouts**
+
+  A single left rail replaces the tab strips, tables become labelled cards on a phone, and touch controls are large enough to tap. The console can also be installed on a home screen.
+
+- **A clearer Activity view**
+
+  Every job page shares one summary table. Each node links to its instance and VM row, and a failed node states its exit status, the user it ran as, and the error lines that matter.
+
+- **Run command output in order**
+
+  A command's error stream now arrives in the same stream as its output, in the order the command wrote it.
+
+### Documentation
+
+- **Running a command as root**
+
+  The manual now has a Running a command as root section. It explains that a command that runs as vcap can't use `sudo`, quotes the error so we can find it, and says to choose root without `sudo` for privileged work. It also notes that the root choice stays greyed out until we set `commands_allow_root: true`.
+
 ## v1.6.3
 
 This release moves the create-env stemcell pins to a newer ubuntu-jammy stemcell.
