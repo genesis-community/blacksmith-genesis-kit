@@ -88,7 +88,7 @@ The `bosh` command below is our own tooling and not something the kit runs for u
 ### Updating the manifest through the broker
 
 2. Update your RabbitMQ deployment manifest:
-   - Download the manifest through the broker, which returns JSON whose `text` field holds the manifest YAML. We save that field with `genesis <env> do -- curl -s /b/deployments/rabbitmq-single-node-fcab211b-dffd-478d-8537-5ba2b7c4d5bb/manifest | jq -r .text > single-plugins-manifest.yml`
+   - Download the manifest through the broker, which returns JSON whose `text` field holds the manifest YAML. We save that field with `genesis <env> do curl /b/deployments/rabbitmq-single-node-fcab211b-dffd-478d-8537-5ba2b7c4d5bb/manifest -s | jq -r .text > single-plugins-manifest.yml`
    - Add or modify the `plugins` property under the `properties` section of the `rabbitmq` job specification
 
    For example:

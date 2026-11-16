@@ -114,7 +114,7 @@ genesis my-blacksmith do curl /v2/catalog
 genesis my-blacksmith do curl /b/deployments/<deployment-name>/vms
 ```
 
-The `--` separates genesis's own options from the arguments that go to the addon. This addon is useful for troubleshooting or accessing API endpoints that aren't exposed through other tools. It automatically handles authentication.
+Add `--` before the addon's arguments only when the first one starts with a dash. The curl addon takes the path first, so its examples never need `--`. Options such as `-v` or `-X POST` placed after the path pass through to curl unchanged. This addon is useful for troubleshooting or accessing API endpoints that aren't exposed through other tools. It automatically handles authentication.
 
 ## Tips for Using Addons
 
