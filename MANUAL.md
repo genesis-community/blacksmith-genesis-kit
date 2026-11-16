@@ -936,7 +936,7 @@ params:
   This interface is protected by HTTP basic authentication, and
   this addon takes that into account, without bothering you.
 
-- `register` (alias `re`) - Register this Blacksmith Broker with a Cloud Foundry instance (deployed by Genesis). The addon reads the Cloud Foundry connection details from the exodus data stored under this environment's name, and it syncs the CA certificates.
+- `register` (alias `re`) - Register this Blacksmith Broker with a Cloud Foundry instance (deployed by Genesis). It takes an optional Cloud Foundry environment name, and that name defaults to this environment's own name. The addon reads the Cloud Foundry connection details from the exodus data stored under that name, and it syncs the CA certificates.
 
   It enables service access for every service in the Cloud Foundry catalog. If the service broker is already registered, this will run update-service-broker instead.
 

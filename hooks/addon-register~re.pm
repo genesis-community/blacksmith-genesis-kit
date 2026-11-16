@@ -24,8 +24,8 @@ sub cmd_details {
 		"Synchronizes CA certificates and enables service access for all forges.\n".
 		"\n".
 		"Usage: genesis <env> do register [cf-environment-name]\n".
-		"  If no CF environment name is provided, attempts to use the current\n".
-		"  environment name with '/cf' suffix.\n".
+		"  If no CF environment name is provided, it defaults to the current\n".
+		"  environment's name.\n".
 		"\n".
 		"Example: genesis blacksmith-dev do register cf-dev";
 }
@@ -85,7 +85,7 @@ sub perform {
 		return $self->done(0);
 	}
 
-	my $cf_env = $self->env->name;
+	my $cf_env = $self->_determine_cf_environment;
 
 	# Sync CA certificates
 	unless ($self->ca_sync($cf_env)) {
@@ -134,25 +134,12 @@ sub perform {
 sub _determine_cf_environment {
 	my ($self) = @_;
 
-	my $cf_env = $self->{args}[0];
+	# An argument names the CF environment. Without one, the CF environment
+	# is this environment's own name, which OCFP pairs with the blacksmith
+	# environment by kit type in the exodus path.
+	return $self->{args}[0] if $self->{args} && $self->{args}[0];
 
-	if (!$cf_env) {
-		# Try to infer from current environment name
-		my $current_env = $self->env->name;
-
-		# Common patterns: blacksmith-dev -> cf-dev
-		if ($current_env =~ /^blacksmith-(.+)$/) {
-			$cf_env = "cf-$1";
-			info("\nNo CF environment specified. Inferring: #C{%s}\n", $cf_env);
-		} else {
-			error("\n#R{Error:} No Cloud Foundry environment name provided.\n\n");
-			info("Usage: #G{genesis %s do register <cf-environment>}\n\n", $current_env);
-			info("Example: #G{genesis %s do register cf-dev}\n\n", $current_env);
-			return undef;
-		}
-	}
-
-	return $cf_env;
+	return $self->env->name;
 }
 # }}}
 
