@@ -41,7 +41,7 @@ new data services instances on behalf of end users.
   `ubuntu-noble`.
 
 - `stemcell_version` - The version of the stemcell to deploy.
-  Defaults to `latest`
+  Defaults to `latest`.
 
 - `vm_type` - The name of the `vm_type` (per cloud-config) that
   will be used to deploy the blacksmith broker VM. Defaults to
@@ -50,14 +50,15 @@ new data services instances on behalf of end users.
 - `disk_size` - How big of a data disk to provide the Blacksmith
   broker, for persistent storage. Defaults to `20480` (20G).
 
+The defaults above apply when `ocfp` is off. With `ocfp`, the AWS, PVE, and StackIT overlays take the VM type, network, and disk type from the cloud-config names that the kit builds for the environment. Those overlays also remove the persistent disk from the broker VM, so `disk_size` has no effect there.
+
 ## Blacksmith Broker Parameters
 
 - `blacksmith_debug` - Whether or not to enable Blacksmith
   debug logging. Defaults to `false`, but you can set it to
   `true` if you really like log output.
 
-- `blacksmith_port` - The TCP port that Blacksmith will bind to
-  This defaults to `3000`.
+- `blacksmith_port` - The TCP port that Blacksmith will bind to. This defaults to `3000`, or to `80` when the `broker-tls` feature is on, which `ocfp` always turns on.
 
 - `blacksmith_tls_port` - The TCP port that Blacksmith will bind to for tls traffic
   This defaults to `443`.
@@ -863,7 +864,7 @@ Root deserves care. A root command can change anything on the VM, and nothing th
 
 ## Ubuntu Resolute Stemcells
 
-The kit deploys the broker on its default stemcell, which is `ubuntu-noble` for `ocfp` environments, unless we ask for something else. Adding the `resolute` feature moves the broker VM onto `ubuntu-resolute`.
+The kit deploys the broker on its default stemcell, which is `ubuntu-noble`, unless we ask for something else. Adding the `resolute` feature moves the broker VM onto `ubuntu-resolute`.
 
 ```yaml
 kit:
@@ -892,7 +893,7 @@ Before the first deploy we need to do two things on the director.
 
 Resolute ships without runit, so the `chpst` command is missing. The Blacksmith release does not use runit, which is why the broker VM runs on resolute, but a release whose start script drops privileges with `chpst` hangs there. We should check any job we add to the broker deployment for `chpst` before we move it to resolute.
 
-The feature moves only the broker VM and the stemcell the kit itself names. Service instances are deployed by the Blacksmith broker through the director, using the stemcell that each forge asks for, and the kit does not set that for every forge. The valkey, redis, and rabbitmq forges all receive the same `stemcell_os` and `stemcell_version` as job properties, so their instances follow the feature, provided the forge release reads those properties. For redis and rabbitmq, `redis_stemcell_version` and `rabbitmq_stemcell_version` still take precedence over `stemcell_version`. The postgresql, mariadb, and kubernetes forges are not passed the operating system, so their instances use whichever one the forge release declares. For those forges we have to confirm that the forge release supports resolute and that a matching stemcell is on the director before we offer the plan. Without `ocfp`, the broker uploads the stemcells in `params.stemcells` to its internal director, and the IaaS defaults in the kit are jammy stemcells, so we also set `params.stemcells` to a resolute stemcell there.
+The feature moves only the broker VM and the stemcell the kit itself names. Service instances are deployed by the Blacksmith broker through the director, using the stemcell that each forge asks for, and the kit does not set that for every forge. The valkey, redis, and rabbitmq forges all receive the same `stemcell_os` and `stemcell_version` as job properties, so their instances follow the feature, provided the forge release reads those properties. For redis and rabbitmq, `redis_stemcell_version` and `rabbitmq_stemcell_version` still take precedence over `stemcell_version`. The postgresql, mariadb, and kubernetes forges are not passed the operating system, so their instances use whichever one the forge release declares. For those forges we have to confirm that the forge release supports resolute and that a matching stemcell is on the director before we offer the plan. Without `ocfp`, the broker uploads the stemcells in `params.stemcells` to its internal director, and the IaaS defaults in the kit are jammy stemcells, except vSphere, which uses bionic, so we also set `params.stemcells` to a resolute stemcell there.
 
 ## Cloud Configuration
 
@@ -926,8 +927,7 @@ params:
 
 ## Available Addons
 
-- `open` - Opens the Blacksmith Web Management Console in your
-  browser.
+- `open` (alias `o`) - Opens the Blacksmith Web Management Console in your browser.
 
   This web interface provides an at-a-glance summary of all the
   salient bits of the Blacksmith broker deployment, the service
@@ -936,35 +936,22 @@ params:
   This interface is protected by HTTP basic authentication, and
   this addon takes that into account, without bothering you.
 
-- `register` - Register this Blacksmith Broker with a Cloud
-  Foundry instance (deployed by Genesis). Optionally takes the
-  name of the CF environment to register with.
+- `register` (alias `re`) - Register this Blacksmith Broker with a Cloud Foundry instance (deployed by Genesis). The addon reads the Cloud Foundry connection details from the exodus data stored under this environment's name, and it syncs the CA certificates.
 
-  If the service broker is already registered, this will run
-  update-service-broker instead.
+  It enables service access for every service in the Cloud Foundry catalog. If the service broker is already registered, this will run update-service-broker instead.
 
-- `bosh` - Prints shell export lines for the Blacksmith (Internal)
-  BOSH director, namely BOSH_ENVIRONMENT, BOSH_CA_CERT, BOSH_CLIENT,
-  and BOSH_CLIENT_SECRET. It runs no command. The output holds a
-  secret, so the usual way to use it is
-  `eval "$(genesis do <env> bosh)"`.
+- `bosh` (alias `bo`) - Prints shell export lines for the Blacksmith (Internal) BOSH director, namely BOSH_ENVIRONMENT, BOSH_CA_CERT, BOSH_CLIENT, and BOSH_CLIENT_SECRET. It runs no command. The output holds a secret, so the usual way to use it is `eval "$(genesis do <env> bosh)"`.
 
   This is for the times when the broker isn't answering, or when
   you need something the broker has no `/b/` route for. After the
   eval, your own BOSH CLI can talk to the director.
 
-- `boss` - Runs `boss`, a command-line utility for interacting
-  directly with Blacksmith via the Open Service Broker API,
-  without needing a Cloud Foundry instance.
+- `boss` (alias `b`) - Runs `boss`, a command-line utility for interacting directly with Blacksmith via the Open Service Broker API, without needing a Cloud Foundry instance.
 
   This requires that you have `boss` already installed. You can
-  get `boss` from https://github.com/jhunt/boss/releases
+  get `boss` from https://github.com/blacksmith-community/boss/releases
 
-- `curl` - Run arbitrary HTTP requests against the Blacksmith
-  Broker and its API, as in `genesis do <env> -- curl <path>`.
-  This is very useful for troubleshooting weird Blacksmith
-  issues. The `/b/status` and `/v2/catalog` endpoints are
-  useful.
+- `curl` (alias `cu`) - Run arbitrary HTTP requests against the Blacksmith Broker and its API, as in `genesis do <env> -- curl <path>`. This is very useful for troubleshooting weird Blacksmith issues. The `/b/status` and `/v2/catalog` endpoints are useful.
 
 ## Examples
 
