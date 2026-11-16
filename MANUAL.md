@@ -38,10 +38,10 @@ new data services instances on behalf of end users.
 
 - `stemcell_os` - The operating system you want to deploy the
   Blacksmith service broker itself on. This defaults to
-  `ubuntu-bionic`.
+  `ubuntu-noble`.
 
 - `stemcell_version` - The version of the stemcell to deploy.
-  Defaults to `1.latest`
+  Defaults to `latest`
 
 - `vm_type` - The name of the `vm_type` (per cloud-config) that
   will be used to deploy the blacksmith broker VM. Defaults to
