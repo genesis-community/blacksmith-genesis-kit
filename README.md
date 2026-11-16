@@ -62,11 +62,11 @@ Blacksmith comes with several useful addons to simplify management:
 
 - **open** - Opens the Blacksmith Web Management Console in your browser
 - **register** - Registers the Blacksmith Broker with a Cloud Foundry instance
-- **bosh** - Prints shell export lines with the connection details for the Blacksmith's internal BOSH director, for use as `eval "$(genesis do <env> bosh)"`
+- **bosh** - Prints shell export lines with the connection details for the Blacksmith's internal BOSH director, for use as `eval "$(genesis <env> do bosh)"`
 - **boss** - Runs the boss CLI to interact with Blacksmith directly
-- **curl** - Makes direct API calls to the Blacksmith Broker, as in `genesis do <env> -- curl <path>`
+- **curl** - Makes direct API calls to the Blacksmith Broker, as in `genesis <env> do curl <path>`
 
-Run `genesis do <env> list` to see all available commands.
+Run `genesis <env> do list` to see all available commands.
 
 ## Supported Service Forges
 

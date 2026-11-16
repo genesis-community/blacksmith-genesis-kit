@@ -71,10 +71,10 @@ Once Blacksmith is deployed, register it with your Cloud Foundry instance:
 
 ```bash
 # Register with the default CF environment
-genesis do my-blacksmith-env register
+genesis my-blacksmith-env do register
 
 # Register with a specific CF environment
-genesis do my-blacksmith-env register my-cf-env
+genesis my-blacksmith-env do register my-cf-env
 ```
 
 ## Verifying the Deployment
@@ -83,7 +83,7 @@ genesis do my-blacksmith-env register my-cf-env
 
 ```bash
 # View the broker status in the web UI
-genesis do my-blacksmith-env open
+genesis my-blacksmith-env do open
 
 # Check service offerings in CF
 cf marketplace
@@ -120,16 +120,16 @@ cf services
 
 ```bash
 # Check the broker's status
-genesis do my-blacksmith-env -- curl /b/status
+genesis my-blacksmith-env do curl /b/status
 
 # List the VMs of a service deployment, using its deployment_name from the status
-genesis do my-blacksmith-env -- curl /b/deployments/<deployment-name>/vms
+genesis my-blacksmith-env do curl /b/deployments/<deployment-name>/vms
 ```
 
 When Blacksmith isn't answering, we can reach the internal BOSH director directly. The `bosh` addon prints the director's connection details as export lines and runs no command. Its output holds a secret, so we load it with `eval`.
 
 ```bash
-eval "$(genesis do my-blacksmith-env bosh)"
+eval "$(genesis my-blacksmith-env do bosh)"
 ```
 
 ### Using the boss CLI
@@ -138,7 +138,7 @@ If you have the boss CLI installed, you can interact directly with the Blacksmit
 
 ```bash
 # Run boss commands
-genesis do my-blacksmith-env boss catalog
+genesis my-blacksmith-env do boss catalog
 ```
 
 ## Next Steps

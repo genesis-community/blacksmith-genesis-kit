@@ -300,8 +300,8 @@ sub display_next_steps {
   }
 
   info("For troubleshooting service provisioning issues:\n");
-  info("  - Check BOSH tasks: #G{%s do -- curl /b/tasks}\n", $cmd_with_env);
-  info("  - View BOSH VMs: #G{%s do -- curl /b/blacksmith/vms}\n", $cmd_with_env);
+  info("  - Check BOSH tasks: #G{%s do curl /b/tasks}\n", $cmd_with_env);
+  info("  - View BOSH VMs: #G{%s do curl /b/blacksmith/vms}\n", $cmd_with_env);
   info("  - Check logs: #G{%s do boss logs}\n\n", $cmd_with_env);
 }
 

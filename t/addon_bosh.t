@@ -67,7 +67,7 @@ sub capture {
 	like($out, qr/^export BOSH_ENVIRONMENT='https:\/\/10\.0\.0\.6:25555'$/m, 'environment export');
 	like($out, qr/^export BOSH_CLIENT='admin'$/m, 'client export');
 	like($err, qr/secret/i, 'standard error warns the output holds a secret');
-	like($err, qr/eval "\$\(genesis do lab bosh\)"/, 'standard error shows the eval usage');
+	like($err, qr/eval "\$\(genesis lab do bosh\)"/, 'standard error shows the eval usage');
 	is($done, 1, 'addon finishes through done');
 
 	for my $pair (['BOSH_CLIENT_SECRET', $good{bosh_password}], ['BOSH_CA_CERT', $pem], ['BOSH_CLIENT', 'admin'], ['BOSH_ENVIRONMENT', $good{bosh_address}]) {

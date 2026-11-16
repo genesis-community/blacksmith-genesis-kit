@@ -232,7 +232,7 @@ Register the Blacksmith broker with your Cloud Foundry deployment:
 
 ```bash
 # Register with CF
-genesis do aws-blacksmith register cf-aws
+genesis aws-blacksmith do register cf-aws
 ```
 
 Replace `cf-aws` with the name of your Cloud Foundry environment.
@@ -271,7 +271,7 @@ You can also use the Blacksmith Web UI to monitor the deployment:
 
 ```bash
 # Open the Web UI (macOS only)
-genesis do aws-blacksmith open
+genesis aws-blacksmith do open
 ```
 
 ## Step 8: Bind to an Application
@@ -357,7 +357,7 @@ For AWS-specific debugging:
 
 ```bash
 # Check the broker's logs for CPI errors
-genesis do aws-blacksmith -- curl /b/blacksmith/logs
+genesis aws-blacksmith do curl /b/blacksmith/logs
 
 # Verify AWS credentials
 aws configure list

@@ -940,7 +940,7 @@ params:
 
   It enables service access for every service in the Cloud Foundry catalog. If the service broker is already registered, this will run update-service-broker instead.
 
-- `bosh` (alias `bo`) - Prints shell export lines for the Blacksmith (Internal) BOSH director, namely BOSH_ENVIRONMENT, BOSH_CA_CERT, BOSH_CLIENT, and BOSH_CLIENT_SECRET. It runs no command. The output holds a secret, so the usual way to use it is `eval "$(genesis do <env> bosh)"`.
+- `bosh` (alias `bo`) - Prints shell export lines for the Blacksmith (Internal) BOSH director, namely BOSH_ENVIRONMENT, BOSH_CA_CERT, BOSH_CLIENT, and BOSH_CLIENT_SECRET. It runs no command. The output holds a secret, so the usual way to use it is `eval "$(genesis <env> do bosh)"`.
 
   This is for the times when the broker isn't answering, or when
   you need something the broker has no `/b/` route for. After the
@@ -951,7 +951,7 @@ params:
   This requires that you have `boss` already installed. You can
   get `boss` from https://github.com/blacksmith-community/boss/releases
 
-- `curl` (alias `cu`) - Run arbitrary HTTP requests against the Blacksmith Broker and its API, as in `genesis <env> do -- curl <path>`. This is very useful for troubleshooting weird Blacksmith issues. The `/b/status` and `/v2/catalog` endpoints are useful.
+- `curl` (alias `cu`) - Run arbitrary HTTP requests against the Blacksmith Broker and its API, as in `genesis <env> do curl <path>`. This is very useful for troubleshooting weird Blacksmith issues. The `/b/status` and `/v2/catalog` endpoints are useful.
 
 ## Examples
 

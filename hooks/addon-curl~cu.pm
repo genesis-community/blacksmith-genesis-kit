@@ -42,14 +42,14 @@ sub perform {
 
 	# Validate arguments using mixin method
 	my $usage_msg = sprintf(
-		"  #G{genesis do %s -- curl <path> [curl options...]}\n\n".
+		"  #G{genesis %s do curl <path> [curl options...]}\n\n".
 		"#Bu{Examples:}\n".
 		"  # Get service catalog:\n".
-		"  #G{genesis do %s -- curl /v2/catalog}\n\n".
+		"  #G{genesis %s do curl /v2/catalog}\n\n".
 		"  # Get service instances with verbose output:\n".
-		"  #G{genesis do %s -- curl /v2/service_instances -v}\n\n".
+		"  #G{genesis %s do curl /v2/service_instances -v}\n\n".
 		"  # Make a POST request:\n".
-		"  #G{genesis do %s -- curl /v2/service_instances -X POST -d '{...}'}\n",
+		"  #G{genesis %s do curl /v2/service_instances -X POST -d '{...}'}\n",
 		$env->name, $env->name, $env->name, $env->name
 	);
 	

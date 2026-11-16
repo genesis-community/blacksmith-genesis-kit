@@ -95,7 +95,7 @@ releases:
   sha1:    1def8e4e21d3ea95aaf16339d4dec64667538ae9
 ```
 
-A successful deployment of the above blacksmith manifest (or a variation of, that matches your choices) should be followed by the registration of the broker using the addon `genesis do envname register`. Once blacksmith has been registered, cf will report the available plans provided earlier:
+A successful deployment of the above blacksmith manifest (or a variation of, that matches your choices) should be followed by the registration of the broker using the addon `genesis envname do register`. Once blacksmith has been registered, cf will report the available plans provided earlier:
 
 `cf marketplace`
 
@@ -511,9 +511,9 @@ With everything working we know that we have enough privileges to reach out to t
 
 get a listing of the available vms. We find the deployment name in the `deployment_name` field of each entry under `instances` in the broker's status, and then ask the broker for that deployment's VMs:
 
-`genesis do dev -- curl /b/status`
+`genesis dev do curl /b/status`
 
-`genesis do dev -- curl /b/deployments/<deployment-name>/vms` # replace dev with your environment name file
+`genesis dev do curl /b/deployments/<deployment-name>/vms` # replace dev with your environment name file
 
 The broker answers with JSON that carries the same details as the table below, namely the instance, process state, AZ, IPs, and VM type.
 
@@ -641,11 +641,11 @@ Assuming that your environment name is dev, once you have:
 
 * registered the broker to your deployed cf
 
-`genesis do dev bind-autoscaler`
+`genesis dev do bind-autoscaler`
 
 * setup the the 'autoscaler' plugin to the cf cli
 
-`genesis do dev setup-cf-plugin`
+`genesis dev do setup-cf-plugin`
 
 * and created the corresponding service
 
@@ -898,9 +898,9 @@ With `- rabbitmq-tls` feature enabled you also have the option to anable `- rabb
 
 get a listing of the available vms. For each deployment name in the `instances` section of the broker's status, we ask the broker for its VMs:
 
-`genesis do dev -- curl /b/status`
+`genesis dev do curl /b/status`
 
-`genesis do dev -- curl /b/deployments/<deployment-name>/vms` # replace dev with your environment name file
+`genesis dev do curl /b/deployments/<deployment-name>/vms` # replace dev with your environment name file
 
 The broker answers with JSON that carries the same details as the tables below.
 

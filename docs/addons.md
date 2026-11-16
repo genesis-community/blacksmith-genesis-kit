@@ -17,13 +17,13 @@ Blacksmith Genesis Kit provides several addons to help you interact with and man
 To use any of the Blacksmith addons, use the `genesis do` command:
 
 ```bash
-genesis do <environment-name> <addon-name> [arguments]
+genesis <environment-name> do <addon-name> [arguments]
 ```
 
 For example:
 
 ```bash
-genesis do my-blacksmith open
+genesis my-blacksmith do open
 ```
 
 ## Addon Details
@@ -33,7 +33,7 @@ genesis do my-blacksmith open
 Opens the Blacksmith Web Management Console in your browser. It works on macOS, on Linux with `xdg-open`, and on Windows through WSL.
 
 ```bash
-genesis do my-blacksmith open
+genesis my-blacksmith do open
 ```
 
 The web interface provides:
@@ -50,10 +50,10 @@ Registers this Blacksmith Broker with a Cloud Foundry instance.
 
 ```bash
 # Register with the default CF environment (based on current environment)
-genesis do my-blacksmith register
+genesis my-blacksmith do register
 
 # Register with a specific CF environment
-genesis do my-blacksmith register cf-production
+genesis my-blacksmith do register cf-production
 ```
 
 This addon:
@@ -69,13 +69,13 @@ If the broker is already registered, it will be updated with the latest configur
 Prints the connection details for the Blacksmith internal BOSH director as four shell export lines, for `BOSH_ENVIRONMENT`, `BOSH_CA_CERT`, `BOSH_CLIENT`, and `BOSH_CLIENT_SECRET`. The addon runs no command and makes no change to the director.
 
 ```bash
-genesis do my-blacksmith bosh
+genesis my-blacksmith do bosh
 ```
 
 The output holds the director's client secret, so we should not paste it into a ticket or leave it in a log. The usual way to use it is to load the details straight into the current shell.
 
 ```bash
-eval "$(genesis do my-blacksmith bosh)"
+eval "$(genesis my-blacksmith do bosh)"
 ```
 
 We need this only when Blacksmith isn't answering, or when we need something the broker has no route for, such as the director's own job logs, `cck`, or uploading a release. The broker's `/b/` routes also cover deleting a deployment, reading its manifest, and posting a new one, so we reach for `bosh` for those only when the broker is down. For everyday checks of deployments and their VMs, we use the broker's `/b/` routes through the `curl` addon instead. The `bosh` commands in the troubleshooting guide's section "When Blacksmith isn't answering" are our own tooling, and the kit does not run them.
@@ -86,13 +86,13 @@ Runs the `boss` CLI to interact directly with the Blacksmith broker through the 
 
 ```bash
 # View the service catalog
-genesis do my-blacksmith boss catalog
+genesis my-blacksmith do boss catalog
 
 # List service instances
-genesis do my-blacksmith boss instances
+genesis my-blacksmith do boss instances
 
 # Get info about a specific instance
-genesis do my-blacksmith boss instance <instance-id>
+genesis my-blacksmith do boss instance <instance-id>
 ```
 
 This requires that you have the `boss` CLI installed. You can download it from https://github.com/jhunt/boss/releases.
@@ -105,13 +105,13 @@ Makes direct HTTP requests to the Blacksmith broker's API.
 
 ```bash
 # Get broker status
-genesis do my-blacksmith -- curl /b/status
+genesis my-blacksmith do curl /b/status
 
 # Get the service catalog
-genesis do my-blacksmith -- curl /v2/catalog
+genesis my-blacksmith do curl /v2/catalog
 
 # List the VMs of a service deployment
-genesis do my-blacksmith -- curl /b/deployments/<deployment-name>/vms
+genesis my-blacksmith do curl /b/deployments/<deployment-name>/vms
 ```
 
 The `--` separates genesis's own options from the arguments that go to the addon. This addon is useful for troubleshooting or accessing API endpoints that aren't exposed through other tools. It automatically handles authentication.
@@ -126,10 +126,10 @@ You can use these addons in scripts for automation:
 #!/bin/bash
 # Deploy and register Blacksmith
 genesis deploy my-blacksmith
-genesis do my-blacksmith register my-cf
+genesis my-blacksmith do register my-cf
 
 # Check if the deployment succeeded
-if genesis do my-blacksmith -- curl /b/status | grep -q '"status":"ok"'; then
+if genesis my-blacksmith do curl /b/status | grep -q '"status":"ok"'; then
   echo "Blacksmith deployed successfully!"
 else
   echo "Blacksmith deployment has issues!"
@@ -150,9 +150,9 @@ When troubleshooting service issues:
 For managing the entire lifecycle of your Blacksmith deployment:
 
 1. Deploy Blacksmith with `genesis deploy my-blacksmith`
-2. Register it with Cloud Foundry using `genesis do my-blacksmith register`
-3. Access the Web UI with `genesis do my-blacksmith open` to monitor operations
-4. Use `eval "$(genesis do my-blacksmith bosh)"` to load the BOSH director's details when we need it for maintenance
+2. Register it with Cloud Foundry using `genesis my-blacksmith do register`
+3. Access the Web UI with `genesis my-blacksmith do open` to monitor operations
+4. Use `eval "$(genesis my-blacksmith do bosh)"` to load the BOSH director's details when we need it for maintenance
 5. Update Blacksmith with `genesis deploy my-blacksmith`
 
 ## Additional Information

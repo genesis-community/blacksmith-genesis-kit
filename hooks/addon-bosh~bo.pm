@@ -22,7 +22,7 @@ sub cmd_details {
 		"Prints shell export lines (BOSH_ENVIRONMENT, BOSH_CA_CERT, BOSH_CLIENT,\n".
 		"and BOSH_CLIENT_SECRET) for the Blacksmith BOSH director, so that the\n".
 		"bosh CLI can reach it when the broker is not answering. The output\n".
-		"holds a secret. Use it as: eval \"\$(genesis do <env> bosh)\"";
+		"holds a secret. Use it as: eval \"\$(genesis <env> do bosh)\"";
 }
 
 # Quote a value for the shell, escaping any embedded single quote.
@@ -45,7 +45,7 @@ sub perform {
 	), "\n";
 
 	print STDERR "Note: the output above holds a secret. The usual use is: ".
-		"eval \"\$(genesis do $env_name bosh)\"\n";
+		"eval \"\$(genesis $env_name do bosh)\"\n";
 
 	return $self->done();
 }

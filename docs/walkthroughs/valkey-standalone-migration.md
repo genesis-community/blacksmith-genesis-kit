@@ -81,8 +81,8 @@ cf service-key redis-test redis-test-key
 The `instances` section of the broker's status lists each service instance with its `deployment_name`, so we look there for the `valkey-standalone-8` deployment. We can then confirm its VM through the broker.
 
 ```bash
-genesis do <env> -- curl /b/status
-genesis do <env> -- curl /b/deployments/<valkey-deployment-name>/vms
+genesis <env> do curl /b/status
+genesis <env> do curl /b/deployments/<valkey-deployment-name>/vms
 ```
 
 ## SSH to the Valkey Instance

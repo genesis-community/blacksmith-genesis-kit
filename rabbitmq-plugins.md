@@ -59,7 +59,7 @@ To enable new RabbitMQ Instance deployments with configured plugins, you can eas
 
 7. After the the Blacksmith deployment is complete, verify that the plugins are enabled:
    - Create a new RabbitMQ service instance
-   - SSH into the newly created RabbitMQ instance from the Blacksmith web UI, which `genesis do <env> open` opens for us
+   - SSH into the newly created RabbitMQ instance from the Blacksmith web UI, which `genesis <env> do open` opens for us
    - Run `source /var/vcap/jobs/rabbitmq/env` then `rabbitmq-plugins list` to see the enabled plugins or
    - `cat /var/vcap/sys/log/rabbitmq/rabbitmq.log` which will show the enablement of the plugins
 
@@ -74,7 +74,7 @@ To update plugin configurations for existing RabbitMQ instance deployments, we f
 We load the director's connection details into our shell first. The `bosh` addon prints four export lines and runs no command. Its output holds a secret, so we use `eval` and keep the output out of our terminal history and logs.
 
 ```
-eval "$(genesis do <env> bosh)"
+eval "$(genesis <env> do bosh)"
 ```
 
 The `bosh` command below is our own tooling and not something the kit runs for us.
@@ -88,7 +88,7 @@ The `bosh` command below is our own tooling and not something the kit runs for u
 ### Updating the manifest through the broker
 
 2. Update your RabbitMQ deployment manifest:
-   - Download the manifest through the broker, which returns JSON whose `text` field holds the manifest YAML. We save that field with `genesis do <env> -- curl -s /b/deployments/rabbitmq-single-node-fcab211b-dffd-478d-8537-5ba2b7c4d5bb/manifest | jq -r .text > single-plugins-manifest.yml`
+   - Download the manifest through the broker, which returns JSON whose `text` field holds the manifest YAML. We save that field with `genesis <env> do -- curl -s /b/deployments/rabbitmq-single-node-fcab211b-dffd-478d-8537-5ba2b7c4d5bb/manifest | jq -r .text > single-plugins-manifest.yml`
    - Add or modify the `plugins` property under the `properties` section of the `rabbitmq` job specification
 
    For example:
@@ -108,10 +108,10 @@ The `bosh` command below is our own tooling and not something the kit runs for u
 
    ```
    spruce json single-plugins-manifest.yml > single-plugins-manifest.json
-   genesis do <env> -- curl /b/deployments/rabbitmq-single-node-fcab211b-dffd-478d-8537-5ba2b7c4d5bb/manifest -X POST -H 'Content-Type: application/json' -d @single-plugins-manifest.json
+   genesis <env> do curl /b/deployments/rabbitmq-single-node-fcab211b-dffd-478d-8537-5ba2b7c4d5bb/manifest -X POST -H 'Content-Type: application/json' -d @single-plugins-manifest.json
    ```
 
-   The response carries the task ID, and `genesis do <env> -- curl /b/tasks` shows how the task is going.
+   The response carries the task ID, and `genesis <env> do curl /b/tasks` shows how the task is going.
 
 4. During the deployment process, confirm that:
    - The latest release version is being used. You should see something like:
@@ -153,7 +153,7 @@ For a complete list of available plugins, refer to the official RabbitMQ documen
 
 If you encounter issues with plugin configuration:
 
-1. Check the RabbitMQ logs for any error messages. We open the Blacksmith web UI with `genesis do <env> open`, select the service instance, and start an SSH session on the node from there. In that session we run:
+1. Check the RabbitMQ logs for any error messages. We open the Blacksmith web UI with `genesis <env> do open`, select the service instance, and start an SSH session on the node from there. In that session we run:
    ```
    cat /var/vcap/sys/log/rabbitmq/rabbitmq.log
    ```

@@ -36,7 +36,7 @@ Regardless of the IaaS provider, all Blacksmith deployments follow these general
 
 5. **Register with Cloud Foundry**
    ```bash
-   genesis do my-env register cf-env
+   genesis my-env do register cf-env
    ```
 
 6. **Create service instances**
