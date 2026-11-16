@@ -97,7 +97,7 @@ sub _get_open_command {
 	}
 	error("\nYour system: %s\n", $^O);
 	error("\nAlternatively, you can manually browse to the Blacksmith URL.\n");
-	error("Run '#G{genesis do %s -- info}' to get the connection details.\n", $self->env->name);
+	error("Run '#G{genesis %s info}' to get the connection details.\n", $self->env->name);
 	
 	return undef;
 }

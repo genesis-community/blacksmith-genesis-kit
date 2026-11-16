@@ -232,7 +232,7 @@ sub display_blacksmith_catalog {
   my ($boss_check, $boss_rc) = run({stderr => 0}, 'command -v boss >/dev/null 2>&1');
   if ($boss_rc != 0) {
     info("  #Y{!} The 'boss' CLI is not installed.\n");
-    info("  Install it from: #C{https://github.com/jhunt/boss}\n");
+    info("  Install it from: #C{https://github.com/blacksmith-community/boss}\n");
     info("  Once installed, you can query the catalog with:\n");
     info("    #G{boss catalog}\n");
     return;
