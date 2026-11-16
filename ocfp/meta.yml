@@ -40,7 +40,7 @@ meta:
     network:   (( concat meta.ocfp.env.cloud "net-blacksmith" ))
 
     debug:      (( grab params.blacksmith_debug || false ))
-    shareable:  (( grab params.blacksmith_sharable || false ))
+    shareable:  (( grab params.shareable || params.blacksmith_sharable || false ))
 
     broker:
       # NOTE: TLS is always enabled as broker-tls is included by default.
