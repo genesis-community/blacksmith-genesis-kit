@@ -951,7 +951,7 @@ params:
   This requires that you have `boss` already installed. You can
   get `boss` from https://github.com/blacksmith-community/boss/releases
 
-- `curl` (alias `cu`) - Run arbitrary HTTP requests against the Blacksmith Broker and its API, as in `genesis do <env> -- curl <path>`. This is very useful for troubleshooting weird Blacksmith issues. The `/b/status` and `/v2/catalog` endpoints are useful.
+- `curl` (alias `cu`) - Run arbitrary HTTP requests against the Blacksmith Broker and its API, as in `genesis <env> do -- curl <path>`. This is very useful for troubleshooting weird Blacksmith issues. The `/b/status` and `/v2/catalog` endpoints are useful.
 
 ## Examples
 
