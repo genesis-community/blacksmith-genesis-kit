@@ -929,27 +929,21 @@ params:
 
 - `open` (alias `o`) - Opens the Blacksmith Web Management Console in your browser.
 
-  This web interface provides an at-a-glance summary of all the
-  salient bits of the Blacksmith broker deployment, the service
-  catalog, quotas, and deployed service instances.
+  This web interface provides an at-a-glance summary of all the salient bits of the Blacksmith broker deployment, the service catalog, quotas, and deployed service instances.
 
-  This interface is protected by HTTP basic authentication, and
-  this addon takes that into account, without bothering you.
+  This interface is protected by HTTP basic authentication, and this addon takes that into account, without bothering you.
 
-- `register` (alias `re`) - Register this Blacksmith Broker with a Cloud Foundry instance (deployed by Genesis). It takes an optional Cloud Foundry environment name, and that name defaults to this environment's own name. The addon reads the Cloud Foundry connection details from the exodus data stored under that name, and it syncs the CA certificates.
+- `register` (alias `re`) - Register this Blacksmith Broker with a Cloud Foundry instance (deployed by Genesis). It takes an optional Cloud Foundry environment name, and that name defaults to this environment's own name. The addon reads the Cloud Foundry connection details from the exodus data stored under that name. It syncs the Blacksmith services CA certificate only when the environment enables `broker-tls`, `rabbitmq-tls`, `redis-tls`, or `valkey-tls`, and it skips that step otherwise.
 
   It enables service access for every service in the Cloud Foundry catalog. If the service broker is already registered, this will run update-service-broker instead.
 
 - `bosh` (alias `bo`) - Prints shell export lines for the Blacksmith (Internal) BOSH director, namely BOSH_ENVIRONMENT, BOSH_CA_CERT, BOSH_CLIENT, and BOSH_CLIENT_SECRET. It runs no command. The output holds a secret, so the usual way to use it is `eval "$(genesis <env> do bosh)"`.
 
-  This is for the times when the broker isn't answering, or when
-  you need something the broker has no `/b/` route for. After the
-  eval, your own BOSH CLI can talk to the director.
+  This is for the times when the broker isn't answering, or when you need something the broker has no `/b/` route for. After the eval, your own BOSH CLI can talk to the director.
 
 - `boss` (alias `b`) - Runs `boss`, a command-line utility for interacting directly with Blacksmith via the Open Service Broker API, without needing a Cloud Foundry instance.
 
-  This requires that you have `boss` already installed. You can
-  get `boss` from https://github.com/blacksmith-community/boss/releases
+  This requires that you have `boss` already installed. You can get `boss` from https://github.com/blacksmith-community/boss/releases
 
 - `curl` (alias `cu`) - Run arbitrary HTTP requests against the Blacksmith Broker and its API, as in `genesis <env> do curl <path>`. This is very useful for troubleshooting weird Blacksmith issues. The `/b/status` and `/v2/catalog` endpoints are useful.
 
