@@ -111,7 +111,7 @@ The `bosh` command below is our own tooling and not something the kit runs for u
    genesis <env> do curl /b/deployments/rabbitmq-single-node-fcab211b-dffd-478d-8537-5ba2b7c4d5bb/manifest -X POST -H 'Content-Type: application/json' -d @single-plugins-manifest.json
    ```
 
-   The response carries the task ID, and `genesis <env> do curl /b/tasks` shows how the task is going.
+   We run both commands from the directory that holds the manifest files, because curl reads `@single-plugins-manifest.json` relative to it. The response is JSON with a `task_id`, and `genesis <env> do curl /b/tasks/<task_id> -s` shows how that task is going. If the response is an error body instead, such as `deployment_not_managed` or `instance_busy`, the broker refused the update and nothing was deployed.
 
 4. During the deployment process, confirm that:
    - The latest release version is being used. You should see something like:
