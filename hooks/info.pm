@@ -247,13 +247,13 @@ sub display_blacksmith_catalog {
       error("  Error: %s\n", $catalog_err || $catalog);
     }
     info("\n  This may indicate:\n");
-    info("    - BOSS_URL environment variable is not set\n");
+    info("    - BLACKSMITH_URL environment variable is not set\n");
     info("    - Blacksmith API is not accessible\n");
     info("    - Authentication issues\n");
-    info("\n  Try setting BOSS_URL and credentials:\n");
-    info("    #G{export BOSS_URL=%s}\n", $self->env->lookup('params.blacksmith_url', ''));
-    info("    #G{export BOSS_USERNAME=blacksmith}\n");
-    info("    #G{export BOSS_PASSWORD=<password>}\n");
+    info("\n  Try setting BLACKSMITH_URL and credentials:\n");
+    info("    #G{export BLACKSMITH_URL=%s}\n", $self->env->lookup('params.blacksmith_url', ''));
+    info("    #G{export BLACKSMITH_USERNAME=blacksmith}\n");
+    info("    #G{export BLACKSMITH_PASSWORD=<password>}\n");
   } else {
     # Format catalog output with proper indentation
     my @lines = split /\n/, $catalog;

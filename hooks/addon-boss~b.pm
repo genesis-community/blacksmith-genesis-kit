@@ -47,9 +47,9 @@ sub perform {
 	my $connection_info = $self->get_blacksmith_connection_info();
 	
 	# Set environment variables for boss
-	$ENV{BOSS_URL} = $connection_info->{url};
-	$ENV{BOSS_USERNAME} = $connection_info->{username};
-	$ENV{BOSS_PASSWORD} = $connection_info->{password};
+	$ENV{BLACKSMITH_URL} = $connection_info->{url};
+	$ENV{BLACKSMITH_USERNAME} = $connection_info->{username};
+	$ENV{BLACKSMITH_PASSWORD} = $connection_info->{password};
 	
 	info("Connecting to Blacksmith at #C{%s}...\n", $connection_info->{url});
 	
