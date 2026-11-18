@@ -421,6 +421,10 @@ sub apply_post_processing {
 			"ocfp/$ENV{OCFP_IAAS}/ocf.yml"
 		);
 
+		# An IaaS may pin its stemcell (today only pve does).  The resolute
+		# feature below still merges after it and wins.
+		$self->add_files_if_exists("ocfp/$ENV{OCFP_IAAS}/stemcell.yml");
+
 		if ($self->want_feature("shield-backups")) {
 			$self->add_files("ocfp/shield-backups.yml");
 		}
