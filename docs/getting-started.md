@@ -8,7 +8,7 @@ Before you begin, you'll need:
 
 1. A working BOSH director
 2. A Cloud Foundry deployment (for registering services)
-3. Genesis v2.8.5 or higher
+3. Genesis v3.2.0 or higher
 4. BOSH CLI v2
 5. Cloud Foundry CLI
 6. Access to an IaaS environment (vSphere, AWS, Azure, Google Cloud, or OpenStack)

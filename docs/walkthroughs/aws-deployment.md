@@ -8,7 +8,7 @@ Before starting this walkthrough, you should have:
 
 1. A working BOSH director targeting AWS
 2. A Cloud Foundry deployment (for service registration)
-3. Genesis 2.8.5+ installed
+3. Genesis 3.2.0+ installed
 4. BOSH CLI v2
 5. Cloud Foundry CLI
 6. AWS account with appropriate permissions

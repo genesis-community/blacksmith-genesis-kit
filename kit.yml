@@ -7,7 +7,7 @@ code:     https://github.com/genesis-community/blacksmith-genesis-kit
 
 description: Blacksmith
 
-genesis_version_min: 2.8.5
+genesis_version_min: 3.2.0
 
 supports:
 - aws
