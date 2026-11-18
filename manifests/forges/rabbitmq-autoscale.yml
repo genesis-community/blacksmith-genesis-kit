@@ -1,7 +1,7 @@
 ---
 meta:
   cf:
-    exodus_path:     (( concat genesis.secrets_mount genesis.env "/cf" ))
+    exodus_path:     (( concat genesis.exodus_mount genesis.env "/cf" ))
     deployment_name: (( concat genesis.env "-cf" ))
     system_domain:   (( vault meta.cf.exodus_path ":system_domain" ))
     api_url:         (( concat "https://api." meta.cf.system_domain ))
