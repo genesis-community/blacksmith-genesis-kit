@@ -77,4 +77,17 @@ var _ = Describe("Blacksmith Kit", func() {
 			},
 		})
 	})
+
+	Describe("pxc forge", func() {
+		Test(Environment{
+			Name:        "pxc",
+			CloudConfig: "aws",
+			CPI:         "aws",
+		})
+		Test(Environment{
+			Name:        "resolutepxc",
+			CloudConfig: "aws",
+			CPI:         "aws",
+		})
+	})
 })

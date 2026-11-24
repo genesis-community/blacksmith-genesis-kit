@@ -1,0 +1,55 @@
+---
+meta:
+  environment: (( grab genesis.env || params.env ))
+  bosh_env: (( grab genesis.bosh_env || params.bosh_env || params.env ))
+
+  default:
+    pxc_tags:
+    - blacksmith
+    - dedicated
+    - mysql
+    - pxc
+
+    pxc_plans:
+      standalone:
+        name: standalone
+        description: A dedicated MySQL 8.4 server, with no replication
+        limit: 7
+        type: standalone
+        vm_type: default
+      cluster:
+        name: cluster
+        description: A 3-node MySQL 8.4 Galera cluster behind 2 proxies
+        limit: 5
+        type: cluster
+        vm_type: default
+
+releases:
+- name:    pxc-forge
+  version: 0.1.0
+  url:     https://github.com/blacksmith-community/pxc-forge-boshrelease/releases/download/v0.1.0/pxc-forge-0.1.0.tgz
+
+params:
+  releases:
+  - (( append ))
+  - (( grab releases.pxc-forge ))
+
+instance_groups:
+- name: blacksmith
+  jobs:
+  - release: pxc-forge
+    name:    pxc-blacksmith-plans
+    properties:
+      environment: (( grab meta.environment ))
+      bosh_env: (( grab meta.bosh_env ))
+
+      stemcell_os:      (( grab params.stemcell_os      || "ubuntu-noble" ))
+      stemcell_version: (( grab params.stemcell_version || "latest" ))
+
+      plans: (( grab params.pxc_plans || meta.default.pxc_plans ))
+      service:
+        id:          (( grab params.pxc_service_id          || "pxc" ))
+        name:        (( grab params.pxc_service_name        || params.pxc_service_id || "pxc" ))
+        description: (( grab params.pxc_service_description || "A dedicated MySQL 8.4 instance on Percona XtraDB Cluster, deployed on-demand" ))
+        tags:        (( grab params.pxc_service_tags        || meta.default.pxc_tags ))
+        limit:       (( grab params.pxc_service_limit       || 0 ))

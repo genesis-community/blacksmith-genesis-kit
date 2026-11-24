@@ -87,7 +87,7 @@ sub perform {
             }
 					}
         ),
-        # The valkey, redis, and rabbitmq forge releases hardcode a bare
+        # The valkey, redis, rabbitmq, and pxc forge releases hardcode a bare
         # <forge>-service network name as the default in their plan templates
         # (eg `meta.net || "valkey-service"`), so each must exist unprefixed
         # for the default plans to resolve without a manually uploaded
@@ -466,7 +466,7 @@ sub perform {
 sub _forge_features {
 	my ($self) = @_;
 	my @on;
-	foreach my $feature (qw(valkey redis rabbitmq)) {
+	foreach my $feature (qw(valkey redis rabbitmq pxc)) {
 		push @on, $feature if $self->want_feature($feature);
 	}
 	return @on;

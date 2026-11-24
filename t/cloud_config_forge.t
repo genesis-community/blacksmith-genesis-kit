@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # Coverage for the forge pieces of the cloud-config hook. The hook builds a
 # network for each forge feature that is on (valkey-service, redis-service,
-# rabbitmq-service), and two forge vm_types, default and small. The test
+# rabbitmq-service, pxc-service), and two forge vm_types, default and small. The test
 # stubs the Genesis helpers the hook calls, runs perform, and inspects the
 # cloud config it hands to build_cloud_config.
 #
@@ -115,6 +115,16 @@ sub by_name { my ($list, $name) = @_; (grep { $_->{name} eq $name } @$list)[0] }
 	$cc = run_hook(rabbitmq => 1);
 	is_deeply([map { $_->{name} } @{$cc->{networks}}], ['blacksmith', 'rabbitmq-service'], 'rabbitmq alone');
 	is_deeply([map { $_->{name} } @{$cc->{azs}}], ['z1'], 'rabbitmq alone defines the z1 az its network uses');
+}
+
+# The pxc forge's plans default to the pxc-service network.
+{
+	my $cc = run_hook(pxc => 1);
+	is_deeply([map { $_->{name} } @{$cc->{networks}}], ['blacksmith', 'pxc-service'], 'pxc alone');
+	is_deeply([map { $_->{name} } @{$cc->{azs}}], ['z1'], 'pxc alone defines the z1 az its network uses');
+	my $c = $network_calls[1];
+	is($c->{name_prefix}, '', 'pxc-service has an empty name prefix');
+	is_deeply($c->{dynamic_subnets}{subnets}, ['ocfp-1'], 'pxc-service reads subnet ocfp-1');
 }
 
 # The small vm_type sits beside default, with PVE defaults and overrides.
