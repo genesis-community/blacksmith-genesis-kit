@@ -590,6 +590,78 @@ Blacksmith uses "forges" to deploy different types of services. You can activate
   - `valkey-dual-mode` - When enabled along with `valkey-tls`, allows both
     TLS and non-TLS communication.
 
+#### PXC (MySQL)
+
+- `pxc` (Blacksmith Forge) - Enables the Blacksmith Service
+  Broker to deploy dedicated MySQL 8.4 instances on Percona XtraDB
+  Cluster (pxc-release). A `standalone` plan runs one MySQL node; a
+  `cluster` plan runs three Galera nodes behind two proxies. Service
+  instances use `stemcell_os` and `stemcell_version`, so the
+  `resolute` feature moves them to resolute too.
+
+  Activating this feature also activates the following parameters:
+
+  - `pxc_plans` - A YAML fragment that contains the set of
+     Cloud Foundry MySQL service plans to offer. Each plan's `type`
+     is `standalone` or `cluster`. The forge's README lists every
+     plan key, including `disk`, `proxy_vm_type` and `tls_required`.
+
+  - `pxc_service_name` - The name of the service, to be
+    shown in the services marketplace.
+
+    Defaults to `pxc`.
+
+  - `pxc_service_id` - A globally unique (internal)
+    identifier for this service.
+
+    Defaults to `pxc`.
+
+  - `pxc_service_description` - A long-form description of
+    the service, for use in both console and web-based UIs.
+
+    Defaults to `A dedicated MySQL 8.4 instance on Percona XtraDB
+    Cluster, deployed on-demand`.
+
+  - `pxc_service_tags` - The list of tags to apply to all
+    new instances of this service.
+
+    Defaults to `blacksmith`, `dedicated`, `mysql` and `pxc`. If
+    you specify this, and you want the defaults too, you have to
+    provide them explicitly.
+
+  - `pxc_service_limit` - An upper limit on the number of
+    service instances _total_ that can be provisioned, regardless
+    of per-plan limits. `0` (the default) imposes no global
+    limit.
+
+  Example configuration:
+  ```yaml
+  pxc_plans:
+    standalone:
+      name: standalone
+      description: A dedicated MySQL 8.4 server, with no replication
+      type: standalone
+      vm_type: default
+      limit: 7
+
+    cluster:
+      name: cluster
+      description: A 3-node MySQL 8.4 Galera cluster behind 2 proxies
+      type: cluster
+      vm_type: default
+      limit: 5
+  ```
+
+  A binding returns the host, port, admin username and password, a
+  `mysql://` URI and the Blacksmith services CA. MySQL serves TLS with
+  a certificate that covers the binding's host names. The kit adds a
+  `pxc-service` network to the cloud config, the plans' default
+  network.
+
+  The first service instance on a director compiles Percona XtraDB
+  Cluster and XtraBackup from source, which can take more than an hour.
+  Later instances reuse the compiled packages.
+
 #### MariaDB
 
 - `mariadb` (Blacksmith Forge) - Enables the Blacksmith Service

@@ -21,6 +21,7 @@ Blacksmith is an on-demand service broker that uses BOSH to provision dedicated 
   - RabbitMQ message brokers (with TLS, clustering, and autoscaling)
   - Valkey key-value stores (with persistence and TLS)
   - Redis key-value stores (deprecated — use Valkey for new service instances)
+  - MySQL 8.4 on Percona XtraDB Cluster (standalone or 3-node Galera)
   - MariaDB databases
   - Kubernetes clusters
 - **Security Features**: TLS support, credential management, and role-based access control
@@ -94,6 +95,11 @@ Blacksmith provides "forges" that know how to deploy specific data services:
 - Retained for existing service instances only
 - Standalone and clustered deployments with optional persistence
 - TLS encryption for secure communication
+
+### PXC (MySQL)
+- MySQL 8.4 on Percona XtraDB Cluster
+- Standalone, or a 3-node Galera cluster behind 2 proxies
+- TLS with certificates that cover the binding's host names
 
 ### MariaDB
 - MySQL-compatible database deployments
