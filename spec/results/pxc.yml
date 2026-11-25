@@ -33,7 +33,8 @@ instance_groups:
         password: <!{meta.vault}/users/blacksmith:password!>
         releases:
         - name: pxc-forge
-          url: https://github.com/blacksmith-community/pxc-forge-boshrelease/releases/download/v0.1.0/pxc-forge-0.1.0.tgz
+          sha1: sha256:2dec42f71ea442463af9c990080e0b0a927ab468623b1d9c3bf209fc3f6af977
+          url: https://github.com/norman-abramovitz/pxc-forge-boshrelease/releases/download/v0.1.0/pxc-forge-0.1.0.tgz
           version: 0.1.0
         stemcells:
         - name: bosh-aws-xen-hvm-ubuntu-jammy-go_agent
@@ -352,7 +353,8 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry/bosh-dns-aliases-release?v=0.0.4
   version: 0.0.4
 - name: pxc-forge
-  url: https://github.com/blacksmith-community/pxc-forge-boshrelease/releases/download/v0.1.0/pxc-forge-0.1.0.tgz
+  sha1: sha256:2dec42f71ea442463af9c990080e0b0a927ab468623b1d9c3bf209fc3f6af977
+  url: https://github.com/norman-abramovitz/pxc-forge-boshrelease/releases/download/v0.1.0/pxc-forge-0.1.0.tgz
   version: 0.1.0
 - name: bosh-aws-cpi
   sha1: ffc4a06d6728d88eb108418f886f46428c2a1bf2
