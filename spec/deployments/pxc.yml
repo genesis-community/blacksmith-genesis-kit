@@ -1,0 +1,21 @@
+---
+kit:
+  name:    dev
+  version: latest
+  features:
+  - aws
+  - pxc
+  - broker-tls
+
+genesis:
+  env: pxc
+  entomb: false
+
+params:
+  env: pxc
+  ip: 10.0.0.16
+  fqdn: blacksmith.testing.example
+  cloud_config: {}
+  aws_region: us-east-1
+  aws_default_sgs: [default]
+  blacksmith_services_network: services

@@ -21,7 +21,7 @@ use File::Basename qw/dirname/;
 ## Supported feature categories:
 ## - IaaS: aws, azure, google, openstack, vsphere, stackit
 ## - BOSH: external-bosh, ocfp (implies external-bosh)
-## - Forges: rabbitmq, redis, postgresql, mariadb, kubernetes
+## - Forges: rabbitmq, redis, postgresql, mariadb, pxc, kubernetes
 ## - Addons: broker-tls, shield-*, redis-*, rabbitmq-*, cf-route-registrar,
 ##   cf-integration, cf-haproxy-ca, skip-credhub-cleanup
 ##
@@ -100,6 +100,7 @@ sub validate_blacksmith_features {
 		valkey
 		postgresql
 		mariadb
+		pxc
 		kubernetes
 		broker-tls
 		shield-backups
@@ -281,7 +282,7 @@ sub is_iaas_feature {
 # is_forge_feature - Check if feature is forge-related {{{2
 sub is_forge_feature {
 	my ($self, $feature) = @_;
-	return $feature =~ /^(rabbitmq|redis|valkey|postgresql|mariadb|kubernetes)$/;
+	return $feature =~ /^(rabbitmq|redis|valkey|postgresql|mariadb|pxc|kubernetes)$/;
 }
 # }}}
 
@@ -591,7 +592,7 @@ sub validate_configuration {
 
 	# Validate forge selection
 	if ($forge_count == 0) {
-		push @errors, "You have not activated any Blacksmith Forges. Please specify at least one of: rabbitmq, redis, valkey, postgresql, mariadb, kubernetes.";
+		push @errors, "You have not activated any Blacksmith Forges. Please specify at least one of: rabbitmq, redis, valkey, postgresql, mariadb, pxc, kubernetes.";
 	}
 
 	# Bail if we have errors

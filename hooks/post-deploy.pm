@@ -201,6 +201,7 @@ sub display_deployment_summary {
   push @forges, 'PostgreSQL' if $self->want_feature('postgresql');
   push @forges, 'RabbitMQ' if $self->want_feature('rabbitmq');
   push @forges, 'MariaDB' if $self->want_feature('mariadb');
+  push @forges, 'PXC (MySQL)' if $self->want_feature('pxc');
 
   if (@forges) {
     info("\nEnabled Service Forges:\n");
