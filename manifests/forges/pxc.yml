@@ -27,7 +27,8 @@ meta:
 releases:
 - name:    pxc-forge
   version: 0.1.0
-  url:     https://github.com/blacksmith-community/pxc-forge-boshrelease/releases/download/v0.1.0/pxc-forge-0.1.0.tgz
+  url:     https://github.com/norman-abramovitz/pxc-forge-boshrelease/releases/download/v0.1.0/pxc-forge-0.1.0.tgz
+  sha1:    sha256:2dec42f71ea442463af9c990080e0b0a927ab468623b1d9c3bf209fc3f6af977
 
 params:
   releases:
